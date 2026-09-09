@@ -81,8 +81,15 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   for feilsøking, ikke noe spillet trenger, så jeg skrudde det av kun
   for HTML5 (andre plattformer er urørt). Nytt bygg kjører nå, venter
   på bekreftelse fra Mathias om det faktisk løste det.
-- **Nytt bygg publisert** (42 sekunder). Venter på at Mathias tester
-  siden på nytt for å bekrefte at krasjen er borte.
+- **FPS-/minne-fiksen virket, men avdekket et nytt krasj lenger inn.**
+  "attempt to index a nil value" inne i Solar2Ds `composer`-bibliotek
+  sin egen `gotoScene`/`dispatchEvent`, altså i selve
+  scenebytte-mekanismen når `gotolevel1`-scenen skal vises første gang.
+  Fortsatt bare "?" i stedet for filnavn/linjenummer i feilmeldingen,
+  så la til `settings.build.neverStripDebugInfo = true` i
+  `build.settings` for å beholde den informasjonen i bygg fremover.
+  Nytt bygg kjører nå, forventer en mye mer presis feilmelding neste
+  gang.
 
 ## Hvor ting ligger
 
