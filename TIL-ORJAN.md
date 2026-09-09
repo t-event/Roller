@@ -152,6 +152,14 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   funksjonen og fanget opp krasjet slik at feilmeldingen og siste
   sjekkpunkt vises direkte på skjermen. Midlertidig feilsøkingskode,
   fjernes når krasjet er funnet. Nytt bygg kjører nå.
+- **`level1` lastet faktisk denne gangen!** Mathias kom inn i selve
+  banen og fikk opp pausemenyen, men krasjet (samme feiltype) da han
+  trykket "main menu" der. Det er en annen kjede
+  (`pausemenu1.lua` → `gotomenu.lua` → `menu.lua`) enn den vi allerede
+  hadde sjekkpunkter i. Utvidet samme teknikk dit: fanget opp
+  scenebyttene i `pausemenu1.lua` og `gotomenu.lua`, og la 6
+  sjekkpunkter i `menu.lua` sin `scene:create` (kortere fil, 200
+  linjer). Nytt bygg kjører nå.
 
 ## Hvor ting ligger
 
