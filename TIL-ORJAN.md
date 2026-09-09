@@ -81,6 +81,8 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   for feilsøking, ikke noe spillet trenger, så jeg skrudde det av kun
   for HTML5 (andre plattformer er urørt). Nytt bygg kjører nå, venter
   på bekreftelse fra Mathias om det faktisk løste det.
+- **Nytt bygg publisert** (42 sekunder). Venter på at Mathias tester
+  siden på nytt for å bekrefte at krasjen er borte.
 
 ## Hvor ting ligger
 
