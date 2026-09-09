@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LDObjectLevelPack xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>My Game</Name>
+  <Level>
+    <LDObjectLevel TargetWidth="1920" TargetHeight="1080" m_Target="16" m_GravityX="0" m_GravityY="9.8" m_marginX="128" m_marginY="128">
+      <Layers Name="New Layer" Visible="true" Id="645cad8a-9291-405e-9ba8-58f1de9e8c2b" Count="0">
+        <UserProperties />
+        <GridX>16</GridX>
+        <GridY>16</GridY>
+        <SnapToGrid>true</SnapToGrid>
+        <ShowGrid>true</ShowGrid>
+        <ShowBodies>false</ShowBodies>
+        <ParallaxRepeat>false</ParallaxRepeat>
+        <ParallaxSpeedX>0</ParallaxSpeedX>
+        <ParallaxSpeedY>0</ParallaxSpeedY>
+        <ParallaxCulling>None</ParallaxCulling>
+      </Layers>
+      <AssetGroups>
+        <Group>Assets</Group>
+        <GroupState>80</GroupState>
+      </AssetGroups>
+      <AssetGroups>
+        <Group>Audio</Group>
+        <GroupState>80</GroupState>
+      </AssetGroups>
+      <WireFrame>false</WireFrame>
+      <Name>New Level</Name>
+      <BackColorARGB>-9868951</BackColorARGB>
+      <CanvasWidth>1920</CanvasWidth>
+      <CanvasHeight>1080</CanvasHeight>
+      <Export>true</Export>
+      <ParallaxEnabled>false</ParallaxEnabled>
+      <ParallaxInfinite>false</ParallaxInfinite>
+      <ParallaxDamping>1</ParallaxDamping>
+      <MarginX>128</MarginX>
+      <MarginY>128</MarginY>
+      <UserProperties />
+      <DebugMode>Normal</DebugMode>
+      <GravityX>0</GravityX>
+      <GravityY>9.8</GravityY>
+      <PositionIterations>8</PositionIterations>
+      <VelocityIterations>3</VelocityIterations>
+    </LDObjectLevel>
+  </Level>
+  <ClassList />
+  <ZoomIndex>2</ZoomIndex>
+  <CurrentLevel>0</CurrentLevel>
+  <ExportFolder />
+  <ExportExtension>lua</ExportExtension>
+  <RelativePaths>true</RelativePaths>
+  <Graphics2>false</Graphics2>
+  <AnchorX>0</AnchorX>
+  <AnchorY>0</AnchorY>
+</LDObjectLevelPack>
