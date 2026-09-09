@@ -97,6 +97,7 @@ local mark =require("mark")
         
 
 function scene:create( event )
+checkpoint("level1:create_start")
 
 
     local sceneGroup = self.view
@@ -682,6 +683,7 @@ timer.performWithDelay(3000, hent, 1)
 
 
 ------------------------------------------------------------------------
+checkpoint("level1:cp_684_after_backgrounds")
 
     
 
@@ -1060,6 +1062,7 @@ firkant4.type = "firkant4"
 
 
 ------------------------------------------------------------------
+checkpoint("level1:cp_1062_before_onCollision_def")
 local function onCollision(event)
 if event.phase == "began" then
 
@@ -1105,6 +1108,7 @@ end
 end
 Runtime:addEventListener("collision", onCollision)
 ------------------------------------------------------------------
+checkpoint("level1:cp_1107_after_onCollision_listener")
 
 local function onCollision1(event)
 if event.phase == "began" then
@@ -1124,6 +1128,7 @@ end
 end
 Runtime:addEventListener("collision", onCollision1)
 ------------------------------------------------------------------
+checkpoint("level1:cp_1126_after_onCollision1_listener")
 
 
 stovteller1=0
@@ -1511,6 +1516,7 @@ end
 del1.collision = onLocalCollision1
 del1:addEventListener( "collision" )
 ------------------------------------
+checkpoint("level1:cp_1513_after_del1_addEventListener")
 del2.collision = onLocalCollision2
 del2:addEventListener( "collision" )
 ------------------------------------
@@ -1535,6 +1541,7 @@ del8:addEventListener( "collision" )
 del9.collision = onLocalCollision9
 del9:addEventListener( "collision" )
 ----------------------------------
+checkpoint("level1:cp_1537_after_del9_addEventListener")
 
 
 
@@ -2002,6 +2009,7 @@ camera:add (blod2,1,false)
 end
 --Runtime:addEventListener("collision", knekk)
 ----------------------------------------------------------------------------------
+checkpoint("level1:cp_2004_after_collision_del9_block")
 
 
 --[[
@@ -2338,6 +2346,7 @@ local function trykk_knapp1( event )
     end
 end
 knapp1:addEventListener( "touch", trykk_knapp1)
+checkpoint("level1:before_end_of_create")
 
 
 end

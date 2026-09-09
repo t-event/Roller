@@ -1,5 +1,14 @@
 display.setStatusBar( display.HiddenStatusBar )
 
+-- Temporary debugging aid: records the last reached checkpoint so a crash
+-- overlay can show roughly where things broke, since Solar2D's HTML5
+-- command-line builder doesn't support keeping real file/line info in
+-- error messages. Safe no-op call, remove once debugging is done.
+_G.LAST_CHECKPOINT = "app_start"
+function checkpoint( name )
+	_G.LAST_CHECKPOINT = name
+end
+
 local composer = require( "composer" )
 
  

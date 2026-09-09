@@ -39,7 +39,15 @@ local lm = require("ogt_levelmanager")
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 local function goto( event )
-composer.gotoScene( "level1",{effect = "fade" , time = 500})  
+	local ok, err = pcall( composer.gotoScene, "level1", {effect = "fade" , time = 500} )
+	if not ok then
+		local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+		print( "CRASH going to level1: " .. msg )
+		local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+		bg:setFillColor( 0, 0, 0, 0.85 )
+		local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+		t:setFillColor( 1, 0.3, 0.3 )
+	end
 end
 
 function scene:create( event )
