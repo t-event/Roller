@@ -377,9 +377,10 @@ function k.init(grp, pageNum)
 		bgswiper:addEventListener("touch", swipeOGTLM)
 	end
 	
-	--print("INSIDE ogt_levelmanager:init")	
+	--print("INSIDE ogt_levelmanager:init")
 	loadData()
-	
+	checkpoint("ogt_lm:init_after_loadData")
+
 	if pageNum then k.currentPage = pageNum end
 	
 	if k.backgroundImage then
@@ -400,13 +401,15 @@ function k.init(grp, pageNum)
 	if k.lockImage then k.lockWidth, k.lockHeight = getImageSize(imgPfx .. tostring(k.lockImage)) end
 	if k.prevImage then k.prevWidth, k.prevHeight = getImageSize(imgPfx .. tostring(k.prevImage)) end
 	if k.nextImage then k.nextWidth, k.nextHeight = getImageSize(imgPfx .. tostring(k.nextImage)) end
+	checkpoint("ogt_lm:init_after_imagesizes")
 
 	grid = k.makeGrid()
+	checkpoint("ogt_lm:init_after_makeGrid")
 
 	if grp then
 		grp:insert(grid)
 	end
-	
+
 	--put in next/prev arrows
 	if k.nextImage then
 		prevArrow = display.newImageRect ( grp, imgPfx .. k.prevImage, k.prevWidth, k.prevHeight )
@@ -449,8 +452,9 @@ function k.makeGrid(pageNum)
      tilbake.x = bredde-bredde+(tilbake.width/2)
      tilbake.y = 80
       tilbake:addEventListener( "tap", goSomewhere )
+checkpoint("ogt_lm:makeGrid_after_tilbake")
 
-	
+
 	for page = 1, k.numPages do
 		xPos = (centerX + ((page-1) * screenWidth) + k.gridOffsetX) - (k.numCols * k.tileWidth + k.numCols * k.colSpace) / 2
 		yPos = (centerY + k.gridOffsetY) - (k.numRows * k.tileHeight + k.numRows * k.rowSpace) / 2
@@ -552,11 +556,11 @@ function k.makeGrid(pageNum)
 			end
 		end
 	end
+	checkpoint("ogt_lm:makeGrid_after_tile_loop")
 	-- see if we need to start on page 1 or page we last came from.
 	if k.rememberPage then
 		tmpGrid.x = tmpGrid.x - ((k.currentPage - 1) * screenWidth)
 	end
-	
 
 
 
