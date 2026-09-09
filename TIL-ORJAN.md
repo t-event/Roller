@@ -214,6 +214,13 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   nytt i PhysicsEditor per banebilde, eller sier fra om bildene egentlig
   skal ha samme grunnform som level 1 sitt (da er det noe annet som er
   galt). Ikke noe jeg kan gjette meg fram til selv.
+- **Bekreftet med filsjekksummer: `level2/` til `level9/` bruker
+  helt identiske bilder** (samme MD5 på 1.png, 2.png, 3.png, 4.png i
+  alle åtte mappene), mens `level1/` har sine egne, unike bilder. Bare
+  bane 1 har ferdig, tilpasset grafikk, de åtte andre deler ett og
+  samme plassholder-sett. Forklarer sannsynligvis hele
+  "feil bakgrunn på bane 2"-observasjonen: det er ikke en kodefeil,
+  det er kunst som aldri ble laget ferdig per bane.
 
 - **🎉 "Main menu"-krasjen er fikset, bekreftet av Mathias.** Spillet
   går nå hele veien fra oppstart, gjennom en bane, til pausemeny og
