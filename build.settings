@@ -2,7 +2,11 @@
 -- portrait, portraitUpsideDown, landscapeLeft, landscapeRight
 
 settings = {
-	
+
+	build = {
+		neverStripDebugInfo = true, -- keep file/line info in error tracebacks
+	},
+
 	orientation = {
 		default = "landscapeRight",
 		supported = { "landscapeRight", "landscapeLeft"}
