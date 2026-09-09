@@ -309,6 +309,12 @@ local function loadData()
 			end			
 		end
 	end
+
+	-- TEMP for debugging: force every level unlocked regardless of any
+	-- saved progress from before this was added, so old saves in the
+	-- browser can't override it. Remove once done testing.
+	for x = 1, k.totalLevels do k.levelLocked[x] = false end
+
 	levelInfo.locked = k.levelLocked
 
 	if levelInfo.starsOnLevel == nil then
