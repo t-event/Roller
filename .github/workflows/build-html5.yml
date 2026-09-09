@@ -1,0 +1,35 @@
+name: Bygg HTML5 og publiser til GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      AppVersion:
+        description: 'Versjonsnavn'
+        required: true
+        default: '1.0'
+      Solar2DBuild:
+        description: 'Solar2D build-nummer (f.eks. 2026.3731)'
+        required: true
+        default: '2026.3731'
+
+env:
+  APP_VERSION_NAME: '${{ github.event.inputs.AppVersion }}'
+  S2D_BUILD_NAME: '${{ github.event.inputs.Solar2DBuild }}'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build HTML5
+        run: |
+          chmod +x Util/build-html5.sh
+          Util/build-html5.sh
+      - name: Publiser til gh-pages-grenen
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Output
