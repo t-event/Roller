@@ -62,6 +62,13 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   jobb. Samme problem gjaldt outputmappen. Flyttet begge utenfor
   prosjektmappen. Femte forsøk kjører nå, forventer at dette er det som
   faktisk løser det.
+- **Femte forsøk lyktes, på 50 sekunder.** Bekrefter at problemet
+  virkelig var mappestrukturen, ikke noe med selve spillet eller koden
+  din. `gh-pages`-grenen ble opprettet automatisk med den ferdige
+  nettleser-versjonen. Spillet ligger nå på
+  `https://t-event.github.io/roller/` (kan ta et par minutter etter at
+  Pages er slått på i repo-innstillingene før lenken virker første
+  gang).
 
 ## Hvor ting ligger
 
