@@ -133,6 +133,25 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   altså et rent visuelt problem nå, ikke en feil som stopper koden.
   Ber om skjermbilde/opptak for å kunne se hva som faktisk skjer før
   jeg gjetter på en fiks.
+- **"Glitchen" var ikke en feil.** Spillet er laget for liggende
+  skjermorientering, men en nettside kan ikke tvinge telefonen din til
+  å rotere slik en ekte app gjør, den bruker uansett hvordan du holder
+  den. I stående modus blir spillet "letterboxet" ned til en tynn
+  stripe for å beholde riktig størrelsesforhold. Løste seg av seg selv
+  ved å rotere telefonen til liggende.
+- **Nytt krasj etter rotering:** samme type feil som tidligere
+  ("attempt to index a nil value"), nå i selve `level1.lua` når
+  splash-animasjonen bytter til den ekte banen. `scene:create`-
+  funksjonen der er over 2000 linjer, umulig å lese seg fram til
+  presist uten linjenummer. Fant også at
+  `neverStripDebugInfo`-innstillingen jeg la til aldri kunne virket for
+  HTML5 uansett, det er en begrensning i Solar2Ds kommandolinje-
+  byggeverktøy (fungerer bare via Simulator-appens egen "Bygg for
+  web"-dialog, som vi ikke kan bruke i en automatisk byggejobb).
+  Løsning: satte inn 9 usynlige "sjekkpunkter" spredt gjennom
+  funksjonen og fanget opp krasjet slik at feilmeldingen og siste
+  sjekkpunkt vises direkte på skjermen. Midlertidig feilsøkingskode,
+  fjernes når krasjet er funnet. Nytt bygg kjører nå.
 
 ## Hvor ting ligger
 
