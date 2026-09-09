@@ -31,8 +31,17 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   opprettes når Solar2D er installert og kjørt normalt på en maskin, noe
   en fersk GitHub-runner aldri har gjort. Løste det ved å pakke ut
   disk-imaget lokalt og se hvor filen faktisk lå, og pekte
-  byggeoppskriften rett på den i stedet for å stole på snarveien. Andre
-  forsøk kjører nå.
+  byggeoppskriften rett på den i stedet for å stole på snarveien.
+- **Andre forsøk hang i over 15 minutter** uten output eller feil, mest
+  sannsynlig fordi CoronaBuilder prøver å nå en gammel
+  aktiverings-/lisensserver fra da Corona SDK var kommersielt, som ikke
+  svarer lenger. Avbrøt kjøringen og la inn en vaktbikkje som dreper
+  byggeprosessen etter 8 minutter og feiler tydelig i stedet, pluss en
+  hard 20-minutters grense på hele jobben som siste sikkerhetsnett.
+  Tredje forsøk kjører nå.
+- **Gjort repoet offentlig** (var privat) fordi GitHub Pages på gratis
+  konto krever offentlig repo. Betyr at hele koden og grafikken din nå
+  er synlig og klonbar for alle på nett, verdt å vite.
 
 ## Hvor ting ligger
 
