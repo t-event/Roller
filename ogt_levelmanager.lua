@@ -119,7 +119,7 @@ end
 function k.beforeLeaving ()
 print("hei")
 
-local sheetData =  { width = 1200 , height= 540, count = 6 , numFrames = 6 }
+local sheetData =  { width = 1200 , height= 540, count = 6 , numFrames = 6, sheetContentWidth = 3600, sheetContentHeight = 1080 }
     local spriteSheet = graphics.newImageSheet("last.png" , sheetData)
  
     local sequenceData = { 
