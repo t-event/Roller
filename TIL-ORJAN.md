@@ -97,6 +97,17 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   Bra å vite når vi etter hvert kommer forbi oppstartskrasjen og skal
   teste selve spillingen, level 5-9 er trolig ikke noe å bruke tid på å
   feilsøke.
+- **Presis feilmelding kom, og den var faktisk fiksbar!**
+  `bad argument #2 to 'newImageSheet' (... width og height ...)`, i
+  `gotolevel1.lua` sitt sprite-ark for splash-animasjonen (`last.png`).
+  Målte den faktiske PNG-fila direkte: 3600×1080 piksler, et 3×2-rutenett
+  á 1200×540. Koden oppga aldri hvor stort hele arket er, bare
+  rutestørrelsen, og Solar2D klarte tydeligvis å gjette riktig på
+  telefonen din men ikke på web. La til `sheetContentWidth`/
+  `sheetContentHeight` (den robuste måten å gjøre dette på), samme
+  kopierte kodesnutt fantes i 12 filer (alle `gotolevelN.lua`,
+  `gotomenu.lua`, `gotochooselevel.lua`, `ogt_levelmanager.lua`),
+  rettet alle. Nytt bygg kjører nå.
 
 ## Hvor ting ligger
 
