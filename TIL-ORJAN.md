@@ -128,6 +128,12 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   har støtt på slike grenser før. Kan bety flere lignende overraskelser
   dukker opp etter hvert som vi kommer lenger inn i spillet.
 
+- **Minnekrasjen er borte, spillet kjører nå gjennom oppstarten!**
+  Mathias melder at "skjermen glitcher" i stedet for en krasjmelding,
+  altså et rent visuelt problem nå, ikke en feil som stopper koden.
+  Ber om skjermbilde/opptak for å kunne se hva som faktisk skjer før
+  jeg gjetter på en fiks.
+
 ## Hvor ting ligger
 
 - Selve spillkoden: repo-roten (`main.lua`, `level1.lua` osv, akkurat som
