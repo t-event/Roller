@@ -90,6 +90,9 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   `build.settings` for å beholde den informasjonen i bygg fremover.
   Nytt bygg kjører nå, forventer en mye mer presis feilmelding neste
   gang.
+- **Nytt bygg publisert** (47 sekunder), nå med filnavn/linjenummer i
+  feilmeldinger. Venter på at Mathias tester siden og limer inn den nye
+  feilmeldingen.
 
 ## Hvor ting ligger
 
