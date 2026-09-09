@@ -108,6 +108,17 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   kopierte kodesnutt fantes i 12 filer (alle `gotolevelN.lua`,
   `gotomenu.lua`, `gotochooselevel.lua`, `ogt_levelmanager.lua`),
   rettet alle. Nytt bygg kjører nå.
+- **Sprite-ark-fiksen virket, men et nytt krasj lenger inn:**
+  `module 'ssk2.display.layers' not found: not enough memory` under
+  `ssk.init()`. "Ikke nok minne" er et ekte signal, ikke bare en
+  feiltekst, nettleser-versjonen kjører i en begrenset minnepakke
+  (WebAssembly). Fant at ssk2-biblioteket ditt allerede har en
+  innebygd HTML5-modus (`_G.HTML5_MODE`) som skrur av et par moduler
+  som bruker filsystemtilgang som ikke gir mening i en nettleser, men
+  `main.lua` brukte den aldri. Slått på nå
+  (`ssk.init({ html5 = true })`). Nytt bygg kjører, usikker på om det
+  er nok alene siden dette kan være en reell minnegrense i
+  nettleser-målet, ikke bare denne ene tingen.
 
 ## Hvor ting ligger
 
