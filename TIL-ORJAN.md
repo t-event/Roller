@@ -69,6 +69,18 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   `https://t-event.github.io/roller/` (kan ta et par minutter etter at
   Pages er slått på i repo-innstillingene før lenken virker første
   gang).
+- **Siden lastet, men krasjet med det samme.** "attempt to call method
+  'addEventListener' (a nil value)" rett ved oppstart, dette er
+  Solar2Ds egen standard krasjskjerm, ikke noe fra spillets egen
+  feilhåndtering (den var ikke satt opp enda når krasjet skjedde).
+  Mistenker `ssk.meters.create_fps`/`create_mem` i `main.lua` (linje
+  8-9), de kaller `Runtime:addEventListener` og
+  `objekt:addEventListener("touch")` synkront, før feilhåndtereren i
+  linje 29 er klar, og HTML5-målet i Solar2D har kjente hull
+  sammenlignet med iOS/Android. Dette er bare et FPS-/minnebruk-overlay
+  for feilsøking, ikke noe spillet trenger, så jeg skrudde det av kun
+  for HTML5 (andre plattformer er urørt). Nytt bygg kjører nå, venter
+  på bekreftelse fra Mathias om det faktisk løste det.
 
 ## Hvor ting ligger
 
