@@ -180,6 +180,13 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   egen `levelN/`-mappe, slik `level1.lua` allerede gjorde riktig) var
   riktig retning.
 
+- **🎉 "Main menu"-krasjen er fikset, bekreftet av Mathias.** Spillet
+  går nå hele veien fra oppstart, gjennom en bane, til pausemeny og
+  tilbake til hovedmeny uten å krasje. Neste: Mathias melder at
+  bane 2 ikke har riktig bilde der banen faktisk er, sannsynligvis en
+  liten, ufarlig content-bug (feil banelayout-bilde), ikke noe som
+  stopper spillet. Ser nærmere på det.
+
 ## Død kode (finnes i repoet, men brukes aldri)
 
 Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
