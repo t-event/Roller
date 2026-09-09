@@ -5,8 +5,10 @@ local composer = require( "composer" )
  
 require "ssk2.loadSSK"
 _G.ssk.init()
-aaa = ssk.meters.create_fps(  true )
-bbb = ssk.meters.create_mem( true )
+if system.getInfo( "platformName" ) ~= "HTML5" then
+	aaa = ssk.meters.create_fps(  true )
+	bbb = ssk.meters.create_mem( true )
+end
 
 composer.gotoScene( "gotolevel1" )
 
