@@ -7,9 +7,12 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
 ## Husk før dette regnes som ferdig
 
 - **Lås banene igjen.** `ogt_lmdata.lua` har `k.numUnlocked` satt til
-  9 (alle baner åpne) for å gjøre det raskt å teste. Sett den tilbake
-  til `1` når feilsøkingen er ferdig, ellers er hele bane-progresjonen
-  i spillet meningsløs.
+  9, og `ogt_levelmanager.lua` har en direkte override (`for x = 1,
+  k.totalLevels do k.levelLocked[x] = false end`, rett før
+  `levelInfo.locked = k.levelLocked`) som tvinger alt ulåst uansett
+  lagret fremgang. Begge er merket "TEMP for debugging", fjern dem når
+  feilsøkingen er ferdig, ellers er hele bane-progresjonen i spillet
+  meningsløs.
 - **Fjern feilsøkings-sjekkpunktene.** `checkpoint(...)`-kallene i
   `main.lua`, `level1.lua`, `menu.lua`, og pcall-innpakningene i
   `gotolevel1.lua`/`gotomenu.lua`/`pausemenu1.lua` var midlertidige
