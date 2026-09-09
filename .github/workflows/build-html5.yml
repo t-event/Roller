@@ -22,7 +22,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Build HTML5

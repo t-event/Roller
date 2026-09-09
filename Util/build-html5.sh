@@ -21,16 +21,22 @@ echo "Building HTML5"
 mkdir -p "$WORKSPACE/Output"
 BUILDER="Util/S2D/Corona-${S2D_BUILD_NUMBER}/Native/Corona/mac/bin/CoronaBuilder.app/Contents/MacOS/CoronaBuilder"
 
-# CoronaBuilder has been seen to hang indefinitely (no output, no error)
-# instead of failing fast, e.g. if it tries to phone home for an activation
-# check. Give it a hard ceiling so a hang surfaces as a clear timeout with
-# whatever it printed, instead of eating the whole job's time budget.
+# The plugin collector module (required partway through the HTML5 build)
+# overwrites the global log() with a no-op unless DEBUG_BUILD_PROCESS is
+# set, so a plain run goes completely silent after "HTML5 builder started"
+# even when it's making real progress. Turn on verbose logging so a slow
+# build shows progress instead of looking hung.
+export DEBUG_BUILD_PROCESS=1
+
+# Give it a generous but finite ceiling so a genuine hang still surfaces as
+# a clear timeout with whatever it printed, instead of eating the whole
+# job's time budget silently.
 "$BUILDER" build --lua "Util/recipe-html5.lua" &
 BUILD_PID=$!
 (
-	sleep 480
+	sleep 900
 	if kill -0 "$BUILD_PID" 2>/dev/null; then
-		echo "CoronaBuilder did not finish within 8 minutes, killing it (probably hung)" 1>&2
+		echo "CoronaBuilder did not finish within 15 minutes, killing it (probably hung)" 1>&2
 		kill -9 "$BUILD_PID" 2>/dev/null
 	fi
 ) &
