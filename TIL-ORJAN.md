@@ -24,8 +24,15 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   med Solar2Ds eget byggeverktøy (CoronaBuilder) og publiserer det på
   GitHub Pages. Når det er satt opp, kan hvem som helst åpne
   `https://t-event.github.io/roller/` i en vanlig nettleser på telefon
-  eller PC, ingen installasjon. Bygget kjører fortsatt/venter på
-  verifisering i skrivende stund.
+  eller PC, ingen installasjon.
+- **Første forsøk på HTML5-bygget feilet, funnet og fikset.**
+  CoronaBuilder krasjet med en nil-feil (`webPackageApp.lua:165`) fordi
+  den prøvde å finne en fil (`webtemplate.zip`) via en snarvei som bare
+  opprettes når Solar2D er installert og kjørt normalt på en maskin, noe
+  en fersk GitHub-runner aldri har gjort. Løste det ved å pakke ut
+  disk-imaget lokalt og se hvor filen faktisk lå, og pekte
+  byggeoppskriften rett på den i stedet for å stole på snarveien. Andre
+  forsøk kjører nå.
 
 ## Hvor ting ligger
 
