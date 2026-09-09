@@ -35,7 +35,7 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   (`.github/workflows/build-html5.yml`) som bygger spillet om til HTML5
   med Solar2Ds eget byggeverktøy (CoronaBuilder) og publiserer det på
   GitHub Pages. Når det er satt opp, kan hvem som helst åpne
-  `https://t-event.github.io/roller/` i en vanlig nettleser på telefon
+  `https://t-event.github.io/Roller/` i en vanlig nettleser på telefon
   eller PC, ingen installasjon.
 - **Første forsøk på HTML5-bygget feilet, funnet og fikset.**
   CoronaBuilder krasjet med en nil-feil (`webPackageApp.lua:165`) fordi
@@ -78,7 +78,7 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   virkelig var mappestrukturen, ikke noe med selve spillet eller koden
   din. `gh-pages`-grenen ble opprettet automatisk med den ferdige
   nettleser-versjonen. Spillet ligger nå på
-  `https://t-event.github.io/roller/` (kan ta et par minutter etter at
+  `https://t-event.github.io/Roller/` (kan ta et par minutter etter at
   Pages er slått på i repo-innstillingene før lenken virker første
   gang).
 - **Siden lastet, men krasjet med det samme.** "attempt to call method

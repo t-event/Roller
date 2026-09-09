@@ -25,7 +25,7 @@ nettleser uten installasjon.
 2. Første gang: slå på GitHub Pages i **Settings → Pages**, sett kilde til
    grenen `gh-pages`.
 3. Etter noen minutter ligger spillet på
-   `https://t-event.github.io/roller/`.
+   [https://t-event.github.io/Roller/](https://t-event.github.io/Roller/).
 
 Bygget kjører på en macOS-runner siden Solar2Ds byggeverktøy krever det,
 selv for HTML5. Se `Util/build-html5.sh` og `Util/recipe-html5.lua`.
