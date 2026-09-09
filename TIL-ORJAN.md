@@ -160,6 +160,19 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   scenebyttene i `pausemenu1.lua` og `gotomenu.lua`, og la 6
   sjekkpunkter i `menu.lua` sin `scene:create` (kortere fil, 200
   linjer). Nytt bygg kjører nå.
+- **Sjekkpunkt-overlayet funket, og fant en ekte bug!** Etter litt fram
+  og tilbake med tilsynelatende ustabil visning (bare mellomlagring i
+  Safari som måtte tvinges på nytt) viste skjermen tydelig:
+  `Checkpoint: menu:after_camera_scale`. Rett kode: `menu.lua` lastet
+  `"bg1.png"` fra rota, men filen ligger faktisk i `background/`-mappen.
+  Samme kopier-lim-inn-feil fantes i `level2.lua`, `level3.lua` og
+  `level4.lua` (dine fire ferdige baner), bakgrunnsbilder manglet
+  `background/`-prefikset og banespesifikke bilder (1-4.png) manglet
+  sitt eget `levelN/`-prefiks, noe `level1.lua` hadde riktig. Rettet
+  alle fire filene likt. Sjekket samtidig at `brett.lua`, `menu1.lua`,
+  `options.lua` og `play.lua` (som også har knuste bildereferanser) er
+  død kode som aldri nås i spillet, rørte ikke de. Nytt bygg kjører nå,
+  dette kan faktisk være den siste brikken.
 
 ## Hvor ting ligger
 
