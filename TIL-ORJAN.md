@@ -4,6 +4,18 @@ Hei Ørjan! Mathias delte Dropbox-mappen din (NewNewNew Roller) og ba AI se
 hva som kunne gjøres med spillet. Denne fila er en logg over alt som er
 gjort med koden din, i vanlig språk, oppdatert etter hvert.
 
+## Husk før dette regnes som ferdig
+
+- **Lås banene igjen.** `ogt_lmdata.lua` har `k.numUnlocked` satt til
+  9 (alle baner åpne) for å gjøre det raskt å teste. Sett den tilbake
+  til `1` når feilsøkingen er ferdig, ellers er hele bane-progresjonen
+  i spillet meningsløs.
+- **Fjern feilsøkings-sjekkpunktene.** `checkpoint(...)`-kallene i
+  `main.lua`, `level1.lua`, `menu.lua`, og pcall-innpakningene i
+  `gotolevel1.lua`/`gotomenu.lua`/`pausemenu1.lua` var midlertidige
+  for å finne krasjer. Trygge å la stå (de gjør ingenting skadelig),
+  men ryddigst å fjerne når alt fungerer.
+
 ## 2026-09-09
 
 - **Hentet hele mappen fra Dropbox og lagt den i et eget GitHub-repo**
