@@ -50,7 +50,18 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   det trenger ikke ha hengt i det hele tatt, det kan ha jobbet helt
   stille i bakgrunnen. Skrudde på detaljert logging og ga det mer tid
   (15 min vaktbikkje, 25 min jobbgrense) for å se hva som faktisk skjer.
-  Fjerde forsøk kjører nå.
+- **Fjerde forsøk fortsatt helt stille i 15 minutter**, selv med detaljert
+  logging på. Det viste at forrige forklaring var feil, den detaljerte
+  loggingen jeg skrudde på traff ikke koden som faktisk kjørte. Leste
+  meg videre gjennom Solar2Ds kildekode og fant den ekte årsaken: det
+  monterte Solar2D-disk-imaget (`Util/S2D`) lå inni selve prosjektmappen,
+  og HTML5-byggeverktøyet kopierer *alt* i prosjektmappen inn i spillet
+  som ressurser. Det prøvde altså å kopiere hele det ~270MB store
+  SDK-et (Android/iOS-verktøy, Java-runtime, Xcode-maler) inn i spillet
+  ditt, filbyte for filbyte. Så det hang ikke, det gjorde en enorm feil
+  jobb. Samme problem gjaldt outputmappen. Flyttet begge utenfor
+  prosjektmappen. Femte forsøk kjører nå, forventer at dette er det som
+  faktisk løser det.
 
 ## Hvor ting ligger
 
