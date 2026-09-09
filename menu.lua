@@ -51,6 +51,7 @@ end
 
 -- "scene:create()"
 function scene:create( event )
+checkpoint("menu:create_start")
 
     local sceneGroup = self.view
 
@@ -76,6 +77,7 @@ local hent = mark.hent
     grp=sceneGroup
     camera.xScale = scaleFactor
     camera.yScale = scaleFactor
+checkpoint("menu:after_camera_scale")
 
 
 
@@ -128,6 +130,7 @@ camera:add(bg4,2,false)
          physics.addBody(bg5,"static", physicsData:get("bg5") )
 grp:insert(bg5)
 camera:add(bg5,1,false)
+checkpoint("menu:after_backgrounds")
            
 
 local storyknapp = display.newImageRect( "storyknapp.png",2880,1620 )
@@ -166,6 +169,7 @@ end
     end
     storyknapp:addEventListener( "tap", spill )
     --storyknapp:addEventListener( "tap", hent )
+checkpoint("menu:after_spill_listener")
 ------------------------------------------------------------------------------
   
 
@@ -195,6 +199,7 @@ local function onBackgroundTouch(event)
  end
 end
 bg5:addEventListener("touch", onBackgroundTouch)
+checkpoint("menu:after_bg5_touch_listener")
 
 
 
@@ -211,6 +216,7 @@ bg5:addEventListener("touch", onBackgroundTouch)
     camera:toBack()
     --camera:layer(5).parallaxRatio=0
     local sqCenterX, sqCenterY = punkt:localToContent( 0, 0 )
+checkpoint("menu:after_camera_setup")
     
 
 
