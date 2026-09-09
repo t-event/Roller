@@ -42,6 +42,15 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
 - **Gjort repoet offentlig** (var privat) fordi GitHub Pages på gratis
   konto krever offentlig repo. Betyr at hele koden og grafikken din nå
   er synlig og klonbar for alle på nett, verdt å vite.
+- **Tredje forsøk drept av vaktbikkja etter 8 minutter**, fortsatt uten
+  noen feilmelding. Gravde i Solar2D sin egen kildekode og fant den
+  egentlige forklaringen: et modul som brukes til å hente
+  tredjeparts-plugins overskriver den globale loggefunksjonen med en
+  stille versjon med mindre man eksplisitt ber om detaljert logging. Så
+  det trenger ikke ha hengt i det hele tatt, det kan ha jobbet helt
+  stille i bakgrunnen. Skrudde på detaljert logging og ga det mer tid
+  (15 min vaktbikkje, 25 min jobbgrense) for å se hva som faktisk skjer.
+  Fjerde forsøk kjører nå.
 
 ## Hvor ting ligger
 
