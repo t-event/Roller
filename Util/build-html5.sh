@@ -6,6 +6,7 @@ export WORKSPACE
 
 [ "${S2D_BUILD_NAME}" ] || { echo "S2D_BUILD_NAME is not set (e.g. 2026.3731)" 1>&2; exit 1; }
 S2D_BUILD_NUMBER="$(echo "$S2D_BUILD_NAME." | cut -d. -f2)"
+export S2D_BUILD_NUMBER
 
 S2D_DMG="Util/S2D-${S2D_BUILD_NUMBER}.dmg"
 if [ ! -f "${S2D_DMG}" ]
