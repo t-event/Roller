@@ -180,6 +180,11 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   egen `levelN/`-mappe, slik `level1.lua` allerede gjorde riktig) var
   riktig retning.
 
+- **Låst opp alle 9 banene midlertidig** (`k.numUnlocked` i
+  `ogt_lmdata.lua`, var 1, satt til 9) slik at Mathias kan teste
+  banene direkte uten å spille seg gjennom dem. Husk å sette denne
+  tilbake til 1 når feilsøkingen er ferdig.
+
 - **🎉 "Main menu"-krasjen er fikset, bekreftet av Mathias.** Spillet
   går nå hele veien fra oppstart, gjennom en bane, til pausemeny og
   tilbake til hovedmeny uten å krasje. Neste: Mathias melder at
