@@ -119,6 +119,14 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   (`ssk.init({ html5 = true })`). Nytt bygg kjører, usikker på om det
   er nok alene siden dette kan være en reell minnegrense i
   nettleser-målet, ikke bare denne ene tingen.
+- **Nytt bygg publisert.** Venter på at Mathias tester på nytt.
+- **Notat fra deg (via Mathias):** du husker at én fil ikke klarte å
+  ha alle banene under selve utviklingen, og måtte deles opp (derfor
+  egne `levelN.lua`-filer per bane i stedet for én stor fil). Trolig
+  ikke samme begrensning som minnekrasjen over (den skjer i
+  ssk2-biblioteket, ikke i banefilene), men bra å vite at prosjektet
+  har støtt på slike grenser før. Kan bety flere lignende overraskelser
+  dukker opp etter hvert som vi kommer lenger inn i spillet.
 
 ## Hvor ting ligger
 
