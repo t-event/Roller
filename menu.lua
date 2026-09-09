@@ -90,7 +90,7 @@ checkpoint("menu:after_camera_scale")
 
 
 ----------------------------------------------------------------
-     local bg1       = display.newImageRect( "bg1.png",2880,1620)
+     local bg1       = display.newImageRect( "background/bg1.png",2880,1620)
            bg1.width = 1920
            bg1.height= 1080
            bg1.x     = bredde/2
