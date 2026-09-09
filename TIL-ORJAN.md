@@ -93,6 +93,10 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
 - **Nytt bygg publisert** (47 sekunder), nå med filnavn/linjenummer i
   feilmeldinger. Venter på at Mathias tester siden og limer inn den nye
   feilmeldingen.
+- **Notat fra deg (via Mathias): bare 4 av de 9 banene er ferdige.**
+  Bra å vite når vi etter hvert kommer forbi oppstartskrasjen og skal
+  teste selve spillingen, level 5-9 er trolig ikke noe å bruke tid på å
+  feilsøke.
 
 ## Hvor ting ligger
 
