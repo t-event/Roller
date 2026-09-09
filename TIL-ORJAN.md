@@ -174,6 +174,28 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   død kode som aldri nås i spillet, rørte ikke de. Nytt bygg kjører nå,
   dette kan faktisk være den siste brikken.
 
+- **Notat fra deg om N.png-mønsteret:** i banemappene (`level1/`,
+  `level2/` osv) tilsvarer `1.png` bane 1, `2.png` bane 2, og så
+  videre, det bekrefter at fiksen over (hver banefil skal peke på sin
+  egen `levelN/`-mappe, slik `level1.lua` allerede gjorde riktig) var
+  riktig retning.
+
+## Død kode (finnes i repoet, men brukes aldri)
+
+Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
+fordi ingenting i spillet faktisk navigerer dit, verken via `require`
+eller `composer.gotoScene`/`showOverlay`. Trygge å ignorere, eller
+slette hvis du en dag vil rydde:
+
+- `brett.lua` — refererer `"backgroun1d.jpg"` (finnes ikke, sannsynlig
+  skrivefeil for et bakgrunnsbilde). Selv uten den bugen navigeres det
+  aldri hit.
+- `menu1.lua` — refererer `"background.jpg"` (finnes ikke). En
+  alternativ/tidligere versjon av `menu.lua`, gjettevis.
+- `options.lua` — samme `"backgroun1d.jpg"`-referanse som `brett.lua`.
+- `play.lua` — refererer `"images/eforest02.jpg"` (finnes ikke). Ser ut
+  som en stjerne-/resultatskjerm som aldri ble koblet til noe.
+
 ## Hvor ting ligger
 
 - Selve spillkoden: repo-roten (`main.lua`, `level1.lua` osv, akkurat som
