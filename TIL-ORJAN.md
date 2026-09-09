@@ -197,6 +197,21 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   banene direkte uten å spille seg gjennom dem. Husk å sette denne
   tilbake til 1 når feilsøkingen er ferdig.
 
+- **Mathias meldte at level 2 sin bakgrunn ikke stemmer med hvor
+  ballen faktisk kolliderer med gulvet.** Dette er IKKE en
+  porteringsbug, det ville sett likt ut på Android. `shapedefs.lua`
+  har bare ett sett usynlige kollisjonsformer kalt "1", "2", "3", "4"
+  (sporet av PhysicsEditor fra ett bestemt bilde), men `level1.lua`,
+  `level2.lua`, `level3.lua` og `level4.lua` bruker alle sammen akkurat
+  de samme fire formene, selv om hver bane har sine egne bakkebilder
+  (`level1/1.png`, `level2/1.png` osv). Kollisjonen stemmer bare med
+  bildet den opprinnelig ble sporet fra (sannsynligvis level 1, siden
+  den fungerer perfekt), de andre banene får feil usynlig gulv i
+  forhold til bildet de faktisk viser. Krever at du sporer formene på
+  nytt i PhysicsEditor per banebilde, eller sier fra om bildene egentlig
+  skal ha samme grunnform som level 1 sitt (da er det noe annet som er
+  galt). Ikke noe jeg kan gjette meg fram til selv.
+
 - **🎉 "Main menu"-krasjen er fikset, bekreftet av Mathias.** Spillet
   går nå hele veien fra oppstart, gjennom en bane, til pausemeny og
   tilbake til hovedmeny uten å krasje. Neste: Mathias melder at
