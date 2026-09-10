@@ -92,11 +92,19 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener("collision", onCollision1)
-local currentLevel = composer.getSceneName( "current" )
-local ok, err = pcall( composer.gotoScene, currentLevel, {effect = "fade" , time = 1} )
+liv.endreliv(1)
+liv.lagreliv()
+local destination = composer.getSceneName( "current" )
+if liv.erTom() then
+	-- Ingen liv igjen. Reklame-for-liv er ikke bygget ennå (krever et
+	-- annonse-SDK), så inntil videre: den som ikke vil/kan se reklame
+	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
+	destination = "gotolevel1"
+end
+local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
-	print( "CRASH going to " .. tostring(currentLevel) .. " (retry): " .. msg )
+	print( "CRASH going to " .. tostring(destination) .. " (retry): " .. msg )
 	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
 	bg:setFillColor( 0, 0, 0, 0.85 )
 	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
@@ -104,8 +112,6 @@ if not ok then
 end
 pausemenu.alpha=0
 physics.start()
-liv.endreliv(1)
-liv.lagreliv()
 end
 pausemenuretry:addEventListener ("touch", resume)
 

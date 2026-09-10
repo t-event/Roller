@@ -138,15 +138,18 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
   spillingen.** Ørjan bekreftet 2026-09-10: liv skal ha reell
   betydning (ikke ferdig kodet), og skal kunne nå null, da skal
   spilleren kunne se en reklame for å få liv tilbake (1 min reklame =
-  1 liv, lang reklame = flere). Bugen som hindret telleren fra
+  1 liv, lang reklame = flere), eller heller starte på nytt fra bane 1
+  om man ikke vil se reklame. Bugen som hindret telleren fra
   noensinne å nå null er fikset (`liv.endreliv()` la feilaktig til 2
-  liv i stedet for å trekke fra ved siste liv). Lagt til
-  `liv.erTom()` som helper for videre arbeid. **Selve
-  reklame-visningen er IKKE bygget** (krever et valg av annonse-SDK),
-  og ingenting kaller `liv.erTom()` ennå. Dødsskjermen
-  (`showOverlay("dodmenu1")`) trigges fortsatt av noe helt separat: en
-  fysikk-kollisjon mellom et "dod"-objekt og spillerens hode (`del9`),
-  uavhengig av live-telleren.
+  liv i stedet for å trekke fra ved siste liv). "Retry" i
+  `pausemenu1.lua`/`dodmenu1.lua` sjekker nå `liv.erTom()`: har du
+  liv igjen, restartes gjeldende bane; er du tom, går du i stedet til
+  `gotolevel1` (start fra bane 1), som en fallback siden selve
+  reklame-visningen ennå IKKE er bygget (krever et valg av
+  annonse-SDK, ingen faktisk "vil du se reklame?"-dialog finnes ennå).
+  Dødsskjermen (`showOverlay("dodmenu1")`) trigges fortsatt av noe
+  helt separat: en fysikk-kollisjon mellom et "dod"-objekt og
+  spillerens hode (`del9`), uavhengig av live-telleren.
 - `mark.lua` — bygger spillerkarakterens kroppsdeler (hale/hode),
   fysikk-leddet sammen. **`require`t av `menu.lua` og `level1.lua`,
   men `mark.hent()` blir aldri faktisk kalt noe sted** (begge fanger

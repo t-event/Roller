@@ -506,3 +506,22 @@ være av når marken er slapp. **Ikke testet i faktisk nettleser ennå**,
 usikker på om 300 ms-vinduet føles riktig, si fra om det bør justeres.
 
 Alt kodet i dag er pushet, og en ny HTML5-build er trigget for å teste.
+
+## 2026-09-10, presisering av liv/reklame-flyten
+
+Mathias presiserte: "om man ikke ønsker å se reklame skal man kunne starte
+på nytt fra level 1." Det svarer på hva som skal skje i den siden av
+reklame-valget som ikke krever et annonse-SDK, så koblet det inn med det
+samme.
+
+`pausemenu1.lua` og `dodmenu1.lua` sin "retry"-knapp sjekker nå
+`liv.erTom()` etter at livet for dette forsøket er trukket fra: har du
+fortsatt liv igjen, restartes banen du var på (som i går). Er du tom for
+liv, går du i stedet til `gotolevel1` (start fra bane 1), siden det er
+fallback-oppførselen når man ikke vil/kan se reklame. Det finnes fortsatt
+ingen faktisk "vil du se reklame?"-dialog, det kommer når noen velger et
+annonse-SDK og bygger det. Inntil da er "start fra bane 1" alt som skjer
+når du går tom for liv, ingen spørring, siden reklame-alternativet ikke
+finnes ennå.
+
+Ikke testet i faktisk nettleser.
