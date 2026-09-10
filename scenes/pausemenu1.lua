@@ -106,6 +106,17 @@ local function resume(event)
 -- (refererte en udefinert global). Selve opprydningen skjer riktig i
 -- banens egen scene:hide når composer.removeScene() under tvinger den
 -- gjennom.
+
+-- Avbryt ventende transitions HER, med en gang retry trykkes, i stedet
+-- for å stole på at banen sin egen scene:hide rekker det i tide
+-- (rettet 2026-09-10, transition.cancel() i scene:hide sin "did"-fase
+-- var IKKE tidsnok: den fasen skjer først når hele overgangs-fadeen
+-- til gotoretry er ferdig (500ms), og en ventende støveffekt fra
+-- level1.lua kan fyre av sitt onComplete midt i den fadeen, altså FØR
+-- did-fasen rekker å avbryte den. transition.cancel() uten argumenter
+-- er globalt og trenger ikke tilgang til banens egne lokale variabler.
+transition.cancel()
+
 timer.cancel(eventTimer)
 print("Current Score1: ", liv.returnScore())
 print("Current Score2: ", liv.returnScore())

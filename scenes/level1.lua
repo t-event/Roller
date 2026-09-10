@@ -1153,7 +1153,14 @@ local tran= transition.to (stov1, {
                                     height     = stov1.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov1 ) stov1 = nil del1:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov1 )
+                                        stov1 = nil
+                                        -- Vaktet 2026-09-10: del1 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del1.stage then del1:addEventListener( "collision" ) end
              end} ) 
                                     return stov1
          end
@@ -1194,7 +1201,14 @@ local tran= transition.to (stov2, {
                                     height     = stov2.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov2 ) stov2 = nil del2:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov2 )
+                                        stov2 = nil
+                                        -- Vaktet 2026-09-10: del2 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del2.stage then del2:addEventListener( "collision" ) end
              end} ) 
                                     return stov2
          end
@@ -1235,7 +1249,14 @@ local tran= transition.to (stov3, {
                                     height     = stov3.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov3 ) stov3 = nil del3:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov3 )
+                                        stov3 = nil
+                                        -- Vaktet 2026-09-10: del3 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del3.stage then del3:addEventListener( "collision" ) end
              end} ) 
                                     return stov3
          end
@@ -1276,7 +1297,14 @@ local tran= transition.to (stov4, {
                                     height     = stov4.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov4 ) stov4 = nil del4:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov4 )
+                                        stov4 = nil
+                                        -- Vaktet 2026-09-10: del4 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del4.stage then del4:addEventListener( "collision" ) end
              end} ) 
                                     return stov4
          end
@@ -1317,7 +1345,14 @@ local tran= transition.to (stov5, {
                                     height     = stov5.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov5 ) stov5 = nil del5:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov5 )
+                                        stov5 = nil
+                                        -- Vaktet 2026-09-10: del5 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del5.stage then del5:addEventListener( "collision" ) end
              end} ) 
                                     return stov5
          end
@@ -1358,7 +1393,14 @@ local tran= transition.to (stov6, {
                                     height     = stov6.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov6 ) stov6 = nil del6:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov6 )
+                                        stov6 = nil
+                                        -- Vaktet 2026-09-10: del6 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del6.stage then del6:addEventListener( "collision" ) end
              end} ) 
                                     return stov6
          end
@@ -1399,7 +1441,14 @@ local tran= transition.to (stov7, {
                                     height     = stov7.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov7 ) stov7 = nil del7:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov7 )
+                                        stov7 = nil
+                                        -- Vaktet 2026-09-10: del7 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del7.stage then del7:addEventListener( "collision" ) end
              end} ) 
                                     return stov7
          end
@@ -1440,7 +1489,14 @@ local tran= transition.to (stov8, {
                                     height     = stov8.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov8 ) stov8 = nil del8:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov8 )
+                                        stov8 = nil
+                                        -- Vaktet 2026-09-10: del8 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del8.stage then del8:addEventListener( "collision" ) end
              end} ) 
                                     return stov8
          end
@@ -1481,7 +1537,14 @@ local tran= transition.to (stov9, {
                                     height     = stov9.height + (math.random(1, 50)),
                                     alpha      = 0,
                                     time       = 1000,
-                                    onComplete = function ()display.remove( stov9 ) stov9 = nil del9:addEventListener( "collision" )
+                                    onComplete = function ()
+                                        display.remove( stov9 )
+                                        stov9 = nil
+                                        -- Vaktet 2026-09-10: del9 kan allerede ha blitt
+                                        -- revet ned (retry) mens denne transitionen ventet.
+                                        -- .stage er nil på et fjernet visningsobjekt, se
+                                        -- forklaring i TIL-ORJAN.md/KODEBASE.md.
+                                        if del9.stage then del9:addEventListener( "collision" ) end
              end} ) 
                                     return stov9
          end

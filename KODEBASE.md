@@ -292,7 +292,17 @@ filene gjør.
    'addEventListener' (a nil value)". Fikset med `transition.cancel()`
    i `scene:hide` sin "did"-fase, i alle ni banefiler (kun `level1.lua`
    kan faktisk krasje slik, resten fikk den som forsiktighetsregel).
-   Ikke testet i faktisk nettleser ennå.
+
+   Samme krasj kom likevel igjen. **Fikset på nytt 2026-09-10**:
+   `transition.cancel()` i `scene:hide` kom for sent, den fasen skjer
+   først når HELE gotoretry-overgangen (500ms fade) er ferdig, og en
+   ventende støveffekt kunne fyre av `onComplete` midt i de 500ms'ene.
+   Flyttet `transition.cancel()` til helt øverst i `resume()` i
+   pausemeny/dødsmeny, altså i samme øyeblikk retry trykkes. La i
+   tillegg til en `.stage`-sjekk (fjernede Corona-objekter har
+   `.stage == nil`) rundt selve `addEventListener`-kallet i alle ni
+   `del1`-`del9`-blokkene i `level1.lua`, som ekstra sikring uansett
+   tidsvindu. Ikke testet i faktisk nettleser ennå.
 5. ~~Marken skal kunne "knekke"~~ **Var faktisk allerede kodet, bare
    avslått. Fikset 2026-09-10.** Den forrige vurderingen her, at
    9-leddet-ormen manglet knekk-mekanikk helt, var feil. Mathias

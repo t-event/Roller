@@ -1030,3 +1030,34 @@ måten (de andre banenes støveffekt er enklere og fjerner bare seg
 selv, ikke noe delt objekt).
 
 Luac-sjekket alle ni filer. Ikke testet i faktisk nettleser.
+
+## 2026-09-10, samme addEventListener-krasj: transition.cancel() kom for sent
+
+Mathias testet, samme krasj kom igjen, ordrett identisk stack. Så
+`transition.cancel()` i `scene:hide` løste det IKKE. Tenkte gjennom
+tidsvinduet på nytt: dødsmeny/pausemeny sin `resume()` går nå til
+`"scenes.gotoretry"` med en 500ms fade-overgang, og `scene:hide` sin
+"did"-fase (der `transition.cancel()` lå) skjer først når HELE den
+overgangen er ferdig, altså 500ms etter at retry ble trykket. Den
+ventende støv-effekten (opptil 1 sekund) kan fyre `onComplete` når som
+helst i det vinduet, inkludert midt i de 500ms'ene, altså FØR
+`transition.cancel()` i det hele tatt rekker å kjøre.
+
+Fikset i to lag denne gangen:
+
+1. Flyttet `transition.cancel()` til helt øverst i `resume()` i både
+   `pausemenu1.lua` og `dodmenu1.lua`, altså i samme øyeblikk retry
+   trykkes, FØR noen scene-overgang i det hele tatt starter. Trenger
+   ikke tilgang til `level1.lua` sine egne lokale variabler siden
+   `transition.cancel()` uten argumenter er globalt.
+2. I tillegg, som en mer grunnleggende sikring uansett tidsvindu: la
+   til en `.stage`-sjekk i selve `onComplete`-kallet i alle ni
+   `del1`-`del9`-blokkene i `level1.lua`. Et Corona-visningsobjekt som
+   er fjernet fra scenen har `.stage == nil`, mens et fortsatt levende
+   objekt alltid har en gyldig `.stage`. `del1:addEventListener(...)`
+   kalles nå bare `if del1.stage then ... end`, så selv om en
+   transition mot formodning skulle overleve helt fram til
+   `onComplete`, kan den ikke lenger krasje på en allerede fjernet
+   kroppsdel, uansett hvorfor den overlevde.
+
+Luac-sjekket alle tre filene. Ikke testet i faktisk nettleser.
