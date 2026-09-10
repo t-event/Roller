@@ -108,6 +108,15 @@ function scene:hide( event )
     local sceneGroup = self.view
     local phase = event.phase
 
+    -- VIKTIG: composer.removeScene() på seg selv må skje i "did"-fasen,
+    -- ikke "will". "Will" skjer idet overgangsanimasjonen STARTER, mens
+    -- composer fortsatt aktivt animerer denne scenens visningsgruppe.
+    -- Å rive ned scenen der (som den gjorde før 2026-09-10) korrumperer
+    -- composer sin interne overgangstilstand litt for hver gang scenen
+    -- vises på nytt (denne splashen nås på hver retry), og krasjet til
+    -- slutt dypt inne i selve motoren i stedet for å gi en Lua-feil vi
+    -- kunne fanget med pcall. "Did" skjer først når overgangen faktisk
+    -- er ferdig, da er det trygt.
     if ( phase == "will" ) then
 print ("gotolevel1 scene:hide will")
     elseif ( phase == "did" ) then

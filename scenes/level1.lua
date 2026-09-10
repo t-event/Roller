@@ -698,6 +698,14 @@ checkpoint("level1:cp_684_after_backgrounds")
     --del1.y=17000
     del1.width = 27
     del1.height = 17
+    -- Bruker en egen, håndskrevet kollisjonsform i stedet for
+    -- shapedefs.lua sin ferdige "hale"-form (sjekket 2026-09-10, spurt
+    -- av Ørjan). Grunn: bildet krympes til 27x17 rett over, men
+    -- shapedefs.lua sin "hale"-form er sporet fra bildet i original
+    -- (ukrympet, ca 55x35) størrelse. Denne formen her stemmer med den
+    -- krympede visningsstørrelsen, "hale"-formen ville vært dobbelt så
+    -- stor. Ikke byttet ut, venter på om Ørjan finner en nyere versjon
+    -- av marken (skal knekke i 3 biter, ikke de 9 leddene her).
     local del1Shape = {-13,8, -13,-8, 11,3, 14,0, 11,-3}
     physics.addBody(del1, "dynamic",  {density = 1.0, friction = 0.3, bounce = 0.2, shape=del1Shape})
       del1.alpha = 1

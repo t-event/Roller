@@ -254,7 +254,9 @@ filene gjør.
    oppdaget ville neste berøring slått dem på igjen momentant.
    **Fikset 2026-09-10:** dobbeltklikk oppdages nå selv, ved å måle tid
    mellom to "began"-faser (300 ms vindu), og "ended" lar motorene være
-   av når marken er slapp. Ikke testet i faktisk nettleser ennå.
+   av når marken er slapp. Samme fiks i `level2.lua`-`level9.lua` også
+   (delte nøyaktig samme buggede kode), ikke bare `level1.lua`. Ikke
+   testet i faktisk nettleser ennå.
 
 ## Anbefalt ryddeplan
 

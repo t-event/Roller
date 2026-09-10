@@ -122,6 +122,10 @@ function liv.lastliv()
     lastliv()
 end
 
+-- Trekker fra liv, og lar telleren faktisk nå null (rettet 2026-09-10,
+-- den gjorde før det motsatte: la til 2 liv i stedet for å trekke fra
+-- ved siste liv, så man kunne aldri tape). Klipper ved 0 i stedet for
+-- å gå negativ, se liv.erTom() rett under.
 function liv.endreliv( val )
    liv_igjen = liv_igjen - val
    if liv_igjen < 0 then

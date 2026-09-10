@@ -76,6 +76,10 @@ local liv =require("lib.liv")
 
 -- -----------------------------------------------------------------------------------------------------------------
 
+        -- "Neste bane"-knappen. Viste før alltid gotolevel2 hardkodet
+        -- her, uansett hvilken bane som ble fullført, og selv den gikk
+        -- videre til bane 1, ikke bane 2 (rettet 2026-09-10). Går nå
+        -- til banevalget i stedet, samme som level1.lua alltid gjorde.
         local function goto2( event )
         --grp:remove(camera)
         physics.pause( )
@@ -1669,63 +1673,79 @@ grp.yScale = scaleFactor
 
 
 
+-- Dobbeltklikk skal gjøre marken helt slapp (motorene på leddene av).
+-- Samme fiks som level1.lua (2026-09-10): brukte før Runtime "tap"-
+-- eventet sin event.numTaps == 2, som ikke synkroniserte pålitelig med
+-- HTML5-eksportens musekklikk. "ended"-fasen satte i tillegg alltid
+-- motorene på igjen uansett, så selv et riktig oppdaget dobbeltklikk
+-- ville blitt slått av ved neste berøring. Oppdager nå dobbeltklikk selv
+-- ved å måle tid mellom to "began"-faser, og "ended" lar motorene være
+-- av når marken er slapp.
+ local isLimp = false
+ local sisteBegan = 0
+ local dobbeltklikkVindu = 300 -- ms
+
  function trykk_knapp( event )
     if event.phase == "began" then
+            local naa = system.getTimer()
+            if ( naa - sisteBegan ) < dobbeltklikkVindu then
+                isLimp = not isLimp
+                print( "marken slapp: " .. tostring(isLimp) )
+            end
+            sisteBegan = naa
 
-            print( "knapp" )
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.motorSpeed  = pivot_joint.motorSpeed - 80
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.motorSpeed = pivot_joint.motorSpeed - 80
-          
-            
+            if isLimp then
+                pivot_joint.isMotorEnabled = false
+                pivot_joint1.isMotorEnabled = false
+                pivot_joint2.isMotorEnabled = false
+                pivot_joint3.isMotorEnabled = false
+                pivot_joint4.isMotorEnabled = false
+                pivot_joint5.isMotorEnabled = false
+                pivot_joint6.isMotorEnabled = false
+                pivot_joint7.isMotorEnabled = false
+            else
+                print( "knapp" )
+                pivot_joint.isMotorEnabled = true
+                pivot_joint.motorSpeed  = pivot_joint.motorSpeed - 80
+                pivot_joint1.isMotorEnabled = true
+                pivot_joint1.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint2.isMotorEnabled = true
+                pivot_joint2.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint3.isMotorEnabled = true
+                pivot_joint3.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint4.isMotorEnabled = true
+                pivot_joint4.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint5.isMotorEnabled = true
+                pivot_joint5.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint6.isMotorEnabled = true
+                pivot_joint6.motorSpeed = pivot_joint.motorSpeed - 80
+                pivot_joint7.isMotorEnabled = true
+                pivot_joint7.motorSpeed = pivot_joint.motorSpeed - 80
+            end
 
     elseif event.phase == "ended" then
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.motorSpeed = 30
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.motorSpeed = 30
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.motorSpeed = 30
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.motorSpeed = 30
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.motorSpeed = 30
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.motorSpeed = 30
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.motorSpeed = 30
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.motorSpeed = 30
+            if not isLimp then
+                pivot_joint.isMotorEnabled = true
+                pivot_joint.motorSpeed = 30
+                pivot_joint1.isMotorEnabled = true
+                pivot_joint1.motorSpeed = 30
+                pivot_joint2.isMotorEnabled = true
+                pivot_joint2.motorSpeed = 30
+                pivot_joint3.isMotorEnabled = true
+                pivot_joint3.motorSpeed = 30
+                pivot_joint4.isMotorEnabled = true
+                pivot_joint4.motorSpeed = 30
+                pivot_joint5.isMotorEnabled = true
+                pivot_joint5.motorSpeed = 30
+                pivot_joint6.isMotorEnabled = true
+                pivot_joint6.motorSpeed = 30
+                pivot_joint7.isMotorEnabled = true
+                pivot_joint7.motorSpeed = 30
+            end
 
     end
-    if ( event.numTaps == 2 ) then
-        print( "knapp1" )
-        print( event.numTaps )
-            pivot_joint.isMotorEnabled = false
-            pivot_joint1.isMotorEnabled = false
-            pivot_joint2.isMotorEnabled = false
-            pivot_joint3.isMotorEnabled = false
-            pivot_joint4.isMotorEnabled = false
-            pivot_joint5.isMotorEnabled = false
-            pivot_joint6.isMotorEnabled = false
-            pivot_joint7.isMotorEnabled = false
-        end
 end
 Runtime:addEventListener( "touch", trykk_knapp)
-Runtime:addEventListener( "tap", trykk_knapp)
 
 
 

@@ -109,6 +109,8 @@ function scene:hide( event )
     local sceneGroup = self.view
     local phase = event.phase
 
+    -- VIKTIG: composer.removeScene() på seg selv må skje i "did"-fasen,
+    -- ikke "will", se samme forklaring i gotolevel1.lua sin scene:hide.
     if ( phase == "will" ) then
 print ("gotochooselevel scene:hide will")
     elseif ( phase == "did" ) then

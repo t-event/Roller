@@ -158,10 +158,16 @@ local function selectLevel(event)
 		print("no")
 
 		if last then
+			-- Fjern splash-spriten fra k.beforeLeaving() her, rett før
+			-- selve scenebyttet. Ble før aldri fjernet (kommentert bort),
+			-- så hvert banevalg la igjen ett objekt til (rettet 2026-09-10).
 			display.remove( last )
 			last = nil
 		end
 
+		-- pcall lagt til 2026-09-10, samme sikkerhetsnett som resten av
+		-- navigasjonen i spillet: fanger krasj her og viser en rød
+		-- feilboks med sjekkpunkt, i stedet for at hele siden bare dør.
 		local ok, err = pcall( sceneMgr.gotoScene, newScene, {effect=k.sboardEffect, time=k.sboardTime} )
 		if not ok then
 			local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)

@@ -1,3 +1,10 @@
+-- NB (2026-09-10): mark.hent() under blir aldri faktisk kalt noe sted i
+-- spillet. Både menu.lua og level1.lua gjør require("lib.mark"), men
+-- fanger bare funksjonen i en lokal variabel uten å kalle den.
+-- level1.lua bygger i stedet spillerkroppen med kopiert kode rett i
+-- egen fil (samme kode som her, bare limt inn). Denne fila kjører altså
+-- harmløst (selve require-kallet), men gjør reelt sett ingenting.
+-- Spurte Ørjan om dette var meningen, se sporsmal.md spørsmål 2.
 
 local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 

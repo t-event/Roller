@@ -673,3 +673,41 @@ resonnement om Composer sin livssyklus, ikke noe jeg kan bekrefte selv
 uten en simulator. Si fra om slow motion / dårlig restart fortsatt
 skjer etter denne, så må vi grave dypere (f.eks. sjekke om selve
 pausemeny-overlayet blir riktig ryddet bort også).
+
+## 2026-09-10, sjekket faktisk dokumentasjon, og la til forklaringer i koden
+
+Mathias spurte om jeg faktisk hadde studert Solar2D sin dokumentasjon.
+Ærlig svar: nei, ikke underveis, alt har vært basert på det jeg vet om
+Corona/Solar2D fra før kombinert med lesing av koden og symptomene
+dere har rapportert. Fikk tilgang til nettsøk nå og sjekket noen av
+antakelsene fra i kveld mot faktisk dokumentasjon (docs.coronalabs.com
+var blokkert direkte for meg, fant sitater via søk i stedet):
+
+- `composer.getSceneName("current")` + `gotoScene()` til samme navn er
+  faktisk et **dokumentert mønster** for å laste gjeldende scene på
+  nytt, ikke i seg selv ugyldig slik jeg konkluderte i går kveld etter
+  telefon-krasjen. Årsaken til den krasjen er dermed fortsatt ikke
+  100 % forklart, men uansett løst i praksis siden vi byttet til
+  `lm.currentLevel` i stedet.
+- `composer.gotoScene()` skjuler automatisk et aktivt overlay, så
+  pausemeny-overlayet er bekreftet ikke kilden til noe av dagens bugs.
+- `composer.removeScene()` sender en destroy-hendelse og fjerner
+  scenen helt, harmløst hvis den ikke var lastet. Bekrefter at
+  slow-motion-fiksen (riv ned banen før retry laster den på nytt) er
+  den offisielt riktige måten å tvinge fram en ren tilstand på.
+
+Ba meg samtidig rydde opp og legge til forklaringer på norsk i selve
+filene, ikke bare i disse dokumentene. Gikk gjennom alt som er endret
+i kveld og la til/utvidet kommentarer der de manglet: "will vs
+did"-fiksen i `gotolevel1.lua`/`gotomenu.lua`/`gotochooselevel.lua`,
+liv-bugen i `liv.lua`, sprite-lekkasjen og pcall-en i
+`ogt_levelmanager.lua`, hvorfor `mark.lua` sin `mark.hent()` aldri
+kalles, og hvorfor `level1.lua` sin hale bruker en egen kollisjonsform
+i stedet for `shapedefs.lua` sin ferdige.
+
+**Fant samtidig at dobbeltklikk-bugen (rettet i `level1.lua` i går) var
+identisk kopiert inn i `level2.lua`-`level9.lua` også**, ufikset der.
+Siden banene skal holdes åpne for testing (Ørjans svar på spørsmål 7),
+rettet samme fiks der også, ikke bare i `level1.lua`.
+
+**Ikke testet i faktisk nettleser ennå.**
