@@ -82,7 +82,9 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
   ingen fil i hele repoet refererer til `"pausemenu2"` gjennom `"pausemenu9"`
   i det hele tatt.
 - `dodmenu1.lua` — **i bruk, av ALLE ni baner**. Samme mønster som
-  pausemenu1.
+  pausemenu1, men **mangler pcall-/sjekkpunkt-sikkerhetsnettet** som
+  pausemenu1.lua fikk under feilsøkingen. Alle tre knappene (retry/
+  main menu/levels) kaller `composer.gotoScene()` helt direkte.
 - `dodmenu2.lua` til `dodmenu9.lua` — **100 % død kode**, samme bekreftelse
   som pausemenu2-9.
 
@@ -95,7 +97,13 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
   (se under) og de samme (feil) kollisjonsformene som level1.
 - `level5.lua` til `level9.lua` — **ufullstendige, ifølge Ørjan.** Har i
   tillegg egne knuste bilde-stier (samme mønster som level2-4 hadde før vi
-  fikset dem), ikke rettet siden disse ikke er prioritert.
+  fikset dem), ikke rettet siden disse ikke er prioritert. Bekreftet med
+  `diff`: alle fem er **100 % byte-identiske filer**, ikke bare samme
+  plassholderbilder. De knuste stiene er konkret: bildene refereres uten
+  mappe-prefiks (`"back_cave.png"`, `"dirt1.png"`, `"1.png"`-`"4.png"`),
+  mens filene faktisk ligger under `background/` og under sin egen
+  `levelN/`-mappe. `level2.lua`-`level4.lua` har korrekte stier og er
+  ikke rammet.
 - **Alle ni baner bruker identiske plassholderbilder** for banestykkene
   (`levelN/1.png` til `4.png`), unntatt level1 som har unike bilder.
   Bekreftet med MD5-sjekksum, se `TIL-ORJAN.md`.
@@ -104,7 +112,14 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
   "level select grid"-bibliotek (paginert rutenett, lås/opplåsing,
   stjerner). `ogt_lmdata.lua` er konfigurasjonen (antall baner, låste
-  baner, bildefiler).
+  baner, bildefiler). To ting funnet ved gjennomgang: `k.beforeLeaving()`
+  (kjører hver gang du trykker en banerute) lager en splash-sprite som
+  aldri fjernes (opprydningen er kommentert bort), så hvert banevalg
+  legger igjen ett objekt til. Og selve scenebyttet når du trykker en
+  banerute (`sceneMgr.gotoScene()` i `selectLevel`) mangler pcall-
+  sikkerhetsnettet som resten av kjeden dit (pausemeny →
+  gotochooselevel → chooselevel → init/makeGrid) fikk under
+  feilsøkingen.
 
 ### Delte spillobjekter
 - `perspective.lua` — kamerasystem (parallakse, lag), tredjepartsbibliotek
@@ -112,12 +127,33 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
 - `shapedefs.lua` — auto-generert av PhysicsEditor, kollisjonsformer. Se
   "Kjente feil".
 - `liv.lua` — "liv" = spillerens liv/poengsum, lagres via `GGData.lua`.
-- `mark.lua` — spillerkarakterens kroppsdeler (hale/hode), fysikk-leddet
-  sammen.
+  **Trekkes bare fra når du bruker en knapp i pause-/dødsmenyen
+  (retry/main menu/levels), ikke av noe som skjer inni selve
+  spillingen**, og `liv.endreliv()` legger faktisk TIL 2 liv i stedet
+  for å trekke fra når telleren når 1 (`liv_igjen == 1`), så tallet
+  kan aldri nå null i praksis. Ingenting i koden sjekker uansett
+  `liv.returnScore()` mot null. Selve dødsskjermen
+  (`showOverlay("dodmenu1")`) trigges av en helt separat ting: en
+  fysikk-kollisjon mellom et "dod"-objekt og spillerens hode
+  (`del9`). Lives-tallet som vises er altså kosmetisk per nå, uten
+  konsekvens for spillet.
+- `mark.lua` — bygger spillerkarakterens kroppsdeler (hale/hode),
+  fysikk-leddet sammen. **`require`t av `menu.lua` og `level1.lua`,
+  men `mark.hent()` blir aldri faktisk kalt noe sted** (begge fanger
+  funksjonen i en lokal variabel og bruker den ikke). `level1.lua`
+  bygger i stedet spillerkroppen med ca 90-100 linjer kopiert kode
+  rett i egen fil. Reelt sett dødt, bortsett fra at selve `require`-
+  kallet kjører harmløst.
 - `gameUI.lua` — liten delt hjelpefunksjon (`dragBody`), i bruk.
 - `GGData.lua` — tredjeparts lagringsbibliotek, urørt.
 - `game.lua`, `livddadas.lua` — **død kode**, gamle/kommenterte varianter av
-  `liv.lua`, aldri `require`t noe sted.
+  `liv.lua`, aldri `require`t noe sted. Snodig detalj: filnavn og innhold
+  er byttet om. `game.lua` inneholder (til tross for navnet) en gammel
+  `liv`-modul med udefinerte `saveScore()`/`loadScore()`-kall (ville
+  krasjet hvis den noen gang ble brukt). `livddadas.lua` inneholder i
+  stedet en gammel `game`-modul (score.txt/high_score, fungerende
+  internt). Ufarlig siden begge er 100 % ubrukte, men en felle for
+  filnavn-basert gjetting hvis noen vurderer å gjenopplive en av dem.
 
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
 

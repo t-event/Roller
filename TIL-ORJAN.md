@@ -14,10 +14,14 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   feilsøkingen er ferdig, ellers er hele bane-progresjonen i spillet
   meningsløs.
 - **Fjern feilsøkings-sjekkpunktene.** `checkpoint(...)`-kallene i
-  `main.lua`, `level1.lua`, `menu.lua`, og pcall-innpakningene i
-  `gotolevel1.lua`/`gotomenu.lua`/`pausemenu1.lua` var midlertidige
-  for å finne krasjer. Trygge å la stå (de gjør ingenting skadelig),
-  men ryddigst å fjerne når alt fungerer.
+  `main.lua`, `level1.lua`, `menu.lua`, `ogt_levelmanager.lua`, og
+  pcall-innpakningene i `gotolevel1.lua`/`gotomenu.lua`/
+  `gotochooselevel.lua`/`pausemenu1.lua` var midlertidige for å finne
+  krasjer. Trygge å la stå (de gjør ingenting skadelig), men ryddigst
+  å fjerne når alt fungerer. `dodmenu1.lua` fikk aldri samme
+  sikkerhetsnett som `pausemenu1.lua` (se 2026-09-10-oppføringen under),
+  vurder å legge det til der også hvis feilsøkingen fortsetter, ellers
+  er det ikke noe å fjerne der.
 
 ## 2026-09-09
 
@@ -270,6 +274,100 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   sammen med den større, allerede kjente "neste bane"-bugen og bør
   fikses samlet, ikke gjettes fram til stykkevis.
 
+## 2026-09-10, grundig linje-for-linje gjennomgang av hele koden
+
+Gikk gjennom samtlige 61 egne Lua-filer (alt utenom `ssk2/`) på nytt,
+denne gangen faktisk lest, ikke skummet: diff mellom filer som skal
+være like, grep etter reelle referanser i stedet for å stole på gamle
+notater, og sjekket at asset-filene som refereres faktisk finnes på
+disk. Bekreftet det meste av det som allerede sto i dette dokumentet
+og i `KODEBASE.md`, men fant noen nye ting:
+
+- **`mark.lua` sin `mark.hent()` blir aldri kalt.** Både `menu.lua` og
+  `level1.lua` gjør `require("mark")` og fanger opp `mark.hent`-
+  funksjonen i en lokal variabel, men ingen av dem faktisk *kaller*
+  den. I stedet har `level1.lua` ca 90-100 linjer kopiert kode som
+  bygger spillerkroppen (`del1`-`del9`) rett inn i fila selv, samme
+  mønster som det ferdig-dokumenterte kaoset i `hoydehopp.lua`/
+  `game.lua`. `mark.lua` er dermed i praksis dødt, bortsett fra at
+  `require`-kallet kjører harmløst. Rørte den ikke, siden jeg ikke vet
+  om du planla å faktisk ta den i bruk igjen.
+- **"Liv" (livene i spillet) kan aldri nå null.** I `liv.lua`,
+  `liv.endreliv(val)`: når `liv_igjen == 1`, LEGGER funksjonen til 2
+  liv i stedet for å trekke fra, så sekvensen blir 3→2→1→3→2→1→... i
+  det uendelige. Og siden `liv.endreliv(1)` bare kalles fra
+  "retry"/"main menu"/"levels"-knappene i pause- og dødsmenyen (aldri
+  fra selve spillingen), og ingenting noe sted sjekker
+  `liv.returnScore()` mot null for å faktisk avslutte spillet, er
+  live-telleren per nå bare et tall som vises, uten konsekvens. Selve
+  "du døde"-skjermen (`showOverlay("dodmenu1")`) trigges av noe helt
+  annet: en kollisjon mellom et "dod"-objekt (faren) og hodet på
+  ormekroppen (`del9`), se `level1.lua` rundt linje 1080-1103. Ikke
+  rørt, siden jeg ikke vet om liv-systemet er ment å faktisk bety noe
+  ennå eller er en bevisst "kan ikke tape ennå"-sikring mens resten
+  bygges ferdig.
+- **`dodmenu1.lua` mangler samme sikkerhetsnett som `pausemenu1.lua`.**
+  Alle tre knappene der (`resume`/`resume1`/`resume3`, altså retry/
+  main menu/levels) kaller `composer.gotoScene(...)` helt direkte, uten
+  `pcall` og uten sjekkpunkt. `dodmenu1.lua` er dødsskjermen for ALLE
+  ni baner, akkurat som `pausemenu1.lua` er pauseskjermen for alle ni,
+  og den navigerer til nøyaktig de samme stedene
+  (`gotolevel1`/`gotomenu`/`gotochooselevel`) som fikk "will/did"-fiksen
+  i dag. Rot-årsaken er nå fikset uansett, men hvis noe nytt krasjer
+  langs denne veien, vil du ikke få en rød sjekkpunkt-boks fra
+  dødsskjermen slik du ville fått fra pauseskjermen. Verdt å legge til
+  samme mønster her hvis dere fortsetter feilsøkingen.
+- **`ogt_levelmanager.lua` lekker en sprite for hver banevelging.**
+  `k.beforeLeaving()` (kalt rett før du går inn i en bane fra
+  banevalg-rutenettet) lager en ny splash-sprite
+  (`last = display.newSprite(...)`, global variabel) og spiller den,
+  men opprydningen er kommentert bort (`--display.remove( last )`,
+  `--last = nil`). Hver gang du velger en bane fra rutenettet blir det
+  ett usynlig (eller kanskje ikke usynlig?) objekt til liggende igjen.
+  Ufarlig i en kort testøkt, men kan bli mange objekter over en lang
+  spilløkt med mye fram-og-tilbake til banevalget.
+- **Selve banevalget mangler sikkerhetsnettet.** Den faktiske
+  scenebytte-linja når du trykker en banerute
+  (`sceneMgr.gotoScene(newScene, ...)` inni `selectLevel` sin `goto()`
+  i `ogt_levelmanager.lua`, rundt linje 166) har ingen `pcall`. Resten
+  av kjeden dit (pausemeny → `gotochooselevel` → `chooselevel` →
+  `ogt_levelmanager.lua` sin `init`/`makeGrid`) ble instrumentert i går,
+  men selve trykket på banen ble stående ubeskyttet.
+  `ogt_levelmanager.lua` har forøvrig egne sjekkpunkt-kall
+  (`checkpoint("ogt_lm:...")`, 4 stykker) som heller ikke sto nevnt i
+  "husk før dette regnes som ferdig"-lista øverst i dette dokumentet,
+  lagt til der nå.
+- **`level6.lua` til `level9.lua` er bokstavelig talt 100 % identiske
+  filer**, bekreftet med `diff` (null forskjell, ikke bare samme
+  bilder). Og nå med konkrete detaljer på hvorfor bildene deres er
+  knuste: de refererer bilder UTEN mappe-prefiks
+  (`"back_cave.png"`, `"dirt1.png"`, `"1.png"`-`"4.png"`), mens de
+  faktiske filene bare finnes under `background/` og under sin egen
+  `levelN/`-mappe (`background/back_cave.png`, `level5/1.png` osv).
+  `level2.lua`-`level4.lua` har IKKE denne bugen, de bruker riktige
+  stier. Dette bekrefter og konkretiserer det som sto i `KODEBASE.md`
+  fra før, ikke noe overraskende nytt, men nå med eksakte stier å
+  rette hvis/når disse banene prioriteres.
+- **To dødekode-filer har byttet om egne interne navn.** `game.lua`
+  (til tross for filnavnet) inneholder en gammel `liv`-modul
+  (`liv_igjen`, `liv.txt`, kaller udefinerte `saveScore()`/
+  `loadScore()` — ville krasjet hvis den noensinne ble brukt).
+  `livddadas.lua` (til tross for SITT filnavn) inneholder i stedet en
+  gammel `game`-modul (`score.txt`, `high_score`, fungerende internt).
+  Begge er fortsatt 100 % ubrukte og urørt, men verdt å vite om navnet
+  lurer deg hvis du noen gang vurderer å gjenopplive en av dem.
+- **To mindre bugs i allerede-død kode**, kun for katalogens skyld:
+  `options.lua` sjekker `if event.phase == began then` (linje 67) uten
+  anførselstegn rundt "began", så den sammenligner mot en udefinert
+  global variabel (alltid usann) — "rask meny"-hjørnet ville aldri
+  reagert selv om fila var i bruk. `brett.lua` bygger en riktig
+  `options`-tabell for overgangseffekt, men sender i steden den
+  udefinerte globalen `brett` til `composer.gotoScene()` (linje 27),
+  så tilbake-knappen ville alltid brukt standard-overgang. `brett.lua`
+  har også tre av fire banetile-knapper som peker til scener
+  (`"play2"`, `"play3"`, `"play4"`) som ikke finnes noe sted i
+  prosjektet i det hele tatt, bare `"play"` (→ `play.lua`) er reell.
+
 ## Død kode (finnes i repoet, men brukes aldri)
 
 Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
@@ -285,6 +383,14 @@ slette hvis du en dag vil rydde:
 - `options.lua` — samme `"backgroun1d.jpg"`-referanse som `brett.lua`.
 - `play.lua` — refererer `"images/eforest02.jpg"` (finnes ikke). Ser ut
   som en stjerne-/resultatskjerm som aldri ble koblet til noe.
+- `menu backup.lua` — en eldre, ikke-instrumentert kopi av `menu.lua`
+  (ingen `checkpoint()`-kall, ellers nesten identisk). Refererer
+  bilder uten `background/`-prefiks (f.eks `"bg1.png"` i stedet for
+  `"background/bg1.png"`), som heller ikke finnes på den stien.
+- `hoydehopp.lua` — en fysikk-lekeplass (to komplette 9-ledds
+  ormekropper), ingen knust bilde-referanse denne gangen (`del1.jpg`
+  finnes faktisk, om enn inkonsekvent blandet med `.png` samme sted i
+  fila), men ingen steder navigert til.
 
 ## Hvor ting ligger
 
