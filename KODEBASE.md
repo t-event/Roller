@@ -28,6 +28,9 @@ filer i roten). Nå:
 - `lib/` — delte moduler som ikke er egne scener (fysikkformer, kamera,
   liv/poeng, banevalg-systemet, tredjeparts lagringsbibliotek).
 - `dod-kode/` — bekreftet ubrukt kode, se `dod-kode/README.md`.
+- `opprinnelig-fra-dropbox/` — de 306 originale filene fra Dropbox, helt
+  urørt, lagt til 2026-09-10 så Ørjan kan bla i dem direkte på GitHub.
+  Ikke en del av selve spillet, se `opprinnelig-fra-dropbox/README.md`.
 - `ssk2/` — tredjepartsbibliotek, urørt.
 
 I Solar2D er `require("navn")` og `composer.gotoScene("navn")` bokstavelig
