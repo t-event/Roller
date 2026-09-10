@@ -28,6 +28,12 @@ local lm = require("lib.ogt_levelmanager")
 local liv =require("lib.liv")
 --local pausemenu = require("pausemenu")
 
+-- Forhåndsdeklarert her (fil-scope) i stedet for utilsiktet global,
+-- gjort 2026-09-10. Trengs synlig for BÅDE scene:create (der den
+-- defineres) og scene:hide (der touch-lytteren fjernes igjen) siden de
+-- er to separate funksjoner i denne fila, ikke nestet i hverandre.
+local trykk_knapp
+
 -- -----------------------------------------------------------------------------------------------------------------
 
 
@@ -932,7 +938,9 @@ local function ferdi()
 end
 
 local tran 
-function kill(obj)
+-- Gjort lokal 2026-09-10 (var utilsiktet global, aldri kalt fra
+-- noe annet sted i spillet).
+local function kill(obj)
 display.remove(obj)
 obj=nil
 end    
@@ -1685,7 +1693,7 @@ grp.yScale = scaleFactor
  local sisteBegan = 0
  local dobbeltklikkVindu = 300 -- ms
 
- function trykk_knapp( event )
+ trykk_knapp = function( event )
     if event.phase == "began" then
             local naa = system.getTimer()
             if ( naa - sisteBegan ) < dobbeltklikkVindu then

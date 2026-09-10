@@ -143,13 +143,16 @@ grp:insert(storyknapp)
 camera:add(storyknapp,1,false)
 ----------------------------------------------------------------
 
-function lock( event )
+-- lock/goto gjort lokale 2026-09-10 (var utilsiktet globale, ingen
+-- annen fil bruker dem, se Solar2D sine egne anbefalinger om å unngå
+-- utilsiktede globale variabler/funksjoner).
+local function lock( event )
     physics.addBody(storyknapp,"dynamic", physicsData:get("storyknapp") )
 end
 
 
-function goto( event )
-   composer.gotoScene( "scenes.chooselevel",{effect = "slideUp" , time = 1000}) 
+local function goto( event )
+   composer.gotoScene( "scenes.chooselevel",{effect = "slideUp" , time = 1000})
 end
 -----------------------------------------------------------------------------
     --local spillknapp = display.newRect( 50,500,100,100 )

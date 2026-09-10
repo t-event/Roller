@@ -711,3 +711,53 @@ Siden banene skal holdes åpne for testing (Ørjans svar på spørsmål 7),
 rettet samme fiks der også, ikke bare i `level1.lua`.
 
 **Ikke testet i faktisk nettleser ennå.**
+
+## 2026-09-10, opprydding av utilsiktede globale variabler
+
+Mathias ba om en full, grundig opprydding "i henhold til
+dokumentasjonen", uavhengig av bugs (de tar vi senere). Fant noe
+konkret i Solar2D sin egen dokumentasjon om nettopp det jeg mistenkte
+i går: Runtime-lyttere som ikke fjernes lekker minne, siden
+Runtime-eventet er globalt og lyttere overlever selv om
+display-objektet de hørte til er borte.
+
+Gikk gjennom `scenes/`-filene for utilsiktede globale funksjoner
+(skrevet uten `local`). Fant `trykk_knapp` i alle ni banefiler, `kill`
+i bane 2-9 (aldri kalt noe sted), og `lock`/`goto` i `menu.lua`.
+
+**Viktig lærdom underveis:** dette er IKKE en mekanisk "legg til
+local overalt"-jobb. `trykk_knapp` viste seg å være avhengig av å
+være global, siden `pausemenu1.lua`/`dodmenu1.lua` refererer den ved
+navn for å fjerne touch-lytteren når du pauser/dør. Å bare gjøre den
+lokal ville brutt den opprydningen. Løsningen: gjorde `trykk_knapp`
+fil-scoped i hver banefil (en `local trykk_knapp`-forhåndsdeklarasjon
+øverst, synlig for både `scene:create` og `scene:hide`), og fjernet
+de nå garantert virkningsløse forsøkene på å fjerne den fra
+pausemeny/dødsmeny. Opprydningen skjer riktig i banens egen
+`scene:hide` i stedet, som uansett alltid tvinges gjennom nå takket
+være `composer.removeScene()`-fiksen fra tidligere i kveld.
+
+**Ekstra funn i samme runde:** `onCollision`/`onCollision1`/`knekk`
+var faktisk ALLEREDE riktig lokale i banefilene, men
+`pausemenu1.lua`/`dodmenu1.lua` prøvde likevel å fjerne dem ved navn
+på tvers av filer. Det har aldri fungert (refererte en udefinert
+global), sannsynligvis siden spillet ble skrevet. Fjernet de
+virkningsløse linjene. Dette er trolig en medvirkende årsak til
+slow-motion-bugen fra i sted: lyttere som aldri faktisk fjernes hoper
+seg opp for hver runde i pause/død, nøyaktig det Solar2D sin egen
+dokumentasjon advarer mot.
+
+**Om omfanget videre:** "all kode i henhold til dokumentasjonen" er et
+mye større løft enn det som er gjort her. `camera` og `grp` er også
+utilsiktet globale i alle banefiler (brukt på samme måte som
+`trykk_knapp` var, mellom `scene:create` og `scene:hide`), og hver av
+de ni banefilene har flere store, utkommenterte kodeblokker (gamle,
+forlatte forsøk) som strengt tatt burde fjernes for et virkelig rent
+resultat. Det er en betydelig jobb til, per fil, med samme grundighet
+som i kveld. Gjorde det viktigste og best dokumenterte først
+(Runtime-lyttere, siden det direkte henger sammen med
+slow-motion-bugen), og stopper her for å spørre om dere vil at jeg
+fortsetter resten nå eller en annen gang, fremfor å gjette meg videre
+inn i natten på egen hånd.
+
+**Ikke testet i faktisk nettleser ennå.**

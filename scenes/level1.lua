@@ -28,6 +28,12 @@ local lm = require("lib.ogt_levelmanager")
 local liv =require("lib.liv")
 local mark =require("lib.mark")
 
+-- Forhåndsdeklarert her (fil-scope) i stedet for utilsiktet global,
+-- gjort 2026-09-10. Trengs synlig for BÅDE scene:create (der den
+-- defineres) og scene:hide (der touch-lytteren fjernes igjen) siden de
+-- er to separate funksjoner i denne fila, ikke nestet i hverandre.
+local trykk_knapp
+
 
 -- -----------------------------------------------------------------------------------------------------------------
 
@@ -2189,7 +2195,7 @@ grp.yScale = scaleFactor
  local sisteBegan = 0
  local dobbeltklikkVindu = 300 -- ms
 
- function trykk_knapp( event )
+ trykk_knapp = function( event )
     if event.phase == "began" then
             local naa = system.getTimer()
             if ( naa - sisteBegan ) < dobbeltklikkVindu then

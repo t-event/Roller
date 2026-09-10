@@ -100,10 +100,12 @@ grp=sceneGroup
 
 local function resume(event)
 
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/onCollision/onCollision1 er lokale
+-- variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 timer.cancel(eventTimer)
 print("Current Score1: ", liv.returnScore())
 print("Current Score2: ", liv.returnScore())
@@ -148,10 +150,12 @@ pausemenuretry:addEventListener ("touch", resume)
 
 local function resume1(event)
 pausemenu.alpha=0
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/onCollision/onCollision1 er lokale
+-- variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 timer.cancel(eventTimer)
 local ok, err = pcall( composer.gotoScene, "scenes.gotomenu", {effect = "fade" , time = 1} )
 if not ok then
@@ -190,10 +194,12 @@ pausemenuquit:addEventListener ("touch", resume2)
 
 local function resume3(event)
 pausemenu.alpha=0
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/onCollision/onCollision1 er lokale
+-- variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 timer.cancel(eventTimer)
 local ok, err = pcall( composer.gotoScene, "scenes.gotochooselevel", {effect = "fade" , time = 1} )
 if not ok then

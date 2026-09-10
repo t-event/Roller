@@ -87,11 +87,12 @@ grp=sceneGroup
 
 local function resume(event)
 
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", knekk)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/knekk/onCollision/onCollision1 er
+-- lokale variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 liv.endreliv(1)
 liv.lagreliv()
 local destination = "scenes.level" .. tostring(lm.currentLevel)
@@ -122,11 +123,12 @@ pausemenuretry:addEventListener ("touch", resume)
 local function resume1(event)
 pausemenu.alpha=0
 timer.cancel(eventTimer)
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", knekk)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/knekk/onCollision/onCollision1 er
+-- lokale variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 local ok, err = pcall( composer.gotoScene, "scenes.gotomenu", {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
@@ -154,11 +156,12 @@ pausemenumainmenu:addEventListener ("touch", resume1)
 local function resume3(event)
 pausemenu.alpha=0
 timer.cancel(eventTimer)
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", knekk)
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener("collision", onCollision1)
+-- Ryddet bort 2026-09-10: trykk_knapp/knekk/onCollision/onCollision1 er
+-- lokale variabler i banefilen (level1.lua osv), usynlige herfra. Disse
+-- removeEventListener-kallene har dermed aldri fjernet noe i praksis
+-- (refererte en udefinert global). Selve opprydningen skjer riktig i
+-- banens egen scene:hide når composer.removeScene() under tvinger den
+-- gjennom.
 local ok, err = pcall( composer.gotoScene, "scenes.gotochooselevel", {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)

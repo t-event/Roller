@@ -257,6 +257,27 @@ filene gjør.
    av når marken er slapp. Samme fiks i `level2.lua`-`level9.lua` også
    (delte nøyaktig samme buggede kode), ikke bare `level1.lua`. Ikke
    testet i faktisk nettleser ennå.
+7. **Utilsiktede globale variabler, bekreftet mot Solar2D sin egen
+   dokumentasjon (2026-09-10).** Solar2D advarer eksplisitt: fjernes
+   ikke Runtime-lyttere, fortsetter de å kjøre og lekker minne, siden
+   Runtime-eventet er globalt. Fant flere funksjoner skrevet uten
+   `local` (utilsiktet globale) i banefilene: `trykk_knapp` (alle ni
+   baner), `kill` (bane 2-9, aldri kalt noe sted), `lock`/`goto`
+   (`menu.lua`). **Fikset**, men `trykk_knapp` krevde ekstra
+   forsiktighet: `pausemenu1.lua`/`dodmenu1.lua` prøvde å fjerne den
+   som om den var global, på tvers av filer. Løst ved å gjøre
+   `trykk_knapp` fil-scoped i hver banefil (synlig for både
+   `scene:create` og `scene:hide` som egen `local`), og fjerne de
+   virkningsløse cross-fil-forsøkene i pausemeny/dødsmeny (opprydningen
+   skjer nå riktig i banens egen `scene:hide`, tvunget gjennom av
+   `composer.removeScene()`-fiksen fra samme dag). Oppdaget samtidig at
+   `onCollision`/`onCollision1`/`knekk` **allerede var** korrekt lokale
+   i banefilene, og at pausemeny/dødsmeny sine forsøk på å fjerne DEM
+   på tvers av filer **aldri har fungert** (refererte en udefinert
+   global) — trolig en medvirkende årsak til slow-motion-bugen (punkt
+   nedenfor), siden lyttere som ikke fjernes hoper seg opp nøyaktig
+   slik Solar2D sin dokumentasjon advarer om. Disse virkningsløse
+   linjene er også fjernet.
 
 ## Anbefalt ryddeplan
 
