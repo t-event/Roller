@@ -229,6 +229,13 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   liten, ufarlig content-bug (feil banelayout-bilde), ikke noe som
   stopper spillet. Ser nærmere på det.
 
+- **2026-09-10.** Nytt krasj funnet: "retry"-knappen i pausemenyen
+  krasjet etter tredje forsøk (samme addEventListener-feil). Den
+  eneste av pausemenyens tre knapper som ikke allerede var fanget opp
+  med sikkerhetsnettet vårt, siden problemet med "main menu" og
+  "levels" knappene ble oppdaget først. Lagt til samme fangst der.
+  Nytt bygg kjører nå. Neste feilmelding bør vise nøyaktig sjekkpunkt.
+
 ## Død kode (finnes i repoet, men brukes aldri)
 
 Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
