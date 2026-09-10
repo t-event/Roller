@@ -863,12 +863,100 @@ checkpoint("level1:cp_684_after_backgrounds")
 
 
     pivot_joint8.isMotorEnabled = false
-    pivot_joint8.motorSpeed = 0 
+    pivot_joint8.motorSpeed = 0
     pivot_joint8.maxMotorTorque = 0
     pivot_joint8.isLimitEnabled=false
     --pivot_joint8:setRotationLimits( 0, 38 )
     pivot_joint8.isCollideConnected = true
- 
+
+-- Lagt til 2026-09-10: level1.lua manglet hele knott/weldJoint-blokken
+-- som level2.lua-level9.lua har (verifisert identisk der, kopiert
+-- derfra uendret). Uten disse fantes det ingen fysikkobjekter som
+-- faktisk kunne utløse knekk(event) sin kollisjonssjekk, uansett om
+-- Runtime-lytteren var skrudd på eller ikke. Se TIL-ORJAN.md.
+local knott1 = display.newRect( 10,10,10,10 )
+knott1.x = del1.x
+knott1.y = del1.y+5
+camera:add(knott1,1,false)
+physics.addBody( knott1, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott1.isSensor = true
+knott1.alpha = 0
+
+local knott2 = display.newRect( 10,10,10,10 )
+knott2.x = del2.x
+knott2.y = del2.y+10
+camera:add(knott2,1,false)
+physics.addBody( knott2, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott2.isSensor = true
+knott2.alpha = 0
+
+local knott3 = display.newRect( 10,10,10,10 )
+knott3.x = del3.x
+knott3.y = del3.y+10
+camera:add(knott3,1,false)
+physics.addBody( knott3, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott3.isSensor = true
+knott3.alpha = 0
+
+local knott4 = display.newRect( 10,10,10,10 )
+knott4.x = del4.x
+knott4.y = del4.y+10
+camera:add(knott4,1,false)
+physics.addBody( knott4, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott4.isSensor = true
+knott4.alpha = 0
+
+local knott5 = display.newRect( 10,10,10,10 )
+knott5.x = del5.x
+knott5.y = del5.y+10
+camera:add(knott5,1,false)
+physics.addBody( knott5, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott5.isSensor = true
+knott5.alpha = 0
+
+local knott6 = display.newRect( 10,10,10,10 )
+knott6.x = del6.x
+knott6.y = del6.y+10
+camera:add(knott6,1,false)
+physics.addBody( knott6, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott6.isSensor = true
+knott6.alpha = 0
+
+local knott7 = display.newRect( 10,10,10,10 )
+knott7.x = del7.x
+knott7.y = del7.y+10
+camera:add(knott7,1,false)
+physics.addBody( knott7, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott7.isSensor = true
+knott7.alpha = 0
+
+local knott8 = display.newRect( 10,10,10,10 )
+knott8.x = del8.x
+knott8.y = del8.y+10
+camera:add(knott8,1,false)
+physics.addBody( knott8, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott8.isSensor = true
+knott8.alpha = 0
+
+local knott9 = display.newRect( 10,10,10,10 )
+knott9.x = del9.x
+knott9.y = del9.y+10
+camera:add(knott9,1,false)
+physics.addBody( knott9, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
+knott9.isSensor = true
+knott9.alpha = 0
+
+
+local weldJoint1 = physics.newJoint( "weld", knott1, del1, knott1.x, knott1.x )
+local weldJoint2 = physics.newJoint( "weld", knott2, del2, knott2.x, knott2.x )
+local weldJoint3 = physics.newJoint( "weld", knott3, del3, knott3.x, knott3.x )
+local weldJoint4 = physics.newJoint( "weld", knott4, del4, knott4.x, knott4.x )
+local weldJoint5 = physics.newJoint( "weld", knott5, del5, knott5.x, knott5.x )
+local weldJoint6 = physics.newJoint( "weld", knott6, del6, knott6.x, knott6.x )
+local weldJoint7 = physics.newJoint( "weld", knott7, del7, knott7.x, knott7.x )
+local weldJoint8 = physics.newJoint( "weld", knott8, del8, knott8.x, knott8.x )
+local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
+
 
 
 
@@ -932,6 +1020,16 @@ del6.type     = "del6"
 del7.type     = "del7"
 del8.type     = "del8"
 del9.type     = "del9"
+
+knott1.type   = "knott1"
+knott2.type   = "knott2"
+knott3.type   = "knott3"
+knott4.type   = "knott4"
+knott5.type   = "knott5"
+knott6.type   = "knott6"
+knott7.type   = "knott7"
+knott8.type   = "knott8"
+knott9.type   = "knott9"
 
 firkant1.type = "firkant1"
 firkant2.type = "firkant2"

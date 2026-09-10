@@ -269,7 +269,14 @@ filene gjør.
    funksjonen til kollisjoner var kommentert bort i alle ni filer, så
    mekanikken kjørte aldri. Skrudd på. Opprydningen i `scene:hide` fjernet
    allerede lytteren riktig ved sceneskifte, så ingen ekstra opprydning
-   trengtes. Ikke testet i faktisk nettleser ennå.
+   trengtes.
+
+   **Fungerte fortsatt ikke i bane 1.** `level1.lua` manglet i tillegg
+   selve `knott1`-`knott9`-fysikkobjektene (usynlige sensorer weldet på
+   hver kroppsdel) som `level2.lua`-`level9.lua` har, uten dem kunne
+   ikke kollisjonssjekken i `knekk()` noensinne bli sann i bane 1.
+   Kopiert inn fra `level2.lua` (kroppen er identisk mellom filene).
+   Se `TIL-ORJAN.md`. Ikke testet i faktisk nettleser ennå.
 6. **Dobbeltklikk for å gjøre marken slapp virket ikke.** Fant koden
    (`trykk_knapp` i `level1.lua`), den brukte `event.numTaps == 2` fra
    Runtime "tap"-eventet, som ikke ser ut til å synkroniseres pålitelig

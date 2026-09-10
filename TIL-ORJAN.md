@@ -905,3 +905,36 @@ tiden, bare avslått med en enkelt kommentert linje per fil.
 
 Ikke testet i faktisk nettleser. Push og bygg gjenstår når dere har
 sett dette.
+
+## 2026-09-10, knekk fungerte fortsatt ikke: level1.lua manglet selve fysikkobjektene
+
+Mathias meldte tilbake at knekk-mekanikken fortsatt ikke fungerte.
+Gikk gjennom `level1.lua` på nytt og fant den egentlige årsaken: i
+motsetning til `level2.lua`-`level9.lua`, som alle oppretter
+`knott1`-`knott9` (usynlige sensor-rektangler, weldet fast på hver
+kroppsdel med `physics.newJoint("weld", ...)`) rett etter
+motor-oppsettet for pivot-jointene, manglet `level1.lua` denne
+blokken fullstendig. `knott1`-`knott9` fantes der kun som referanser
+inne i `knekk()` selv (`display.remove(knottN)`, `knottN = nil`),
+aldri opprettet. Kollisjonssjekken `event.object1.type == "knottN"`
+kunne dermed aldri bli sann i `level1.lua`, uansett om
+Runtime-lytteren var skrudd på, siden ingen fysikkobjekt noensinne
+fikk den typen. Forrige fiks (skru på lytteren) var nødvendig men
+ikke tilstrekkelig, og var trolig grunnen til at det fungerte i
+bane 2-9 men ikke i bane 1, som antakelig var den Mathias testet.
+
+Sammenlignet `level1.lua` og `level2.lua` linje for linje rundt
+mark-oppsettet: kroppsdelene (`del1`-`del9`, samme bilder,
+`hale.png`/`del1.png`), pivot-jointene og motor-oppsettet er
+bokstavelig talt identiske mellom filene. Kopierte derfor
+knott/weldJoint-blokken (og de tilhørende `knottN.type`-linjene)
+uendret fra `level2.lua` inn i `level1.lua`, satt inn på nøyaktig
+samme sted relativt til resten av koden (rett etter
+`pivot_joint8`-oppsettet, før `firkant`-bakgrunnsbildene). Luac
+syntax-sjekket etterpå.
+
+Ikke testet i faktisk nettleser, det er akkurat den delen jeg ikke
+kan gjøre herfra. Ba Mathias bekrefte at bane 1 nå faktisk knekker
+riktig, siden posisjonstallene (`del1.y+5`, `del2.y+10` osv.) er
+kopiert fra bane 2-9 og ikke visuelt verifisert mot bane 1 sin egen
+grafikk, selv om selve kroppen skal være identisk.
