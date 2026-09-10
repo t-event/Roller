@@ -19,7 +19,7 @@ if system.getInfo( "platformName" ) ~= "HTML5" then
 	bbb = ssk.meters.create_mem( true )
 end
 
-composer.gotoScene( "gotolevel1" )
+composer.gotoScene( "scenes.gotolevel1" )
 
  
 

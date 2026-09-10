@@ -1,5 +1,5 @@
 
-local physicsData = (require "shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 
 
 local mark = {}

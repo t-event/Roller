@@ -5,10 +5,10 @@ local scene = composer.newScene()
 local widget = require ("widget")
 
 widget.setTheme ( "widget_theme_ios")
-local physicsData = (require "shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 local physics = require( "physics" )
 --physics.setDrawMode( "hybrid" )
-local perspective = require ("perspective")
+local perspective = require ("lib.perspective")
 local scaleFactor = 1.0
 local bredde = display.contentWidth
 local hoyde = display.contentHeight
@@ -20,10 +20,10 @@ local screenRight = screenLeft + screenWidth
 local screenTop = display.screenOriginY
 local screenHeight = display.viewableContentHeight - screenTop * 2
 local screenBottom = screenTop + screenHeight
-local gameUI =require("gameUI")
-local lm = require("ogt_levelmanager")
+local gameUI =require("lib.gameUI")
+local lm = require("lib.ogt_levelmanager")
 
-local mark =require("mark")
+local mark =require("lib.mark")
 
 
 
@@ -149,7 +149,7 @@ end
 
 
 function goto( event )
-   composer.gotoScene( "chooselevel",{effect = "slideUp" , time = 1000}) 
+   composer.gotoScene( "scenes.chooselevel",{effect = "slideUp" , time = 1000}) 
 end
 -----------------------------------------------------------------------------
     --local spillknapp = display.newRect( 50,500,100,100 )
@@ -230,7 +230,7 @@ checkpoint("menu:after_camera_setup")
 
 
 --[[
-    local playBtn = widget.newButton( {fontSize = 75,width = 250,height = 150,label = "Play", id = "chooselevel", onRelease=goSomewhere})
+    local playBtn = widget.newButton( {fontSize = 75,width = 250,height = 150,label = "Play", id = "scenes.chooselevel", onRelease=goSomewhere})
     playBtn.height = 150
     playBtn.width = 250
     playBtn.y = display.contentHeight/4
@@ -296,7 +296,7 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         -- Called immediately after scene goes off screen.
         print( "loading1" )
- composer.removeScene("menu")
+ composer.removeScene("scenes.menu")
 print( "loading2" )
 
     end

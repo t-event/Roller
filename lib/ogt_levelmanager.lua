@@ -20,11 +20,11 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
-local k = require("ogt_lmdata") -- tweak the variables in this file!
+local k = require("lib.ogt_lmdata") -- tweak the variables in this file!
 
 local sceneMgr = require( "composer" ) -- or use "storyboard"
 
-local GGData = require( "GGData" )
+local GGData = require( "lib.GGData" )
 
 local widget = require ("widget")
 
@@ -76,7 +76,7 @@ end
 
   local function goSomewhere (event)
         
-        composer.gotoScene( "gotomenu" )
+        composer.gotoScene( "scenes.gotomenu" )
 end
 --==============================================================
 -- show the next/prev arrows when they should be visible.

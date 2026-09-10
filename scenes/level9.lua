@@ -8,10 +8,10 @@ widget.setTheme ( "widget_theme_ios")
 
 local physics = require( "physics" )
 --physics.setDrawMode( "hybrid" )
-local perspective = require ("perspective")
+local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -24,8 +24,8 @@ local screenBottom = screenTop + screenHeight
 local bredde = display.contentWidth
 
 local hoyde = display.contentHeight
-local lm = require("ogt_levelmanager")
-local liv =require("liv")
+local lm = require("lib.ogt_levelmanager")
+local liv =require("lib.liv")
 --local pausemenu = require("pausemenu")
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ local liv =require("liv")
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
         Runtime:removeEventListener("collision", onCollision2)
-        composer.showOverlay( "dodmenu1",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.dodmenu1",{isModal = true,effect = "fade",time = 500,})
         end
 
 
@@ -71,7 +71,7 @@ local liv =require("liv")
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "pausemenu1",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.pausemenu1",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ local liv =require("liv")
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "gotolevel2",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.gotolevel2",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ local liv =require("liv")
         
 
 function scene:create( event )
-lm.currentLevel = 8 -- sÃ¥ retry vet hvilken bane den skal restarte
+lm.currentLevel = 9 -- sÃ¥ retry vet hvilken bane den skal restarte
 
 
     local sceneGroup = self.view
@@ -752,7 +752,7 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
    
 
                                      
-                                      local     firkant1 = display.newImageRect("level8/1.png", 7680,4702)
+                                      local     firkant1 = display.newImageRect("level9/1.png", 7680,4702)
                                                 firkant1.x = 3500
                                                 --firkant1.x = 3850
                                                 firkant1.y = 2300
@@ -760,21 +760,21 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
                                                 firkant1.alpha = 1  
                                                 firkant1.myName = "firkant1"                                
                                                 
-                                      local     firkant2 = display.newImageRect("level8/2.png", 7680,4702)
+                                      local     firkant2 = display.newImageRect("level9/2.png", 7680,4702)
                                                 firkant2.x = firkant1.x+firkant2.width
                                                 firkant2.y = firkant1.y+firkant2.height
                                                 physics.addBody(firkant2,"static", physicsData:get("2") )
                                                 firkant2.myName = "firkant2"   
                                                 
                                                  
-                                      local     firkant3 = display.newImageRect("level8/3.png", 7680,4702)
+                                      local     firkant3 = display.newImageRect("level9/3.png", 7680,4702)
                                                 firkant3.x = firkant2.x+firkant3.width
                                                 firkant3.y = firkant2.y+firkant3.height
                                                 physics.addBody(firkant3,"static", physicsData:get("3") )
                                                 firkant3.myName = "firkant3"   
                                                 
                                                 
-                                      local     firkant4 = display.newImageRect("level8/4.png", 7680,4702)
+                                      local     firkant4 = display.newImageRect("level9/4.png", 7680,4702)
                                                 firkant4.x = firkant3.x+firkant4.width
                                                 firkant4.y = firkant3.y+firkant4.height
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
@@ -1839,7 +1839,7 @@ local function trykk_knapp1( event )
          --Runtime:removeEventListener( "touch", trykk_knapp)
 --Runtime:removeEventListener( "tap", trykk_knapp)
 
-         composer.showOverlay( "pausemenu1",options)
+         composer.showOverlay( "scenes.pausemenu1",options)
          return true 
     elseif event.phase == "ended" then
        --camera:destroy()
@@ -1877,7 +1877,7 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         print ("level1 scene:show did")
         --last:pause()
-        composer.removeScene("chooselevel")
+        composer.removeScene("scenes.chooselevel")
         display.remove( last )
         last = nil
     end
@@ -1907,9 +1907,9 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 
 
-composer.removeScene ("pausemenu1")
+composer.removeScene ("scenes.pausemenu1")
 
-       composer.removeScene ("level1")
+       composer.removeScene ("scenes.level1")
 
 
 

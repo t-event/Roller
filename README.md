@@ -6,9 +6,11 @@ ikke en ball) som styres gjennom banen, pausemeny og dødsmeny. Bygget med
 [SSK2](https://github.com/roaminggamer/SSK2) (ligger i `ssk2/`).
 
 Importert rått fra en delt Dropbox-mappe som utgangspunkt for å se hva AI
-kan gjøre videre med det. Siden da er en krasj i retry-knappen fikset, og
-bekreftet ubrukt kode er samlet i `dod-kode/` (se `dod-kode/README.md`).
-Se `TIL-ORJAN.md` for hele loggen, `KODEBASE.md` for hvordan spillet
+kan gjøre videre med det. Siden da er en krasj i retry-knappen fikset,
+bekreftet ubrukt kode er samlet i `dod-kode/` (se `dod-kode/README.md`),
+og koden er ryddet fra én flat mappe til `scenes/` (spillskjermene) og
+`lib/` (delte moduler) — se "Mappestruktur" i `KODEBASE.md`. Se
+`TIL-ORJAN.md` for hele loggen, `KODEBASE.md` for hvordan spillet
 henger sammen, og `sporsmal.md` for åpne spørsmål til Ørjan.
 
 ## Kjøre spillet

@@ -5,10 +5,10 @@ local scene = composer.newScene()
 local widget = require ("widget")
 
 widget.setTheme ( "widget_theme_ios")
-local physicsData = (require "shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 local physics = require( "physics" )
 --physics.setDrawMode( "hybrid" )
-local perspective = require ("perspective")
+local perspective = require ("lib.perspective")
 local scaleFactor = 1.0
 local bredde = display.contentWidth
 local hoyde = display.contentHeight
@@ -20,17 +20,17 @@ local screenRight = screenLeft + screenWidth
 local screenTop = display.screenOriginY
 local screenHeight = display.viewableContentHeight - screenTop * 2
 local screenBottom = screenTop + screenHeight
-local gameUI =require("gameUI")
-local lm = require("ogt_levelmanager")
+local gameUI =require("lib.gameUI")
+local lm = require("lib.ogt_levelmanager")
 
  
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
--- local function gotolevel1( )
+-- local function reload( )
     
---    composer.gotoScene( "chooselevel",{effect = "fade" , time = 3000}) 
+--    composer.gotoScene( "scenes.chooselevel",{effect = "fade" , time = 3000}) 
 -- end
  
  
@@ -39,13 +39,23 @@ local lm = require("ogt_levelmanager")
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 local function goto( event )
-composer.gotoScene( "level1",{effect = "fade" , time = 500})  
+    --last:play()
+ timer.cancel(eventTimer)
+	local ok, err = pcall( composer.gotoScene, "scenes.menu", {effect = "fade" , time = 500} )
+	if not ok then
+		local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+		print( "CRASH going to menu: " .. msg )
+		local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+		bg:setFillColor( 0, 0, 0, 0.85 )
+		local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+		t:setFillColor( 1, 0.3, 0.3 )
+	end
 end
 
 function scene:create( event )
 
     local sceneGroup = self.view
-   print ("gotolevel1 scene:create did")
+   print ("gotomenu scene:create did")
 
  --local abc display.newImage( "loading.png",1920,1080 )
 
@@ -65,8 +75,8 @@ grp=sceneGroup
 
 last.height = screenHeight
 last.width  = screenWidth 
-last.x = bredde*0.5
-last.y = hoyde*0.5
+last.x = bredde/2
+last.y = hoyde/2
 
     last:setSequence("lastlast")
     grp:insert(last)
@@ -84,11 +94,11 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
-        print ("gotolevel1 scene:show will")
+        print ("gotomenu scene:show will")
     elseif ( phase == "did" ) then
-        print ("gotolevel1 scene:show did")
-
-timer.performWithDelay( 1500, goto)
+        print ("gotomenu scene:show did")
+--composer.removeScene( "scenes.level1" )
+local eventTimer = timer.performWithDelay( 1500, goto)
 
     end
 end
@@ -101,10 +111,10 @@ function scene:hide( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
-print ("gotolevel1 scene:hide will")
+print ("gotomenu scene:hide will")
     elseif ( phase == "did" ) then
-       composer.removeScene( "gotolevel1" )
-print ("gotolevel1 scene:hide did")
+       composer.removeScene( "scenes.gotomenu" )
+print ("gotomenu scene:hide did")
 
 
     end
@@ -115,7 +125,7 @@ end
 function scene:destroy( event )
 
     local sceneGroup = self.view
-    print ("gotolevel1 scene:destroy did")
+    print ("gotomenu scene:destroy did")
  
 end
 

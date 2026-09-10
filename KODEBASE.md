@@ -15,33 +15,54 @@ uten å fjerne den under, brukes til pause-/dødsmeny).
 `ssk2/` er et eksternt, generelt utility-bibliotek (Roaming Gamer SSK2),
 urørt tredjepartskode, ikke noe å rydde i.
 
+## Mappestruktur
+
+**Endret 2026-09-10.** Prosjektet var tidligere helt flatt (alle `.lua`-
+filer i roten). Nå:
+
+- Roten: bare `main.lua` og `config.lua` (må ligge her, Solar2D krever det),
+  pluss `build.settings`, mappene under, og alle asset-mapper (bilder/lyd)
+  som ikke er rørt.
+- `scenes/` — alle Composer-scener (splash-skjermer, menyer, pause-/
+  dødsmeny, alle ni baner).
+- `lib/` — delte moduler som ikke er egne scener (fysikkformer, kamera,
+  liv/poeng, banevalg-systemet, tredjeparts lagringsbibliotek).
+- `dod-kode/` — bekreftet ubrukt kode, se `dod-kode/README.md`.
+- `ssk2/` — tredjepartsbibliotek, urørt.
+
+I Solar2D er `require("navn")` og `composer.gotoScene("navn")` bokstavelig
+talt en fil-sti, så alle scenenavn heter nå `"scenes.navn"` (f.eks
+`"scenes.level1"`) og alle modul-`require`-kall heter `"lib.navn"` (f.eks
+`require("lib.liv")`). Bilde-/lyd-stier er IKKE påvirket, de er alltid
+relative til prosjektroten uansett hvilken `.lua`-fil som laster dem.
+
 ## Faktisk scene-flyt (bekreftet ved å spore alle `gotoScene`/`showOverlay`-kall)
 
 ```
 main.lua
-  └─ gotoScene("gotolevel1")        [alltid, uansett]
-       └─ (1.5s) gotoScene("level1")
+  └─ gotoScene("scenes.gotolevel1")        [alltid, uansett]
+       └─ (1.5s) gotoScene("scenes.level1")
 
-level1.lua .. level9.lua            [selve banen, valgt via chooselevel-gridet]
-  ├─ showOverlay("dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
-  ├─ showOverlay("pausemenu1")      [alltid pausemenu1, uansett hvilken bane]
-  └─ level1: showOverlay("gotochooselevel")   [riktig, tilbake til banevalg]
-     level2-9: showOverlay("gotolevel2")      [BUG: hardkodet, se "Kjente feil"]
+scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
+  ├─ showOverlay("scenes.dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
+  ├─ showOverlay("scenes.pausemenu1")      [alltid pausemenu1, uansett hvilken bane]
+  └─ level1: showOverlay("scenes.gotochooselevel")   [riktig, tilbake til banevalg]
+     level2-9: showOverlay("scenes.gotolevel2")      [BUG: hardkodet, se "Kjente feil"]
 
-pausemenu1.lua (delt av alle baner)
-  ├─ "retry"      → gotoScene(composer.getSceneName("current"))   [fikset 2026-09-10,
+scenes/pausemenu1.lua (delt av alle baner)
+  ├─ "retry"      → gotoScene("scenes.level" .. lm.currentLevel)   [fikset 2026-09-10,
   │                  gikk før alltid til level 1 uansett hvilken bane du var på]
-  ├─ "main menu"  → gotoScene("gotomenu") → gotoScene("menu")
-  └─ "levels"     → gotoScene("gotochooselevel") → gotoScene("chooselevel")
-                     └─ lm.init() (ogt_levelmanager.lua) bygger rutenettet
-                          └─ trykk på en rute → gotoScene("level" .. N)
+  ├─ "main menu"  → gotoScene("scenes.gotomenu") → gotoScene("scenes.menu")
+  └─ "levels"     → gotoScene("scenes.gotochooselevel") → gotoScene("scenes.chooselevel")
+                     └─ lm.init() (lib/ogt_levelmanager.lua) bygger rutenettet
+                          └─ trykk på en rute → gotoScene("scenes.level" .. N)
                              [rett til levelN, IKKE via gotolevelN]
 
-dodmenu1.lua (delt av alle baner)
+scenes/dodmenu1.lua (delt av alle baner)
   └─ samme struktur som pausemenu1.lua, "retry"/"main menu"/"levels"
 
-chooselevel.lua / gotochooselevel.lua
-  → lm.init() i ogt_levelmanager.lua, som leser ogt_lmdata.lua
+scenes/chooselevel.lua / gotochooselevel.lua
+  → lm.init() i lib/ogt_levelmanager.lua, som leser lib/ogt_lmdata.lua
 ```
 
 **Viktigst å forstå:** Selve banevalget hopper rett til `levelN`, ikke via
@@ -51,9 +72,12 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
 
 ## Fil-for-fil, gruppert
 
-Alt merket **død kode** under er siden 2026-09-10 flyttet til `dod-kode/`
-i stedet for prosjektroten (ikke slettet, se `dod-kode/README.md`).
-Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
+Filnavnene under er skrevet uten mappe-prefiks for lesbarhet (`gotolevel1.lua`
+i stedet for `scenes/gotolevel1.lua`), se "Mappestruktur" over for hvor de
+faktisk ligger nå. Alt merket **død kode** ligger i `dod-kode/`
+i stedet for i `scenes/`/`lib/` (ikke slettet, se `dod-kode/README.md`).
+Beskrivelsene under er ellers uendret siden flyttingen ikke påvirker hva
+filene gjør.
 
 ### Kjerne / alltid i bruk
 - `main.lua` — appens startpunkt, laster ssk2, går til `gotolevel1`.

@@ -8,10 +8,10 @@ widget.setTheme ( "widget_theme_ios")
 
 local physics = require( "physics" )
 --physics.setDrawMode( "hybrid" )
-local perspective = require ("perspective")
+local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -24,9 +24,9 @@ local screenBottom = screenTop + screenHeight
 local bredde = display.contentWidth
 
 local hoyde = display.contentHeight
-local lm = require("ogt_levelmanager")
-local liv =require("liv")
-local mark =require("mark")
+local lm = require("lib.ogt_levelmanager")
+local liv =require("lib.liv")
+local mark =require("lib.mark")
 
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ local mark =require("mark")
         physics.pause( )
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
-        composer.showOverlay( "dodmenu1",{isModal = true,effect = "fade",time = 1500,})
+        composer.showOverlay( "scenes.dodmenu1",{isModal = true,effect = "fade",time = 1500,})
         end
 
 
@@ -72,7 +72,7 @@ local mark =require("mark")
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "pausemenu1",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.pausemenu1",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ local mark =require("mark")
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "gotochooselevel",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.gotochooselevel",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -2355,7 +2355,7 @@ local function trykk_knapp1( event )
          --Runtime:removeEventListener( "touch", trykk_knapp)
 --Runtime:removeEventListener( "tap", trykk_knapp)
 
-         composer.showOverlay( "pausemenu1",options)
+         composer.showOverlay( "scenes.pausemenu1",options)
          return true 
     elseif event.phase == "ended" then
        --camera:destroy()
@@ -2394,7 +2394,7 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         print ("level1 scene:show did")
         --last:pause()
-        composer.removeScene("chooselevel")
+        composer.removeScene("scenes.chooselevel")
         display.remove( last )
         last = nil
     end
@@ -2424,9 +2424,9 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 
 
-composer.removeScene ("pausemenu1")
+composer.removeScene ("scenes.pausemenu1")
 
-       composer.removeScene ("level1")
+       composer.removeScene ("scenes.level1")
 
 
 

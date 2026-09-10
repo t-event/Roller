@@ -4,7 +4,7 @@
 --
 -- Usage example:
 --			local scaleFactor = 1.0
---			local physicsData = (require "shapedefs").physicsData(scaleFactor)
+--			local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
 --			local shape = display.newImage("objectname.png")
 --			physics.addBody( shape, physicsData:get("objectname") )
 --

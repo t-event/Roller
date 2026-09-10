@@ -2,7 +2,7 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
-local lm = require("ogt_levelmanager")
+local lm = require("lib.ogt_levelmanager")
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -61,7 +61,7 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         -- Called immediately after scene goes off screen.
        print ("chooselevel scene:hide did ")
-     -- composer.removeScene("chooselevel")
+     -- composer.removeScene("scenes.chooselevel")
     end
 end
 

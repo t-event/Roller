@@ -573,3 +573,42 @@ er dette pålitelig uansett vei inn.
 **Viktig: ikke testet i faktisk nettleser ennå**, siden jeg ikke kan
 kjøre HTML5-bygget selv. Dette er andre forsøk på samme bug, så vær
 ekstra oppmerksom når du tester denne gangen.
+
+## 2026-09-10, full opprydding av mappestruktur
+
+Mathias ba om full opprydding i kode og mappestruktur, og valgte
+eksplisitt "flytt aktive filer til undermapper" og "gjør det i én stor
+omgang, test til slutt" fremfor små, trygge biter. Advarte om risikoen
+først (nøyaktig denne typen endring var årsaken til retry-krasjen
+rett over), men kjørte det gitt svaret.
+
+**Gjort:** hele prosjektet, som tidligere var 27 `.lua`-filer flatt i
+roten, er nå delt i `scenes/` (alle Composer-scener) og `lib/` (delte
+moduler som ikke er egne scener). Bare `main.lua` og `config.lua` ble
+igjen i roten (Solar2D krever det). Full liste og begrunnelse i
+"Mappestruktur"-avsnittet i `KODEBASE.md`.
+
+Fremgangsmåte for å unngå akkurat den typen glipp som skjedde med
+linjeslutt tidligere i dag: kartla FØRST hver eneste streng-referanse
+til hvert av de 25 filnavnene på tvers av hele den levende kodebasen
+(ikke `dod-kode/`, den er urørt siden ingenting peker dit uansett) med
+grep, bygde et skript som gjør presise erstatninger (kun hele
+anførselstegn-innhold, ikke delstrenger, så f.eks `"levelWidth"`
+aldri kunne bli truffet), kjørte det på én fil om gangen med
+linjeslutt bevart (lærdom fra i sted), luac-sjekket alle 27 filene
+etterpå, og gjorde til slutt et bredt grep-søk etter alt som kunne
+ligne en glemt referanse før filene faktisk ble flyttet.
+
+Fant tre pre-eksisterende, allerede-ødelagte referanser
+(`composer.removeScene("pausemenu")`/`"dodmenu"` uten tallet, og
+`"reload"` i en kommentar) som pekte på scener som aldri har
+eksistert, verken før eller etter flyttingen. Rørte dem ikke, de var
+no-ops før også, ikke noe reorganiseringen skapte.
+
+**Ikke testet i faktisk nettleser ennå, og kan IKKE verifiseres av meg
+selv** siden `require()`/`gotoScene()`-stier bare løses ved kjøretid,
+ikke av `luac` sin syntaks-sjekk. Dette er den mest risikofylte
+endringen så langt i dag, akkurat den typen som forårsaket
+retry-krasjen over. Test grundig: appstart, alle ni baner (både via
+banevalg og "neste bane"), pause/død-menyene sine tre knapper hver,
+og retry på flere baner.

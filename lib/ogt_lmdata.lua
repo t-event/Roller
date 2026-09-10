@@ -36,7 +36,7 @@ Or, create a table in k.sceneNames that holds the composer scene
 name for each level you have.
 	-- ==============================================================]]
 k.playScene = nil -- name of scene or nil to go to sequential scenes
-k.sequentialScene = "level" -- will turn into level1, level2, etc.
+k.sequentialScene = "scenes.level" -- will turn into level1, level2, etc.
 k.sceneNames = nil -- {"scene01", "playme", "world3"}
 
 --[[ =========================================
