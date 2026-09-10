@@ -173,12 +173,15 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
 
 ## Anbefalt ryddeplan
 
-1. **Slett trygt** (ingen referanser noe sted, bekreftet flere ganger):
-   `pausemenu2.lua`-`pausemenu9.lua`, `dodmenu2.lua`-`dodmenu9.lua`,
-   `gotolevel3.lua`-`gotolevel9.lua`, `menu1.lua`, `menu backup.lua`,
-   `options.lua`, `brett.lua`, `play.lua`, `hoydehopp.lua`, `game.lua`,
-   `livddadas.lua`. Det er **23 filer**, over en firedel av alle
-   `.lua`-filene i prosjektet, som ikke gjør noe i det hele tatt.
+1. ~~Slett trygt~~ **Gjort, men flyttet i stedet for slettet (2026-09-10):**
+   de 31 bekreftet ubrukte filene (`pausemenu2.lua`-`pausemenu9.lua`,
+   `dodmenu2.lua`-`dodmenu9.lua`, `gotolevel3.lua`-`gotolevel9.lua`,
+   `menu1.lua`, `menu backup.lua`, `options.lua`, `brett.lua`, `play.lua`,
+   `hoydehopp.lua`, `game.lua`, `livddadas.lua`) ligger nå i `dod-kode/`
+   i stedet for prosjektroten, se `dod-kode/README.md` for hvor hver kom
+   fra. Ingenting av dette gjorde noe i det hele tatt, spillet fungerer
+   identisk. Ikke slettet permanent ennå, i påvente av svar fra Ørjan
+   (spørsmål 6 i `sporsmal.md`).
 2. **Fiks "neste bane" og "retry"-bugene** (punkt 3 og 4 over) før mer
    opprydding, siden de påvirker faktisk spillbarhet.
 3. **Vurder å slå sammen** de 9 nesten-identiske `levelN.lua`-filene til én
