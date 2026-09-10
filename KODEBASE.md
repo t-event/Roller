@@ -47,7 +47,7 @@ relative til prosjektroten uansett hvilken `.lua`-fil som laster dem.
 ```
 main.lua
   └─ gotoScene("scenes.gotolevel1")        [alltid, uansett]
-       └─ (1.5s) gotoScene("scenes.level1")
+       └─ (1.5s) removeScene + gotoScene("scenes.level1")
 
 scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
   ├─ showOverlay("scenes.dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
@@ -56,8 +56,9 @@ scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
                   fikset 2026-09-10, level2-9 gikk før alltid til gotolevel2]
 
 scenes/pausemenu1.lua (delt av alle baner)
-  ├─ "retry"      → gotoScene("scenes.level" .. lm.currentLevel)   [fikset 2026-09-10,
-  │                  gikk før alltid til level 1 uansett hvilken bane du var på]
+  ├─ "retry"      → gotoScene("scenes.gotoretry")   [egen mellomscene, fikset
+  │                  2026-09-10 i to omganger, se "Kjente feil" punkt 4]
+  │                  └─ (0.8s) removeScene + gotoScene("scenes.level" .. lm.currentLevel)
   ├─ "main menu"  → gotoScene("scenes.gotomenu") → gotoScene("scenes.menu")
   └─ "levels"     → gotoScene("scenes.gotochooselevel") → gotoScene("scenes.chooselevel")
                      └─ lm.init() (lib/ogt_levelmanager.lua) bygger rutenettet
@@ -65,16 +66,21 @@ scenes/pausemenu1.lua (delt av alle baner)
                              [rett til levelN, IKKE via gotolevelN]
 
 scenes/dodmenu1.lua (delt av alle baner)
-  └─ samme struktur som pausemenu1.lua, "retry"/"main menu"/"levels"
+  └─ samme struktur som pausemenu1.lua, "retry"/"main menu"/"levels", samme
+     "gotoretry"-omvei. Om liv.erTom() går "retry" til "scenes.gotolevel1"
+     i stedet (start på nytt fra bane 1), samme som main.lua ved appstart.
 
 scenes/chooselevel.lua / gotochooselevel.lua
   → lm.init() i lib/ogt_levelmanager.lua, som leser lib/ogt_lmdata.lua
 ```
 
 **Viktigst å forstå:** Selve banevalget hopper rett til `levelN`, ikke via
-`gotolevelN`. `gotolevel1.lua`-splashen nås bare på selve appstart, den
-eneste `gotolevelN`-fila som fortsatt er i bruk (`gotolevel2.lua` til
-`gotolevel9.lua` ligger i `dod-kode/`, se der for historikken).
+`gotolevelN`. `gotolevel1.lua`-splashen nås på appstart OG av "retry" når
+spilleren er tom for liv. `gotoretry.lua` er en tilsvarende splash, men for
+"retry på gjeldende bane" (se "Kjente feil" punkt 4 for hvorfor den finnes).
+Disse to er de eneste `gotolevelN`-lignende filene som fortsatt er i bruk
+(`gotolevel2.lua` til `gotolevel9.lua` ligger i `dod-kode/`, se der for
+historikken).
 
 ## Fil-for-fil, gruppert
 
@@ -91,7 +97,12 @@ filene gjør.
 - `build.settings` — orientering, feilsøkingsinnstillinger.
 
 ### Splash-skjermer ("gotoX")
-- `gotolevel1.lua` — **i bruk**, appens faktiske startskjerm.
+- `gotolevel1.lua` — **i bruk**, appens faktiske startskjerm, og der
+  "retry" går når spilleren er tom for liv (se `lib/liv.lua`).
+- `gotoretry.lua` — **ny fil, 2026-09-10, i bruk**. Samme mønster som
+  `gotolevel1.lua`, men for "retry på gjeldende bane" i stedet for
+  "start på nytt fra bane 1". Se "Kjente feil" punkt 4 for hvorfor den
+  finnes (retry krasjet fortsatt uten den).
 - `gotolevel2.lua` til `gotolevel9.lua` — **død kode** (`dod-kode/`).
   `gotolevel2.lua` var **i bruk, men bugget** fram til 2026-09-10: vist
   fra "neste bane"-knappen i level2 til level9
@@ -251,9 +262,24 @@ filene gjør.
    se punkt under) ble kalt helt uten `pcall` på banen som fortsatt
    var den aktive scenen, mens pausemeny/dødsmeny lå som overlay oppå
    den. Composer støtter ikke å rive ned en scene mens dens egen
-   overlay fortsatt vises. **Fikset 2026-09-10**: `composer.hideOverlay()`
-   legges nå til rett før `removeScene()` i begge menyenes `resume()`,
-   se `TIL-ORJAN.md`. Ikke testet i faktisk nettleser ennå.
+   overlay fortsatt vises.
+
+   Første forsøk på å fikse det (`composer.hideOverlay()` rett før
+   `removeScene()`, i samme funksjon) løste det IKKE, krasjet fortsatt
+   med samme feilmelding ved retry etter en knekk-død (se punkt 5).
+   **Fikset på nytt 2026-09-10**, denne gangen med en strukturell
+   endring i stedet for å prøve å rekkefølge kallene riktigere: en ny
+   mellomscene `scenes/gotoretry.lua` (samme mønster som
+   `scenes/gotolevel1.lua`, se `TIL-ORJAN.md`) gjør at banen som skal
+   restartes ALDRI rives ned mens dens egen meny fortsatt vises som
+   overlay oppå den. Pausemeny/dødsmeny sin `resume()` gjør nå bare en
+   helt vanlig `gotoScene("scenes.gotoretry", ...)` (Composer skjuler
+   overlayen trygt for dette selv), og selve `removeScene()` +
+   `gotoScene()` til gjeldende bane skjer først når mellomscenen er
+   den aktive, uten overlay oppå seg. Rettet samtidig samme (hittil
+   ubekreftede) latente bug i `gotolevel1.lua` sin egen `goto()`, som
+   manglet en tilsvarende `removeScene()`. Ikke testet i faktisk
+   nettleser ennå.
 5. ~~Marken skal kunne "knekke"~~ **Var faktisk allerede kodet, bare
    avslått. Fikset 2026-09-10.** Den forrige vurderingen her, at
    9-leddet-ormen manglet knekk-mekanikk helt, var feil. Mathias

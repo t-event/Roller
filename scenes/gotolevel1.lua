@@ -39,6 +39,12 @@ local lm = require("lib.ogt_levelmanager")
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 local function goto( event )
+	-- Lagt til 2026-09-10: uten denne kjøres ikke scene:create på nytt
+	-- om "scenes.level1" allerede var lastet (f.eks. om spilleren gikk
+	-- tom for liv MENS de sto på bane 1 selv), se samme forklaring i
+	-- gotoretry.lua/dodmenu1.lua sin resume(). Trygt her: denne splashen
+	-- er den aktive scenen, ingen overlay oppå seg.
+	composer.removeScene( "scenes.level1" )
 	local ok, err = pcall( composer.gotoScene, "scenes.level1", {effect = "fade" , time = 500} )
 	if not ok then
 		local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)

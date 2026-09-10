@@ -114,36 +114,29 @@ print("Current Score3: ", liv.returnScore())
 print("Current Score4: ", liv.returnScore())
 print("Current Score5: ", liv.returnScore())
 liv.lagreliv()
-local destination = "scenes.level" .. tostring(lm.currentLevel)
+-- Går via en liten mellomscene i stedet for å rive ned/laste banen
+-- direkte herfra (rettet 2026-09-10, krasjet fortsatt etter forrige
+-- forsøk med hideOverlay()+removeScene() rett i denne funksjonen: å
+-- rive ned banen som fortsatt er den aktive scenen mens denne
+-- pausemenyen ligger som overlay oppå den er ikke en støttet
+-- rekkefølge i Composer, uansett rekkefølge på
+-- hideOverlay/removeScene/gotoScene). "scenes.gotoretry" gjør en helt
+-- vanlig gotoScene (som Composer selv skjuler denne overlayen trygt
+-- for), og river først ned/laster banen på nytt når den mellomscenen
+-- faktisk er den aktive, uten overlay oppå seg. Samme mønster som
+-- "scenes.gotolevel1" under, som allerede gjorde dette trygt for
+-- "ingen liv igjen"-tilfellet.
+local target = "scenes.gotoretry"
 if liv.erTom() then
 	-- Ingen liv igjen. Reklame-for-liv er ikke bygget ennå (krever et
 	-- annonse-SDK), så inntil videre: den som ikke vil/kan se reklame
 	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
-	destination = "scenes.gotolevel1"
+	target = "scenes.gotolevel1"
 end
--- Lukk overlayen (denne pausemenyen) FØR banen under rives ned. Uten
--- dette (rettet 2026-09-10, retry krasjet fortsatt etter forrige fiks)
--- kaller vi composer.removeScene() på banen som fortsatt er den aktive
--- scenen mens pausemenyen enda ligger som overlay oppå den, med
--- pausemenyen som overlay oppå. Det er ikke en støttet rekkefølge,
--- komponerings egen bokføring av hvilken scene som er aktiv/har en
--- overlay korrumperes, og det gir et krasj dypt inne i motoren selv
--- (ufanget av pcall pga at det skjer i selve removeScene-kallet, ikke
--- i gotoScene-kallet under). gotoScene() skjuler riktignok en aktiv
--- overlay automatisk, men først ETTER at removeScene allerede har
--- rukket å rive ned scenen den lå oppå, så det er for sent.
-composer.hideOverlay()
--- Riv ned den gamle instansen av banen. Uten dette huskes ikke en ny
--- scene:create ved gotoScene til samme scenenavn (retry på gjeldende
--- bane), og gammel fysikk/ledd/Runtime-lyttere kan henge igjen i
--- stedet for at banen bygges på nytt, som ga både "restart virker
--- ikke ordentlig" og stadig tyngre fysikksimulering (slow motion) for
--- hver retry. Harmløst no-op hvis scenen ikke er lastet fra før.
-composer.removeScene( destination )
-local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )
+local ok, err = pcall( composer.gotoScene, target, {effect = "fade" , time = 500} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
-	print( "CRASH going to " .. tostring(destination) .. " (retry): " .. msg )
+	print( "CRASH going to " .. tostring(target) .. " (retry): " .. msg )
 	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
 	bg:setFillColor( 0, 0, 0, 0.85 )
 	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )

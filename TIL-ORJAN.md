@@ -938,3 +938,53 @@ kan gjøre herfra. Ba Mathias bekrefte at bane 1 nå faktisk knekker
 riktig, siden posisjonstallene (`del1.y+5`, `del2.y+10` osv.) er
 kopiert fra bane 2-9 og ikke visuelt verifisert mot bane 1 sin egen
 grafikk, selv om selve kroppen skal være identisk.
+
+## 2026-09-10, retry krasjet fortsatt: bygget om helt i stedet for å rekkefølge på nytt
+
+Bane 1 knakk riktig (bekreftet av Mathias/Ørjan), men retry fra
+dødsmenyen krasjet med nøyaktig samme feil som før forrige fiks:
+uhåndtert "attempt to compare nil with number", samme stack-form
+(`?:0`, `<?:209>`). Det betyr at `composer.hideOverlay()`-fiksen fra
+i sted ikke faktisk løste problemet, den ble bare aldri bekreftet
+testet før vi gikk videre til å teste knekk-mekanikken i stedet.
+
+I stedet for å fortsette å gjette på riktig rekkefølge av
+`hideOverlay()`/`removeScene()`/`gotoScene()` inni `resume()` (som nå
+har blitt prøvd to ganger uten hell), bygget jeg om selve tilnærmingen:
+en ny fil, `scenes/gotoretry.lua`, som er nøyaktig samme mønster som
+`scenes/gotolevel1.lua` (en liten splash-scene med markens
+last-animasjon, venter litt, bytter så videre) — bare for "retry på
+gjeldende bane" i stedet for "ingen liv igjen, start på nytt fra bane
+1", som `gotolevel1.lua` allerede gjorde.
+
+Grunnen til at dette bør være tryggere: problemet har hele tiden vært
+at `composer.removeScene()` ble kalt på banen som FORTSATT var den
+aktive scenen, mens pausemeny/dødsmeny lå som overlay oppå den akkurat
+i det øyeblikket. Uansett hvilken rekkefølge `hideOverlay()` fikk i
+forhold til `removeScene()`, var det fortsatt SAMME funksjonskall
+(`resume()` i en overlay) som gjorde begge deler. Med `gotoretry.lua`
+gjør `resume()` nå bare et helt vanlig `gotoScene("scenes.gotoretry",
+...)` til en ANNEN scene, noe Composer sin egen dokumentasjon
+bekrefter skal skjule en aktiv overlay trygt. Selve `removeScene()` +
+`gotoScene()` til gjeldende bane skjer først 0.8 sekund senere, fra
+INNE I `gotoretry.lua` sin egen `scene:show`, som da er den aktive
+scenen uten noen overlay oppå seg — akkurat den konteksten
+`gotolevel1.lua` allerede har brukt trygt for "ingen liv igjen"-veien.
+
+Fant i samme slengen en beslektet, men til nå ubekreftet, bug i
+`gotolevel1.lua` sin egen `goto()`: den kalte aldri
+`composer.removeScene("scenes.level1")` før `gotoScene`, så om
+spilleren gikk tom for liv MENS de sto på bane 1 selv (ikke en annen
+bane), ville den ikke faktisk kjørt `scene:create` på nytt, ifølge
+samme Solar2D-forum-tråd som forklarte hvorfor `removeScene()`
+trengs for samme-navn-gjenlasting i utgangspunktet. Rettet samme sted.
+
+`pausemenu1.lua` og `dodmenu1.lua` sin `resume()` er dermed betydelig
+enklere nå: ingen `hideOverlay()`/`removeScene()` der lenger i det
+hele tatt, bare en `pcall(composer.gotoScene, target, ...)` til enten
+`"scenes.gotoretry"` eller `"scenes.gotolevel1"`.
+
+Luac-sjekket alle fire filene. Ikke testet i faktisk nettleser, det er
+fortsatt akkurat den delen jeg ikke kan gjøre herfra. Dette er nå
+tredje forsøk på akkurat denne krasjen, så ekstra viktig å få bekreftet
+av dere før vi går videre til noe annet.
