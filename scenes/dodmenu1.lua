@@ -101,6 +101,9 @@ if liv.erTom() then
 	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
 	destination = "scenes.gotolevel1"
 end
+-- Riv ned den gamle instansen av banen først, se samme kommentar i
+-- pausemenu1.lua sin resume().
+composer.removeScene( destination )
 local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)

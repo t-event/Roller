@@ -640,3 +640,36 @@ Ingen kjente åpne spillbarhets-bugs igjen nå, bare de to som venter på
 nytt innhold fra Ørjan (kollisjonsformer, plassholder-grafikk).
 
 **Ikke testet i faktisk nettleser ennå.**
+
+## 2026-09-10, retry ga slow motion og virket fortsatt ikke riktig
+
+Mathias testet: spillet gikk i slow motion, og restart fungerte
+fortsatt ikke som det skal.
+
+Mistanke: retry kaller `composer.gotoScene()` til **samme banenavn
+som allerede er den aktive scenen** (du er på bane 2, trykker retry,
+`destination` blir `"scenes.level2"`, mens du fortsatt står i
+`"scenes.level2"` med pausemenyen som overlay oppå). Composer
+håndterer trolig ikke det tilfellet som en vanlig scenebytte, den kan
+la den gamle instansen (fysikkverden, ledd, Runtime-lyttere som
+`onCollision`, `trykk_knapp`, `knekk`) henge igjen i stedet for å rive
+den ned, mens `scene:create` likevel kjører på nytt oppå. Det ville
+forklare begge symptomene med én årsak: dobbelt sett fysikkobjekter
+og -lyttere gjør simuleringen tyngre for hver retry (slow motion), og
+den gamle, ikke-nullstilte tilstanden er grunnen til at banen ikke
+"restarter" ordentlig.
+
+**Fikset:** lagt til `composer.removeScene(destination)` rett før
+`composer.gotoScene(destination, ...)` i retry-knappen, i både
+`pausemenu1.lua` og `dodmenu1.lua`. Tvinger en fullstendig nedriving
+av banens gamle instans (fysikk, ledd, display-objekter, selve
+Lua-modulen) før den lastes helt på nytt, uansett om Composer ville
+gjort det automatisk eller ikke. Harmløst no-op i tilfellene der
+scenen ikke var lastet fra før (f.eks. `gotolevel1`-fallbacken når du
+er tom for liv).
+
+**Ikke testet i faktisk nettleser ennå.** Dette er et forsøk basert på
+resonnement om Composer sin livssyklus, ikke noe jeg kan bekrefte selv
+uten en simulator. Si fra om slow motion / dårlig restart fortsatt
+skjer etter denne, så må vi grave dypere (f.eks. sjekke om selve
+pausemeny-overlayet blir riktig ryddet bort også).

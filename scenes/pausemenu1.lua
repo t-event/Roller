@@ -119,6 +119,14 @@ if liv.erTom() then
 	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
 	destination = "scenes.gotolevel1"
 end
+-- Riv ned den gamle instansen av banen først. Uten dette kan
+-- composer.gotoScene til en scene med samme navn som den som allerede
+-- er aktiv (retry på gjeldende bane, med pausemenyen som overlay oppå)
+-- la gammel fysikk/ledd/Runtime-lyttere henge igjen i stedet for å
+-- bygge banen på nytt, som gir både "restart virker ikke ordentlig" og
+-- stadig tyngre fysikksimulering (slow motion) for hver retry.
+-- Harmløst no-op hvis scenen ikke er lastet fra før.
+composer.removeScene( destination )
 local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
