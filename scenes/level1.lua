@@ -1865,7 +1865,10 @@ camera:add (blod2,1,false)
                 end         
        end
 end
---Runtime:addEventListener("collision", knekk)
+-- Slått på 2026-09-10 (var kommentert bort, selve knekk-mekanikken var
+-- ellers ferdig kodet: blod, fjerning av motor-joints og dødsmeny
+-- fungerer, bare selve lytteren manglet). Se forklaring i TIL-ORJAN.md.
+Runtime:addEventListener("collision", knekk)
 ----------------------------------------------------------------------------------
 checkpoint("level1:cp_2004_after_collision_del9_block")
 

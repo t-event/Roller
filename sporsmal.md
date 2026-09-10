@@ -45,10 +45,18 @@ motorisert for å kunne strekke seg ut og til slutt knekke om den lander rett.
 Ørjan skal sjekke om han har en nyere versjon der det faktisk er kodet
 ferdig. Spurte samtidig om jeg kunne legge inn kollisjonsboksene på marken.
 
-**Gjort:** Ingenting rørt i fysikk-koden. Det Ørjan beskriver (3 biter som
-knekker) stemmer ikke med koden som ligger her (9 ledd, ingen knekk-logikk),
-så dette venter på at han finner den nyere versjonen. Sjekket samtidig
-kollisjonsboks-spørsmålet: `shapedefs.lua` har faktisk ferdige
+**Gjort:** Denne vurderingen var feil, rettet 2026-09-10. Mathias forklarte
+mer detaljert hvordan mekanikken faktisk skal virke (hver kroppsdel har et
+eget "knott"-kollisjonsobjekt weldet oppå, og når to nabo-knotter kolliderer
+skal motor-jointene mellom delene fjernes, blod vises, og dødsmenyen
+aktiveres), og det viste seg å stemme nøyaktig med noe som allerede lå
+ferdig kodet i alle ni banefiler (`knekk(event)`, knott1/knott2 opp til
+knott8/knott9), bare at selve `Runtime:addEventListener("collision", knekk)`
+var kommentert bort i alle ni, så mekanikken kjørte aldri. Skrudd på, se
+`KODEBASE.md` "Kjente feil" punkt 5. Så det er uklart om dette faktisk er en
+annen/eldre versjon enn den Ørjan husker (9 ledd her, han beskrev 3 biter),
+men selve knekk-logikken var altså der hele tiden, bare avslått. Sjekket
+samtidig kollisjonsboks-spørsmålet: `shapedefs.lua` har faktisk ferdige
 `"hale"`/`"hode"`-former, men de er ikke koblet til `level1.lua` sin
 ormekropp, som bruker egne hånd-skrevne former i stedet. Fant hvorfor: halen
 krympes fra 55×35 til 27×17 før kollisjonsformen legges på, og de

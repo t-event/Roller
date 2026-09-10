@@ -254,13 +254,22 @@ filene gjør.
    overlay fortsatt vises. **Fikset 2026-09-10**: `composer.hideOverlay()`
    legges nå til rett før `removeScene()` i begge menyenes `resume()`,
    se `TIL-ORJAN.md`. Ikke testet i faktisk nettleser ennå.
-5. **Marken skal kunne "knekke"** (brekke i to ved landing), beskrevet
-   av Ørjan som bygget av 3 biter med motoriserte ledd, men koden i
-   dette repoet har en 9-leddet ormekropp uten noen knekk-mekanikk.
-   Ørjan skal sjekke om han har en nyere versjon der dette faktisk er
-   kodet. Ikke rørt fysikk-koden på dette punktet før den versjonen er
-   funnet, siden det ville vært å gjette på en funksjon som kanskje
-   allerede finnes et annet sted.
+5. ~~Marken skal kunne "knekke"~~ **Var faktisk allerede kodet, bare
+   avslått. Fikset 2026-09-10.** Den forrige vurderingen her, at
+   9-leddet-ormen manglet knekk-mekanikk helt, var feil. Mathias
+   forklarte (fra Ørjan) hvordan den skal virke: hver kroppsdel har,
+   i tillegg til sin egen physics body, et eget "knott"-kollisjonsobjekt
+   weldet fast oppå, og når to NABO-knotter kolliderer (marken bøyd for
+   hardt), skal motor-jointene mellom delene fjernes, blod-spriten vises,
+   og dødsmenyen aktiveres. Fant at akkurat dette står ferdig implementert
+   i `knekk(event)` i alle ni banefiler (knott1/knott2 opp til knott8/knott9,
+   fjerner riktig `pivot_jointN`, spawner blod, kaller `goto` som viser
+   `scenes.dodmenu1` etter 3 sekunder) — men selve
+   `Runtime:addEventListener("collision", knekk)`-linja som faktisk kobler
+   funksjonen til kollisjoner var kommentert bort i alle ni filer, så
+   mekanikken kjørte aldri. Skrudd på. Opprydningen i `scene:hide` fjernet
+   allerede lytteren riktig ved sceneskifte, så ingen ekstra opprydning
+   trengtes. Ikke testet i faktisk nettleser ennå.
 6. **Dobbeltklikk for å gjøre marken slapp virket ikke.** Fant koden
    (`trykk_knapp` i `level1.lua`), den brukte `event.numTaps == 2` fra
    Runtime "tap"-eventet, som ikke ser ut til å synkroniseres pålitelig

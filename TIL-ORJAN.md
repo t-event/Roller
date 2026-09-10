@@ -871,3 +871,37 @@ ikke, kun `level2-9.lua`. Luac-sjekket alle ni filer etterpå.
 
 Testet ikke i faktisk nettleser før push, kunne ikke det herfra. Bygg
 trigget på nytt, si fra så snart dere har fått prøvd retry igjen.
+
+## 2026-09-10, knekk-mekanikken var ferdig kodet, bare avslått
+
+Mathias forklarte (fra Ørjan, antar jeg) mer detaljert hvordan marken
+skal knekke: hver kroppsdel har, i tillegg til sin egen physics body,
+et eget "knott"-kollisjonsobjekt weldet fast oppå, og når to
+NABO-knotter kolliderer (marken bøyd for hardt) skal motor-jointene
+mellom delene fjernes, blod-spriten vises, og dødsmenyen aktiveres.
+
+Dette stemte nøyaktig med noe som allerede lå ferdig skrevet i alle
+ni banefiler: en funksjon `knekk(event)` som sjekker akkurat
+knott1/knott2 opp til knott8/knott9-parene, fjerner riktig
+`pivot_jointN` og `knottN`, setter fokus på haledelen, spawner to
+blod-sprites med tilfeldig størrelse/rotasjon/fade, og etter 3
+sekunder kaller `goto` som viser `scenes.dodmenu1`. Alt dette er
+identisk (bortsett fra to ubrukte variabler) i alle ni filer.
+
+Problemet var at selve linja som kobler funksjonen til faktiske
+kollisjoner, `Runtime:addEventListener("collision", knekk)`, var
+kommentert bort i alle ni banefiler. Mekanikken kjørte dermed aldri,
+selv om alt rundt den var klart. Skrudd på i alle ni. Opprydningen i
+`scene:hide` fjernet allerede lytteren riktig ved sceneskifte (den
+lå der fra før, urørt), så ingen ekstra opprydning trengtes for å
+unngå en lekkasje tilsvarende `trykk_knapp`-buggen fra i går.
+
+Rettet den forrige (feilaktige) vurderingen i `sporsmal.md` og
+`KODEBASE.md` "Kjente feil" punkt 5, som konkluderte med at
+knekk-logikk manglet helt. Uklart om dette betyr at Ørjan husker en
+annen/eldre versjon enn den i dette repoet (han beskrev marken som 3
+biter, koden her har 9 ledd), men selve knekk-koden lå altså der hele
+tiden, bare avslått med en enkelt kommentert linje per fil.
+
+Ikke testet i faktisk nettleser. Push og bygg gjenstår når dere har
+sett dette.
