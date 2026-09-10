@@ -303,3 +303,27 @@ filene gjør.
 4. Fjern feilsøkings-`checkpoint()`-kallene og `pcall`-innpakningene som ble
    lagt til under HTML5-portingen (se "Husk før dette regnes som ferdig"
    øverst i `TIL-ORJAN.md`) når spillet er stabilt.
+5. **Fjernet ca 1170 linjer utkommentert dødkode (2026-09-10)**, fra
+   `level1.lua`-`level9.lua`, `menu.lua`, `liv.lua` og `mark.lua`.
+   Dette var gamle, forlatte forsøk skrevet inn som `--[[ ... ]]`-
+   blokker (aldri kjørende kode). Verifisert med et eget skript som
+   følger Lua sin faktiske kommentar-syntaks (en `--[[`-blokk avsluttes
+   av den FØRSTE `]]` den finner, uansett hva som står etter) i stedet
+   for en enklere, upresis metode som først ga feil svar og nesten
+   fjernet ekte, kjørende kode ved en feiltagelse — fanget opp før noe
+   ble skrevet til disk. Lisens-/changelog-kommentarene i
+   `ogt_levelmanager.lua`/`ogt_lmdata.lua`/`perspective.lua` (også
+   `--[[ ]]`-blokker, men ekte dokumentasjon, ikke dødkode) er bevisst
+   IKKE rørt. Hver fil er syntaks-sjekket med `luac -p` og diffet mot
+   forrige versjon for å bekrefte at kun linjer ble fjernet, aldri
+   endret eller lagt til.
+6. **Merket `camera`/`grp` som bevisste globaler (2026-09-10)**, med
+   `_G.`-prefiks på definisjonsstedet i `level1.lua`-`level9.lua` og
+   `menu.lua`, per Solar2D sin egen anbefaling om å gjøre tiltenkte
+   globaler eksplisitte. Disse to kan IKKE gjøres til vanlige lokale
+   variabler slik `trykk_knapp` ble (punkt 7 i "Kjente feil"):
+   `lib/liv.lua` sin `liv.hent()` (viser livstall/-ikon, kalt fra alle
+   ni baner) skriver `grp:insert(...)` direkte og har ingen annen måte
+   å nå banens visningsgruppe på. `pausemenu1.lua`/`dodmenu1.lua` og
+   `gotoX`-filene har sin egen, selvstendige `grp`/`camera` som ikke er
+   bekreftet delt med noe annet (lavere prioritet, ikke rørt ennå).

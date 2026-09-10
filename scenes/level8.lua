@@ -117,7 +117,10 @@ lm.currentLevel = 8 -- sÃ¥ retry vet hvilken bane den skal restarte
     --
    -- local scaleFactor = 0.6
     
-    camera = perspective.createView()
+    -- Bevisst global (2026-09-10, markert eksplisitt per Solar2D sin
+    -- egen anbefaling): lib/liv.lua sin liv.hent() skriver til denne
+    -- gruppa direkte og har ingen annen måte å nå den på.
+    _G.camera = perspective.createView()
     physics.start( )
     --physics.pause( )
     --physics.setGravity(0 , 9.81 )
@@ -132,7 +135,8 @@ lm.currentLevel = 8 -- sÃ¥ retry vet hvilken bane den skal restarte
     --local scaleFactor = 0.050
     --local scaleFactor = 0.1
     local scaleFactor = 0.6
-     grp=sceneGroup
+     -- Bevisst global, se forklaring ved _G.camera over.
+     _G.grp=sceneGroup
     camera.xScale = scaleFactor
     camera.yScale = scaleFactor
 
@@ -790,40 +794,7 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
                                                 firkant4.myName = "firkant4"   
                                                 
-                                                --[[
                                                 
-                                      local     firkant5 = display.newImage("Brett1.png", 7680,4702)
-                                                firkant5.x = firkant4.x+firkant5.width
-                                                firkant5.y = firkant4.y+firkant5.height
-                                                physics.addBody(firkant5,"static", physicsData:get("Brett3") )
-                                                camera:add (firkant5,1,false)
-                                                
-                                                
-                                      local     function firkant6
-                                                firkant6 = display.newImage("verden6.png", 7680,4702)
-                                                firkant6.x = firkant5.x+firkant6.width
-                                                firkant6.y = firkant5.y+firkant6.height
-                                                physics.addBody(firkant6,"static", physicsData:get("verden6") )
-                                                camera:add (firkant6,1,false)
-                                                end
-                                                
-                                      local     function firkant7
-                                                firkant7 = display.newImage("verden7.png", 7680,4702)
-                                                firkant7.x = firkant6.x+firkant7.width
-                                                firkant7.y = firkant6.y+firkant7.height
-                                                physics.addBody(firkant7,"static", physicsData:get("verden7") )
-                                                camera:add (firkant7,1,false)
-                                                end
-                                                
-                                      local     function firkant8
-                                                firkant8 = display.newImage("verden8.png", 7680,4702)
-                                                firkant8.x = firkant7.x+firkant8.width
-                                                firkant8.y = firkant7.y+firkant8.height
-                                                physics.addBody(firkant8,"static", physicsData:get("verden8") )
-                                                camera:add (firkant8,1,false)
-                                                end
-                                                ]]--
-
 
 
 
@@ -1004,38 +975,6 @@ if
     (event.object1.type == "del9" and event.object2.type == "firkant4") then
 
 
---[[ 
---for i = 1,2 do
-    print( "heiho" )
-
-local object = display.newImage("stov.png")
-object.objTable = spawnTable
-object.index = #object.objTable + 1
-object.name = "Object : " .. object.index
-object.group = grp
-object.group:insert(object)
-object.objTable[object.index] = object
-object.width  = 10+(math.random(10, 50)) 
-object.height = object.width
-object.x = event.object1.x+(math.random(1, 10)) 
-object.y = event.object1.y-(math.random(1, 10))
-rot         = (math.random(1,360)) 
-object.alpha  = 0.1
-object:rotate( rot )
-camera:add (object,1,false)
-transition.to(object.objTable[1], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[2], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[3], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[4], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[5], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[6], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-transition.to(object.objTable[7], { x= object.x- (math.random(-50, 50)),y= object.y- (math.random( 1, 50)),width= object.width  + (math.random(1, 50)),height= object.height + (math.random(1, 50)),alpha= 0,time= 2000,onComplete=kill})
-
-return object
-end
- 
-spawnTable = {}
---]]
 
 
 
@@ -1103,26 +1042,6 @@ local hit = event.object2
 
 if  (event.object1.type == "knott1" and event.object2.type == "knott2") then
 
---[[
-knapp1.alpha = 0
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", knekk)
-pivot_joint.isMotorEnabled  = false
-pivot_joint1.isMotorEnabled = false
-pivot_joint2.isMotorEnabled = false
-pivot_joint3.isMotorEnabled = false
-pivot_joint4.isMotorEnabled = false
-pivot_joint5.isMotorEnabled = false
-pivot_joint6.isMotorEnabled = false
-pivot_joint7.isMotorEnabled = false
-display.remove(pivot_joint)
-display.remove(knott1)
-knott1 = nil
-camera:setFocus( del9 )
-timer.performWithDelay( 3000, goto)
---]]
 print( "knott1 og knott2" )
 
 elseif  (event.object1.type == "knott2" and event.object2.type == "knott3") then
@@ -1555,16 +1474,6 @@ end
 ----------------------------------------------------------------------------------
 
 
---[[
-
-for i=1, 10 do
-local rock1 = display.newImageRect ("rock1.png", 10, 6 )
-physics.addBody(rock1,"dynamic", physicsData:get("rock1") )
-rock1.x = 300+ (math.random(1000, 30000))
-rock1.y = 0
-camera:add (rock1,1,false)
-end
-]]--
 
  del1.y = del1.y
  ---------------------------------------------------------
@@ -1758,103 +1667,6 @@ Runtime:addEventListener( "touch", trykk_knapp)
 
 
        local options = {isModal = true,effect = "fade",time = 500,}
---[[
-local function girned( ... )
-          pivot_joint.isMotorEnabled = true
-            pivot_joint.maxMotorTorque = 500
-            pivot_joint.motorSpeed = 30
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.maxMotorTorque = 500
-            pivot_joint1.motorSpeed = 30
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.maxMotorTorque = 500
-            pivot_joint2.motorSpeed = 30
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.maxMotorTorque = 500
-            pivot_joint3.motorSpeed = 30
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.maxMotorTorque = 500
-            pivot_joint4.motorSpeed = 30
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.maxMotorTorque = 500
-            pivot_joint5.motorSpeed = 30
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.maxMotorTorque = 500
-            pivot_joint6.motorSpeed = 30
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.maxMotorTorque = 500
-            pivot_joint7.motorSpeed = 30
-     print( "done" )
-end
-
-
- function trykk_knapp( event )
-    if event.phase == "began" then
---print("del1 sin x pos  "..  del9.x .." ")
---print("del1 sin y pos  "..  del9.y .." ")
---print( "White square's center position in screen coordinates: ", sqCenterX, sqCenterY )
-            print( "knapp" )
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.motorSpeed  = pivot_joint.motorSpeed - 80
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.motorSpeed = pivot_joint.motorSpeed - 80
-
-    elseif event.phase == "ended" then
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.maxMotorTorque = 5000
-            pivot_joint.motorSpeed = 200
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.maxMotorTorque = 5000
-            pivot_joint1.motorSpeed = 200
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.maxMotorTorque = 5000
-            pivot_joint2.motorSpeed = 200
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.maxMotorTorque = 5000
-            pivot_joint3.motorSpeed = 200
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.maxMotorTorque = 5000
-            pivot_joint4.motorSpeed = 200
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.maxMotorTorque = 5000
-            pivot_joint5.motorSpeed = 200
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.maxMotorTorque = 5000
-            pivot_joint6.motorSpeed = 200
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.maxMotorTorque = 5000
-            pivot_joint7.motorSpeed = 200
-            timer.performWithDelay( 100, girned ,1 )
-    end
-    if ( event.numTaps == 2 ) then
-        print( "knapp1" )
-        print( event.numTaps )
-            pivot_joint.isMotorEnabled = false
-            pivot_joint1.isMotorEnabled = false
-            pivot_joint2.isMotorEnabled = false
-            pivot_joint3.isMotorEnabled = false
-            pivot_joint4.isMotorEnabled = false
-            pivot_joint5.isMotorEnabled = false
-            pivot_joint6.isMotorEnabled = false
-            pivot_joint7.isMotorEnabled = false
-        end
-end
-Runtime:addEventListener( "touch", trykk_knapp)
-Runtime:addEventListener( "tap", trykk_knapp)
-local options = {isModal = true,effect = "fade",time = 500,}
---]]
 
 
 
@@ -1881,20 +1693,6 @@ knapp1:addEventListener( "touch", trykk_knapp1)
 end
 
 
---[[  
-local function cord(event)
-    if event.phase == "began" then
-            print ("X = ".. reff.x ,"","Y = ".. reff.y)
-
-    end
-
-
-Runtime:addEventListener( "touch", cord )
-
-
-
-end
---]]
 
 function scene:show( event )
 

@@ -3,24 +3,6 @@
 local bredde = display.contentWidth
 
 local hoyde = display.contentHeight
---[[
-local liv = {}
-
-function liv.hent( event )
-
- liv = 30
- minusliv = 1
- livText = display.newText(liv, bredde-200 ,hoyde-hoyde+25 ,nil ,30)
-
-grp:insert( livText )
-
-liv = liv - minusliv
- 
-end
-
-return liv
- 
---]]
 
 
 local liv = {}

@@ -99,17 +99,6 @@ function mark.hent( event )
     physics.addBody( punkt,"dynamic")
     punkt.isSensor = true
     grp:insert(punkt)
---[[
-     local punkt2 = display.newRect( 200, 200, 10, 10 )
-    punkt2.x = firkant4.x*2
-    punkt2.y = firkant4.y*2
-    punkt2.alpha = 1
-    punktsant   = true
-    physics.addBody( punkt2,"dynamic")
-    punkt2.isSensor = true
-    grp:insert(punkt2)
-    punkt2:addEventListener ("touch", gameUI.dragBody )
-]]--
 
 
     local pivot_joint  = physics.newJoint( "pivot", del1, del2, del1.x-14, del1.y )

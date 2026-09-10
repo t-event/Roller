@@ -64,7 +64,10 @@ checkpoint("menu:create_start")
    
 physics.start( )
 --physics.setGravity( 0, 0 )
-    camera = perspective.createView()
+    -- Bevisst global (2026-09-10, markert eksplisitt per Solar2D sin
+    -- egen anbefaling): lib/liv.lua sin liv.hent() skriver til denne
+    -- gruppa direkte og har ingen annen måte å nå den på.
+    _G.camera = perspective.createView()
    
 local hent = mark.hent 
 
@@ -74,7 +77,8 @@ local hent = mark.hent
     --local scaleFactor = 0.025
     --local scaleFactor = 0.1
     --local scaleFactor = 0.6
-    grp=sceneGroup
+    -- Bevisst global, se forklaring ved _G.camera over.
+    _G.grp=sceneGroup
     camera.xScale = scaleFactor
     camera.yScale = scaleFactor
 checkpoint("menu:after_camera_scale")
@@ -187,14 +191,6 @@ punktsant = true
 --grp:insert(punkt)
 camera:add(punkt,1,false)
 --punkt.isFixedRotation = true
---[[
-local function onBackgroundTouch(event)
- if(event.phase == "began") then
- punkt.x = event.x
- punkt.y = event.y
- end
-end
---]]
 
 local function onBackgroundTouch(event)
  if(event.phase == "moved") then
@@ -232,30 +228,6 @@ checkpoint("menu:after_camera_setup")
 
 
 
---[[
-    local playBtn = widget.newButton( {fontSize = 75,width = 250,height = 150,label = "Play", id = "scenes.chooselevel", onRelease=goSomewhere})
-    playBtn.height = 150
-    playBtn.width = 250
-    playBtn.y = display.contentHeight/4
-    playBtn.x = display.contentWidth/2
-    --grp:insert(playBtn)
-
-
-    local options = widget.newButton( {fontSize = 50,width = 250,height = 150,label = "Options", id = "options", onRelease=goSomewhere})
-    options.height = 150
-    options.width = 250
-    options.y = display.contentHeight/1.5
-    options.x = display.contentWidth/2
-    --grp:insert(options)
-
-    local hoydehopp = widget.newButton( {fontSize = 40,width = 250,height = 75,label = "High Jump", id = "hoydehopp", onRelease=goSomewhere})
-    hoydehopp:setReferencePoint ( display.TopLeftReferencePoint)
-    hoydehopp.height = 75
-    hoydehopp.width = 250
-    hoydehopp.y = display.contentHeight-display.contentHeight
-    hoydehopp.x = display.contentWidth-display.contentWidth
-    --grp:insert( hoydehopp )
---]]
 
 
     

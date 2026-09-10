@@ -115,7 +115,10 @@ lm.currentLevel = 1 -- så retry vet hvilken bane den skal restarte
     --
    -- local scaleFactor = 1
     
-    camera = perspective.createView()
+    -- Bevisst global (2026-09-10, markert eksplisitt per Solar2D sin
+    -- egen anbefaling): lib/liv.lua sin liv.hent() skriver til denne
+    -- gruppa direkte og har ingen annen måte å nå den på.
+    _G.camera = perspective.createView()
     physics.start( )
     --physics.pause( )
     --physics.setGravity(0 , 9.81 )
@@ -131,7 +134,8 @@ local mark = mark.hent
     --local scaleFactor = 0.050
     --local scaleFactor = 0.1
     local scaleFactor = 0.6
-     grp=sceneGroup
+     -- Bevisst global, se forklaring ved _G.camera over.
+     _G.grp=sceneGroup
     camera.xScale = scaleFactor
     camera.yScale = scaleFactor
 
@@ -787,17 +791,6 @@ checkpoint("level1:cp_684_after_backgrounds")
     physics.addBody( punkt,"dynamic")
     punkt.isSensor = true
     grp:insert(punkt)
---[[
-     local punkt2 = display.newRect( 200, 200, 10, 10 )
-    punkt2.x = firkant4.x*2
-    punkt2.y = firkant4.y*2
-    punkt2.alpha = 1
-    punktsant   = true
-    physics.addBody( punkt2,"dynamic")
-    punkt2.isSensor = true
-    grp:insert(punkt2)
-    punkt2:addEventListener ("touch", gameUI.dragBody )
-]]--
 
 
     local pivot_joint  = physics.newJoint( "pivot", del1, del2, del1.x-14, del1.y )
@@ -876,92 +869,6 @@ checkpoint("level1:cp_684_after_backgrounds")
     --pivot_joint8:setRotationLimits( 0, 38 )
     pivot_joint8.isCollideConnected = true
  
---[[
-local knott1 = display.newRect( 10,10,10,10 )
-knott1.x = del1.x
-knott1.y = del1.y+5
-camera:add(knott1,1,false)
-physics.addBody( knott1, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott1.isSensor = true
-knott1.alpha = 0
-
-local knott2 = display.newRect( 10,10,10,10 )
-knott2.x = del2.x
-knott2.y = del2.y+10
-camera:add(knott2,1,false)
-physics.addBody( knott2, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott2.isSensor = true
-knott2.alpha = 0
-
-local knott3 = display.newRect( 10,10,10,10 )
-knott3.x = del3.x
-knott3.y = del3.y+10
-camera:add(knott3,1,false)
-physics.addBody( knott3, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott3.isSensor = true
-knott3.alpha = 0
-
-local knott4 = display.newRect( 10,10,10,10 )
-knott4.x = del4.x
-knott4.y = del4.y+15
-camera:add(knott4,1,false)
-physics.addBody( knott4, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott4.isSensor = true
-knott4.alpha = 0
-
-local knott5 = display.newRect( 10,10,10,10 )
-knott5.x = del5.x
-knott5.y = del5.y+20
-camera:add(knott5,1,false)
-physics.addBody( knott5, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott5.isSensor = true
-knott5.alpha = 0
-
-local knott6 = display.newRect( 10,10,10,10 )
-knott6.x = del6.x
-knott6.y = del6.y+15
-camera:add(knott6,1,false)
-physics.addBody( knott6, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott6.isSensor = true
-knott6.alpha = 0
-
-local knott7 = display.newRect( 10,10,10,10 )
-knott7.x = del7.x
-knott7.y = del7.y+10
-camera:add(knott7,1,false)
-physics.addBody( knott7, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott7.isSensor = true
-knott7.alpha = 0
-
-local knott8 = display.newRect( 10,10,10,10 )
-knott8.x = del8.x
-knott8.y = del8.y+10
-camera:add(knott8,1,false)
-physics.addBody( knott8, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott8.isSensor = true
-knott8.alpha = 0
-
-local knott9 = display.newRect( 10,10,10,10 )
-knott9.x = del9.x
-knott9.y = del9.y+10
-camera:add(knott9,1,false)
-physics.addBody( knott9, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
-knott9.isSensor = true
-knott9.alpha = 0
-
-
-
-local weldJoint1 = physics.newJoint( "weld", knott1, del1, knott1.x, knott1.x )
-local weldJoint2 = physics.newJoint( "weld", knott2, del2, knott2.x, knott2.x )
-local weldJoint3 = physics.newJoint( "weld", knott3, del3, knott3.x, knott3.x )
-local weldJoint4 = physics.newJoint( "weld", knott4, del4, knott4.x, knott4.x )
-local weldJoint5 = physics.newJoint( "weld", knott5, del5, knott5.x, knott5.x )
-local weldJoint6 = physics.newJoint( "weld", knott6, del6, knott6.x, knott6.x )
-local weldJoint7 = physics.newJoint( "weld", knott7, del7, knott7.x, knott7.x )
-local weldJoint8 = physics.newJoint( "weld", knott8, del8, knott8.x, knott8.x )
-local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
-
-]]--
 
 
 
@@ -1002,40 +909,7 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
                                                 firkant4.myName = "firkant4"   
                                                 
-                                                --[[
                                                 
-                                      local     firkant5 = display.newImage("Brett1.png", 7680,4702)
-                                                firkant5.x = firkant4.x+firkant5.width
-                                                firkant5.y = firkant4.y+firkant5.height
-                                                physics.addBody(firkant5,"static", physicsData:get("Brett3") )
-                                                camera:add (firkant5,1,false)
-                                                
-                                                
-                                      local     function firkant6
-                                                firkant6 = display.newImage("verden6.png", 7680,4702)
-                                                firkant6.x = firkant5.x+firkant6.width
-                                                firkant6.y = firkant5.y+firkant6.height
-                                                physics.addBody(firkant6,"static", physicsData:get("verden6") )
-                                                camera:add (firkant6,1,false)
-                                                end
-                                                
-                                      local     function firkant7
-                                                firkant7 = display.newImage("verden7.png", 7680,4702)
-                                                firkant7.x = firkant6.x+firkant7.width
-                                                firkant7.y = firkant6.y+firkant7.height
-                                                physics.addBody(firkant7,"static", physicsData:get("verden7") )
-                                                camera:add (firkant7,1,false)
-                                                end
-                                                
-                                      local     function firkant8
-                                                firkant8 = display.newImage("verden8.png", 7680,4702)
-                                                firkant8.x = firkant7.x+firkant8.width
-                                                firkant8.y = firkant7.y+firkant8.height
-                                                physics.addBody(firkant8,"static", physicsData:get("verden8") )
-                                                camera:add (firkant8,1,false)
-                                                end
-                                                ]]--
-
 
 
 
@@ -1058,17 +932,6 @@ del6.type     = "del6"
 del7.type     = "del7"
 del8.type     = "del8"
 del9.type     = "del9"
---[[
-knott1.type   = "knott1"
-knott2.type   = "knott2"
-knott3.type   = "knott3"
-knott4.type   = "knott4"
-knott5.type   = "knott5"
-knott6.type   = "knott6"
-knott7.type   = "knott7"
-knott8.type   = "knott8"
-knott9.type   = "knott9"
---]]
 
 firkant1.type = "firkant1"
 firkant2.type = "firkant2"
@@ -1574,26 +1437,6 @@ if event.phase == "began" then
 
 if  (event.object1.type == "knott1" and event.object2.type == "knott2") then
 
---[[
-knapp1.alpha = 0
-Runtime:removeEventListener("collision", onCollision)
-Runtime:removeEventListener( "touch", trykk_knapp)
-Runtime:removeEventListener( "tap", trykk_knapp)
-Runtime:removeEventListener("collision", knekk)
-pivot_joint.isMotorEnabled  = false
-pivot_joint1.isMotorEnabled = false
-pivot_joint2.isMotorEnabled = false
-pivot_joint3.isMotorEnabled = false
-pivot_joint4.isMotorEnabled = false
-pivot_joint5.isMotorEnabled = false
-pivot_joint6.isMotorEnabled = false
-pivot_joint7.isMotorEnabled = false
-display.remove(pivot_joint)
-display.remove(knott1)
-knott1 = nil
-camera:setFocus( del9 )
-timer.performWithDelay( 3000, goto)
---]]
 print( "knott1 og knott2" )
 
 elseif  (event.object1.type == "knott2" and event.object2.type == "knott3") then
@@ -2027,16 +1870,6 @@ end
 checkpoint("level1:cp_2004_after_collision_del9_block")
 
 
---[[
-
-for i=1, 10 do
-local rock1 = display.newImageRect ("rock1.png", 10, 6 )
-physics.addBody(rock1,"dynamic", physicsData:get("rock1") )
-rock1.x = 300+ (math.random(1000, 30000))
-rock1.y = 0
-camera:add (rock1,1,false)
-end
-]]--
 
  del1.y = del1.y
  ---------------------------------------------------------
@@ -2260,103 +2093,6 @@ Runtime:addEventListener( "touch", trykk_knapp)
 
 
        local options = {isModal = true,effect = "fade",time = 500,}
---[[
-local function girned( ... )
-          pivot_joint.isMotorEnabled = true
-            pivot_joint.maxMotorTorque = 500
-            pivot_joint.motorSpeed = 30
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.maxMotorTorque = 500
-            pivot_joint1.motorSpeed = 30
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.maxMotorTorque = 500
-            pivot_joint2.motorSpeed = 30
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.maxMotorTorque = 500
-            pivot_joint3.motorSpeed = 30
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.maxMotorTorque = 500
-            pivot_joint4.motorSpeed = 30
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.maxMotorTorque = 500
-            pivot_joint5.motorSpeed = 30
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.maxMotorTorque = 500
-            pivot_joint6.motorSpeed = 30
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.maxMotorTorque = 500
-            pivot_joint7.motorSpeed = 30
-     print( "done" )
-end
-
-
- function trykk_knapp( event )
-    if event.phase == "began" then
---print("del1 sin x pos  "..  del9.x .." ")
---print("del1 sin y pos  "..  del9.y .." ")
---print( "White square's center position in screen coordinates: ", sqCenterX, sqCenterY )
-            print( "knapp" )
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.motorSpeed  = pivot_joint.motorSpeed - 80
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.motorSpeed = pivot_joint.motorSpeed - 80
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.motorSpeed = pivot_joint.motorSpeed - 80
-
-    elseif event.phase == "ended" then
-            pivot_joint.isMotorEnabled = true
-            pivot_joint.maxMotorTorque = 5000
-            pivot_joint.motorSpeed = 200
-            pivot_joint1.isMotorEnabled = true
-            pivot_joint1.maxMotorTorque = 5000
-            pivot_joint1.motorSpeed = 200
-            pivot_joint2.isMotorEnabled = true
-            pivot_joint2.maxMotorTorque = 5000
-            pivot_joint2.motorSpeed = 200
-            pivot_joint3.isMotorEnabled = true
-            pivot_joint3.maxMotorTorque = 5000
-            pivot_joint3.motorSpeed = 200
-            pivot_joint4.isMotorEnabled = true
-            pivot_joint4.maxMotorTorque = 5000
-            pivot_joint4.motorSpeed = 200
-            pivot_joint5.isMotorEnabled = true
-            pivot_joint5.maxMotorTorque = 5000
-            pivot_joint5.motorSpeed = 200
-            pivot_joint6.isMotorEnabled = true
-            pivot_joint6.maxMotorTorque = 5000
-            pivot_joint6.motorSpeed = 200
-            pivot_joint7.isMotorEnabled = true
-            pivot_joint7.maxMotorTorque = 5000
-            pivot_joint7.motorSpeed = 200
-            timer.performWithDelay( 100, girned ,1 )
-    end
-    if ( event.numTaps == 2 ) then
-        print( "knapp1" )
-        print( event.numTaps )
-            pivot_joint.isMotorEnabled = false
-            pivot_joint1.isMotorEnabled = false
-            pivot_joint2.isMotorEnabled = false
-            pivot_joint3.isMotorEnabled = false
-            pivot_joint4.isMotorEnabled = false
-            pivot_joint5.isMotorEnabled = false
-            pivot_joint6.isMotorEnabled = false
-            pivot_joint7.isMotorEnabled = false
-        end
-end
-Runtime:addEventListener( "touch", trykk_knapp)
-Runtime:addEventListener( "tap", trykk_knapp)
-local options = {isModal = true,effect = "fade",time = 500,}
---]]
 
 
 
@@ -2384,20 +2120,6 @@ checkpoint("level1:before_end_of_create")
 end
 
 
---[[  
-local function cord(event)
-    if event.phase == "began" then
-            print ("X = ".. reff.x ,"","Y = ".. reff.y)
-
-    end
-
-
-Runtime:addEventListener( "touch", cord )
-
-
-
-end
---]]
 
 function scene:show( event )
 

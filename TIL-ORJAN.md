@@ -761,3 +761,43 @@ fortsetter resten nå eller en annen gang, fremfor å gjette meg videre
 inn i natten på egen hånd.
 
 **Ikke testet i faktisk nettleser ennå.**
+
+## 2026-09-10, fjernet dødkode og merket bevisste globaler
+
+Mathias ba meg fortsette. Gikk videre med de to gjenstående punktene
+fra forrige oppføring.
+
+**Nesten en alvorlig glipp:** Første forsøk på å finne utkommenterte
+kodeblokker brukte et regex-mønster som feiltolket Lua sin
+kommentar-syntaks. Det ga et fullstendig feil svar: "979
+sammenhengende linjer kommentert ut" i `level1.lua`, som i
+virkeligheten var en blokk på bare 11 linjer etterfulgt av ekte,
+kjørende kode og så flere separate kommentarer. Lua avslutter en
+`--[[`-blokk ved den ALLERFØRSTE `]]` den finner, uansett hva som står
+før eller etter, og mønsteret mitt tok ikke høyde for det. Hadde jeg
+slettet basert på det første svaret, ville jeg slettet fungerende
+spillkode. Skrev om til et skript som følger den faktiske regelen,
+sjekket resultatet manuelt mot hver eneste blokk før noe ble fjernet,
+og verifiserte etterpå med diff at bare linjer ble borte, aldri endret
+eller lagt til, pluss `luac`-syntaks-sjekk av alle filene.
+
+**Fjernet ca 1170 linjer bekreftet dødkode**: gamle, forlatte forsøk
+(dupliserte funksjoner, tidligere varianter av samme kode, ting som
+refererer bilder som aldri fantes) fra `level1.lua`-`level9.lua`,
+`menu.lua`, `liv.lua` og `mark.lua`. Lot lisens- og
+changelog-kommentarene i tredjepartsfilene (`ogt_levelmanager.lua`,
+`ogt_lmdata.lua`, `perspective.lua`) stå urørt, det er ekte
+dokumentasjon, ikke dødkode, selv om de også bruker `--[[ ]]`-syntaks.
+
+**Merket `camera`/`grp` som bevisste globaler** med `_G.`-prefiks på
+definisjonsstedet, slik Solar2D sin dokumentasjon anbefaler for
+globaler som faktisk er meningen skal deles. Disse to kunne IKKE
+gjøres til vanlige lokale variabler slik `trykk_knapp` ble i går:
+`liv.lua` sin `liv.hent()`-funksjon (viser livstall og -ikon, kalt fra
+alle ni baner) skriver rett til `grp` og har ingen annen måte å nå
+banens visningsgruppe på. Sjekket dette grundig før jeg rørte noe,
+etter læringen fra `trykk_knapp`-fiksen.
+
+**Ikke rørt ennå**: `pausemenu1.lua`/`dodmenu1.lua`/`gotoX`-filene sin
+egen, separate `camera`/`grp` (ikke bekreftet delt med noe annet, lavere
+prioritet). Ikke testet i faktisk nettleser.
