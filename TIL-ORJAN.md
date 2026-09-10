@@ -801,3 +801,26 @@ etter læringen fra `trykk_knapp`-fiksen.
 **Ikke rørt ennå**: `pausemenu1.lua`/`dodmenu1.lua`/`gotoX`-filene sin
 egen, separate `camera`/`grp` (ikke bekreftet delt med noe annet, lavere
 prioritet). Ikke testet i faktisk nettleser.
+
+## 2026-09-10, opprinnelige Dropbox-filer og bygg-ekskludering
+
+Mathias lastet opp den originale zip-fila fra Dropbox-mappa
+("NewNewNew Roller (1)") og ba om en mappe Ørjan kan bla i direkte på
+GitHub, uten å måtte grave i git-historikk. La de 306 filene urørt inn
+i `opprinnelig-fra-dropbox/`, med en README som forklarer at samme
+innhold også er den aller første committen i repoet, så mappen er
+bare for bla-bekvemmelighet.
+
+Sjekket etterpå om dette ville blåse opp HTML5-spillet: `dstPath` i
+`Util/recipe-html5.lua` peker på hele repo-roten som `projectPath`, og
+den filas egen kommentar sier rett ut at alt der blir "kopiert rått
+inn i spillbunten som assets". Uten tiltak ville de ~28 MB fra Dropbox
+blitt lastet ned til hver spiller sin telefon for ingenting.
+
+Løsningen er dokumentert av Solar2D selv: `excludeFiles` i
+`build.settings`, med et stjernetegn etter mappenavnet for å
+ekskludere hele mappen (uten stjernen blir bare selve mappen tom, ikke
+utelatt). Lagt til under `all` slik at det gjelder alle
+byggeplattformer, ikke bare HTML5, siden mappen uansett aldri trengs i
+noe bygg. Trigger HTML5-bygget på nytt for å bekrefte at det fortsatt
+fungerer og at bunten ikke har blitt større.

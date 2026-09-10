@@ -7,6 +7,15 @@ settings = {
 		neverStripDebugInfo = true, -- keep file/line info in error tracebacks
 	},
 
+	-- opprinnelig-fra-dropbox/ er referansefiler for Ørjan, ikke noe spillet
+	-- bruker. projectPath i Util/recipe-html5.lua peker på hele repo-roten,
+	-- så uten dette ville de ~28 MB blitt kopiert rått inn i HTML5-bundelen
+	-- som "assets". Stjernen etter mappenavnet er det som ekskluderer hele
+	-- mappen (uten den ville den bare blitt inkludert som en tom mappe).
+	excludeFiles = {
+		all = { "opprinnelig-fra-dropbox*" },
+	},
+
 	orientation = {
 		default = "landscapeRight",
 		supported = { "landscapeRight", "landscapeLeft"}
