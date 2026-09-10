@@ -111,11 +111,11 @@ function scene:hide( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
-       composer.removeScene( "gotomenu" )
 print ("gotomenu scene:hide will")
     elseif ( phase == "did" ) then
+       composer.removeScene( "gotomenu" )
 print ("gotomenu scene:hide did")
-   
+
 
     end
 end

@@ -236,6 +236,40 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
   "levels" knappene ble oppdaget først. Lagt til samme fangst der.
   Nytt bygg kjører nå. Neste feilmelding bør vise nøyaktig sjekkpunkt.
 
+- **2026-09-10, samme dag.** Nok et krasj etter to retry-trykk, men
+  denne gangen med den vanlige Solar2D-varselboksen, ikke vår røde
+  sjekkpunkt-boks. Det var nøkkelen: krasjen skjedde IKKE inni
+  `pcall`-en rundt `composer.gotoScene` i `pausemenu1.lua` (den fanger
+  fint), men et sted composer selv styrer bak kulissene, utenfor det vi
+  hadde satt sikkerhetsnett rundt.
+
+  Fant roten: `gotolevel1.lua`, `gotomenu.lua` og `gotochooselevel.lua`
+  kalte alle `composer.removeScene(...)` på seg selv i `scene:hide`
+  sin **"will"**-fase i stedet for **"did"**. "Will" skjer i det
+  overgangsanimasjonen starter, ikke når den er ferdig, så
+  `removeScene()` der river ned scenens visningsgruppe og laster ut
+  Lua-modulen mens composers egen fade/overgang fortsatt jobber mot den
+  samme gruppa. `gotolevel1` er splash-skjermen retry-knappen alltid
+  går via, så hver retry gjentok akkurat dette, og etter et par runder
+  endte composers interne tilstand opp korrupt nok til å krasje dypt
+  inne i selve composer-biblioteket, langt fra våre pcall-er. Flyttet
+  `removeScene()`-kallet til "did"-fasen i alle tre filene (etter at
+  overgangen faktisk er ferdig), som er slik composer selv sier den
+  skal brukes. Samme fiks i `gotolevel2.lua`, som har nøyaktig samme
+  kopierte feil.
+
+  **Ekstra funn i `gotolevel2.lua`, ikke rørt ennå:** utenom
+  "will/did"-bugen har filen to andre feil som ser ut som rester fra
+  kopiering av `gotolevel1.lua`, print-tekstene sier fortsatt
+  "gotolevel1" og filen går videre til `"level1"` (linje 42) i stedet
+  for `"level2"`, og kallet på linje 104 fjerner scenen `"gotolevel1"`
+  i stedet for `"gotolevel2"`. Kombinert med den fra før dokumenterte
+  "neste bane"-bugen (alltid `gotolevel2`, uansett bane) betyr dette at
+  hele splash-skjermen mellom en fullført bane og neste bane trolig
+  aldri har fungert som tiltenkt. Rørte den ikke nå, siden det henger
+  sammen med den større, allerede kjente "neste bane"-bugen og bør
+  fikses samlet, ikke gjettes fram til stykkevis.
+
 ## Død kode (finnes i repoet, men brukes aldri)
 
 Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
