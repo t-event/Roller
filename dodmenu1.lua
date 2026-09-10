@@ -124,7 +124,15 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener("collision", onCollision1)
-composer.gotoScene( "gotomenu",{effect = "fade" , time = 1}) 
+local ok, err = pcall( composer.gotoScene, "gotomenu", {effect = "fade" , time = 1} )
+if not ok then
+	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+	print( "CRASH going to gotomenu: " .. msg )
+	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+	bg:setFillColor( 0, 0, 0, 0.85 )
+	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+	t:setFillColor( 1, 0.3, 0.3 )
+end
 physics.start( )
 
 print("Current Score1: ", liv.returnScore())
@@ -148,7 +156,15 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener("collision", onCollision1)
-composer.gotoScene( "gotochooselevel",{effect = "fade" , time = 1}) 
+local ok, err = pcall( composer.gotoScene, "gotochooselevel", {effect = "fade" , time = 1} )
+if not ok then
+	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+	print( "CRASH going to gotochooselevel: " .. msg )
+	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+	bg:setFillColor( 0, 0, 0, 0.85 )
+	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+	t:setFillColor( 1, 0.3, 0.3 )
+end
 physics.start( )
 
 print("Current Score1: ", liv.returnScore())

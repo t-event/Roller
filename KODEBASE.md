@@ -87,9 +87,9 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
   ingen fil i hele repoet refererer til `"pausemenu2"` gjennom `"pausemenu9"`
   i det hele tatt.
 - `dodmenu1.lua` — **i bruk, av ALLE ni baner**. Samme mønster som
-  pausemenu1. Fikk pcall-sikkerhetsnettet på "retry"-knappen 2026-09-10
-  (samtidig som retry-til-feil-bane-fiksen), "main menu" og "levels"
-  mangler det fortsatt.
+  pausemenu1. Fikk pcall-sikkerhetsnettet på alle tre knappene
+  (retry/main menu/levels) 2026-09-10, samme dekning som
+  pausemenu1.lua nå.
 - `dodmenu2.lua` til `dodmenu9.lua` — **100 % død kode**, samme bekreftelse
   som pausemenu2-9.
 
@@ -118,14 +118,14 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
   "level select grid"-bibliotek (paginert rutenett, lås/opplåsing,
   stjerner). `ogt_lmdata.lua` er konfigurasjonen (antall baner, låste
-  baner, bildefiler). To ting funnet ved gjennomgang: `k.beforeLeaving()`
-  (kjører hver gang du trykker en banerute) lager en splash-sprite som
-  aldri fjernes (opprydningen er kommentert bort), så hvert banevalg
-  legger igjen ett objekt til. Og selve scenebyttet når du trykker en
-  banerute (`sceneMgr.gotoScene()` i `selectLevel`) mangler pcall-
-  sikkerhetsnettet som resten av kjeden dit (pausemeny →
-  gotochooselevel → chooselevel → init/makeGrid) fikk under
-  feilsøkingen.
+  baner, bildefiler). To ting funnet ved gjennomgang 2026-09-10, begge
+  **fikset samme dag**: `k.beforeLeaving()` (kjører hver gang du
+  trykker en banerute) lagde en splash-sprite som aldri ble fjernet,
+  fjernes nå i `selectLevel()` sin `goto()` rett før scenebyttet. Og
+  selve scenebyttet når du trykker en banerute (`sceneMgr.gotoScene()`
+  i `selectLevel`) manglet pcall-sikkerhetsnettet som resten av kjeden
+  dit (pausemeny → gotochooselevel → chooselevel → init/makeGrid) fikk
+  under feilsøkingen, har det nå også.
 
 ### Delte spillobjekter
 - `perspective.lua` — kamerasystem (parallakse, lag), tredjepartsbibliotek

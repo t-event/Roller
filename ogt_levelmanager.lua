@@ -132,10 +132,7 @@ local sheetData =  { width = 1200 , height= 540, count = 6 , numFrames = 6, shee
     last.y = hoyde/2
     last:setSequence("lastlast")
 	last:play()
-
-	--last:pause()
-	--display.remove( last )
-	--last = nil
+	-- last fjernes i selectLevel() sin goto(), rett før faktisk scenebytte.
 end
 
 
@@ -159,13 +156,21 @@ local function selectLevel(event)
 	end
 	 function goto()
 		print("no")
-			
-		--print("sceneMGgr", table.show(sceneMgr))
-		--event.target.xScale = 1
-		--event.target.yScale = 1
-		sceneMgr.gotoScene ( newScene, {effect=k.sboardEffect, time=k.sboardTime} )
-		--display.remove(  )
-		
+
+		if last then
+			display.remove( last )
+			last = nil
+		end
+
+		local ok, err = pcall( sceneMgr.gotoScene, newScene, {effect=k.sboardEffect, time=k.sboardTime} )
+		if not ok then
+			local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+			print( "CRASH going to " .. tostring(newScene) .. " (selectLevel): " .. msg )
+			local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+			bg:setFillColor( 0, 0, 0, 0.85 )
+			local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+			t:setFillColor( 1, 0.3, 0.3 )
+		end
 
 	end
 

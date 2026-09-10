@@ -525,3 +525,20 @@ når du går tom for liv, ingen spørring, siden reklame-alternativet ikke
 finnes ennå.
 
 Ikke testet i faktisk nettleser.
+
+## 2026-09-10, tre til, samme mønster
+
+Mathias spurte om det var noe annet jeg umiddelbart ville fikse. Tre
+lavrisiko-ting som følger nøyaktig samme mønster som allerede var
+godkjent i dag:
+
+- **`dodmenu1.lua` sine to gjenstående knapper** ("main menu"/"levels")
+  fikk samme pcall-sikkerhetsnett som "retry" fikk tidligere i dag.
+  Samme dekning som `pausemenu1.lua` nå.
+- **Sprite-lekkasjen i `ogt_levelmanager.lua`** (splash-bildet som
+  aldri ble fjernet ved banevalg) er fikset, fjernes nå rett før
+  scenebyttet til den valgte banen.
+- **Selve banevalget** (`sceneMgr.gotoScene()` i `selectLevel`) har nå
+  samme pcall-sikkerhetsnett som resten av kjeden dit.
+
+Ikke testet i faktisk nettleser ennå. Pushet og ny build trigget.
