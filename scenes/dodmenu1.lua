@@ -102,7 +102,20 @@ if liv.erTom() then
 	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
 	destination = "scenes.gotolevel1"
 end
--- Riv ned den gamle instansen av banen først, se samme kommentar i
+-- Lukk overlayen (denne dødsmenyen) FØR banen under rives ned. Uten
+-- dette (rettet 2026-09-10, retry krasjet fortsatt etter forrige fiks)
+-- kaller vi composer.removeScene() på banen som fortsatt er den aktive
+-- scenen mens dødsmenyen enda ligger som overlay oppå den. Det er ikke
+-- en støttet rekkefølge, komponerings egen bokføring av hvilken scene
+-- som er aktiv/har en overlay korrumperes, og det gir et krasj dypt
+-- inne i motoren selv (ufanget av pcall pga at det skjer i selve
+-- removeScene-kallet, ikke i gotoScene-kallet under). gotoScene()
+-- skjuler riktignok en aktiv overlay automatisk, men først ETTER at
+-- removeScene allerede har rukket å rive ned scenen den lå oppå, så
+-- det er for sent. Se samme kommentar i pausemenu1.lua sin resume().
+composer.hideOverlay()
+-- Riv ned den gamle instansen av banen. Uten dette huskes ikke en ny
+-- scene:create ved gotoScene til samme scenenavn, se samme kommentar i
 -- pausemenu1.lua sin resume().
 composer.removeScene( destination )
 local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )

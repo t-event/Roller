@@ -121,13 +121,24 @@ if liv.erTom() then
 	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
 	destination = "scenes.gotolevel1"
 end
--- Riv ned den gamle instansen av banen først. Uten dette kan
--- composer.gotoScene til en scene med samme navn som den som allerede
--- er aktiv (retry på gjeldende bane, med pausemenyen som overlay oppå)
--- la gammel fysikk/ledd/Runtime-lyttere henge igjen i stedet for å
--- bygge banen på nytt, som gir både "restart virker ikke ordentlig" og
--- stadig tyngre fysikksimulering (slow motion) for hver retry.
--- Harmløst no-op hvis scenen ikke er lastet fra før.
+-- Lukk overlayen (denne pausemenyen) FØR banen under rives ned. Uten
+-- dette (rettet 2026-09-10, retry krasjet fortsatt etter forrige fiks)
+-- kaller vi composer.removeScene() på banen som fortsatt er den aktive
+-- scenen mens pausemenyen enda ligger som overlay oppå den, med
+-- pausemenyen som overlay oppå. Det er ikke en støttet rekkefølge,
+-- komponerings egen bokføring av hvilken scene som er aktiv/har en
+-- overlay korrumperes, og det gir et krasj dypt inne i motoren selv
+-- (ufanget av pcall pga at det skjer i selve removeScene-kallet, ikke
+-- i gotoScene-kallet under). gotoScene() skjuler riktignok en aktiv
+-- overlay automatisk, men først ETTER at removeScene allerede har
+-- rukket å rive ned scenen den lå oppå, så det er for sent.
+composer.hideOverlay()
+-- Riv ned den gamle instansen av banen. Uten dette huskes ikke en ny
+-- scene:create ved gotoScene til samme scenenavn (retry på gjeldende
+-- bane), og gammel fysikk/ledd/Runtime-lyttere kan henge igjen i
+-- stedet for at banen bygges på nytt, som ga både "restart virker
+-- ikke ordentlig" og stadig tyngre fysikksimulering (slow motion) for
+-- hver retry. Harmløst no-op hvis scenen ikke er lastet fra før.
 composer.removeScene( destination )
 local ok, err = pcall( composer.gotoScene, destination, {effect = "fade" , time = 1} )
 if not ok then

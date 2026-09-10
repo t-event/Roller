@@ -824,3 +824,50 @@ utelatt). Lagt til under `all` slik at det gjelder alle
 byggeplattformer, ikke bare HTML5, siden mappen uansett aldri trengs i
 noe bygg. Trigger HTML5-bygget på nytt for å bekrefte at det fortsatt
 fungerer og at bunten ikke har blitt større.
+
+## 2026-09-10, retry krasjet fortsatt: composer.removeScene() på aktiv scene
+
+Mathias og Ørjan testet spillet live og fikk fortsatt en krasj ved
+retry, denne gangen en helt uhåndtert "ERROR: Runtime error, attempt
+to compare nil with number" (skjermbilde fra dødsmenyen), ikke vår
+egen røde feilboks. Det i seg selv var et nyttig spor: siden krasjen
+IKKE ble fanget av `pcall`-en rundt `composer.gotoScene()`, måtte den
+skje et annet sted, siden vi wrapper akkurat den ene linja.
+
+HTML5-bygget strippet dessverre all fil-/linjeinfo i feilmeldingen til
+"?"/linje 0 (til tross for `neverStripDebugInfo = true`, som
+tydeligvis ikke hjelper for nettleser-eksport), så feilsøkingen måtte
+skje ved å lese koden, ikke ved å følge en stack trace til rett linje.
+
+Fant den mest sannsynlige årsaken ved å lese `resume()` i både
+`dodmenu1.lua` og `pausemenu1.lua` på nytt: linja
+`composer.removeScene( destination )` (lagt til tidligere i kveld som
+fiks for slow-motion-buggen) kalles helt uten `pcall` rundt seg, og
+`destination` er nettopp banen som fortsatt ER den aktive scenen når
+du trykker retry, siden dødsmenyen/pausemenyen bare ligger som en
+overlay oppå den, ikke som en egen scene. Å rive ned den aktive
+scenen mens dens egen overlay fortsatt vises er ikke en støttet
+rekkefølge i Composer. Composer sin egen dokumentasjon sier at
+`gotoScene()` skjuler en aktiv overlay automatisk, men det skjer for
+sent her, ETTER at `removeScene()` allerede har rukket å ødelegge
+scenen overlayen lå oppå.
+
+Fikset ved å legge til `composer.hideOverlay()` rett før
+`composer.removeScene( destination )` i begge filers `resume()`, slik
+at menyen lukkes skikkelig FØR banen under rives ned og bygges på
+nytt, i stedet for at rekkefølgen er omvendt. `removeScene()` selv
+beholdes, den er fortsatt nødvendig for at et nytt `gotoScene()` til
+samme banenavn faktisk skal kjøre `scene:create()` på nytt (bekreftet
+mot Solar2D-forumet: uten den huskes den gamle scenegruppa, og
+gjenbrukes i stedet for å bygges på nytt).
+
+Fant samtidig og rettet en ren skjønnhetsfeil mens jeg var inne i
+disse filene: kommentaren lagt til i går på `lm.currentLevel = N` i
+`level2.lua`-`level9.lua` hadde blitt dobbelt-UTF-8-kodet et sted
+("sÃ¥" i stedet for "så"), sannsynligvis av et tidligere skript i
+kveld. Ren tekstvisningsfeil i en kommentar, ingen kjørende kode
+berørt, men rettet siden det så slurvete ut. `level1.lua` hadde den
+ikke, kun `level2-9.lua`. Luac-sjekket alle ni filer etterpå.
+
+Testet ikke i faktisk nettleser før push, kunne ikke det herfra. Bygg
+trigget på nytt, si fra så snart dere har fått prøvd retry igjen.

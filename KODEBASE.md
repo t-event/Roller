@@ -243,8 +243,17 @@ filene gjør.
    fangbar Lua-feil. Byttet til en mer robust løsning: hver
    `levelN.lua` setter `lm.currentLevel = N` selv, tidlig i
    `scene:create`, og retry bruker `"level" .. lm.currentLevel`
-   direkte i stedet for å spørre Composer. Ikke testet i faktisk
-   nettleser ennå.
+   direkte i stedet for å spørre Composer.
+
+   Testet av Mathias/Ørjan, krasjet fortsatt, denne gangen et uhåndtert
+   "attempt to compare nil with number" fra selve motoren. Årsak:
+   `composer.removeScene( destination )` (fiksen for slow-motion,
+   se punkt under) ble kalt helt uten `pcall` på banen som fortsatt
+   var den aktive scenen, mens pausemeny/dødsmeny lå som overlay oppå
+   den. Composer støtter ikke å rive ned en scene mens dens egen
+   overlay fortsatt vises. **Fikset 2026-09-10**: `composer.hideOverlay()`
+   legges nå til rett før `removeScene()` i begge menyenes `resume()`,
+   se `TIL-ORJAN.md`. Ikke testet i faktisk nettleser ennå.
 5. **Marken skal kunne "knekke"** (brekke i to ved landing), beskrevet
    av Ørjan som bygget av 3 biter med motoriserte ledd, men koden i
    dette repoet har en 9-leddet ormekropp uten noen knekk-mekanikk.

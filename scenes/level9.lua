@@ -106,7 +106,7 @@ local trykk_knapp
         
 
 function scene:create( event )
-lm.currentLevel = 9 -- sÃ¥ retry vet hvilken bane den skal restarte
+lm.currentLevel = 9 -- så retry vet hvilken bane den skal restarte
 
 
     local sceneGroup = self.view
