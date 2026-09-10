@@ -278,8 +278,21 @@ filene gjør.
    `gotoScene()` til gjeldende bane skjer først når mellomscenen er
    den aktive, uten overlay oppå seg. Rettet samtidig samme (hittil
    ubekreftede) latente bug i `gotolevel1.lua` sin egen `goto()`, som
-   manglet en tilsvarende `removeScene()`. Ikke testet i faktisk
-   nettleser ennå.
+   manglet en tilsvarende `removeScene()`.
+
+   `gotoretry`-omveien virket (bekreftet: en ANNEN feilmelding kom nå
+   i stedet, se under). **Fikset på nytt 2026-09-10, ny separat bug**:
+   `level1.lua` (kun bane 1) har en "kjøletid"-effekt per kroppsdel
+   (`onLocalCollision1`-`onLocalCollision9`): slår av delens egen
+   kollisjonslytter ved landing, viser en støv-sprite i 1 sekund, slår
+   lytteren på igjen når `transition.to()` sitt `onComplete` fyrer.
+   `transition.to()` avbrytes ikke av at scenen skjules, så et retry
+   midt i den ventetiden fikk `onComplete` til å fyre mot en kroppsdel
+   som allerede var revet ned, krasj: "attempt to call method
+   'addEventListener' (a nil value)". Fikset med `transition.cancel()`
+   i `scene:hide` sin "did"-fase, i alle ni banefiler (kun `level1.lua`
+   kan faktisk krasje slik, resten fikk den som forsiktighetsregel).
+   Ikke testet i faktisk nettleser ennå.
 5. ~~Marken skal kunne "knekke"~~ **Var faktisk allerede kodet, bare
    avslått. Fikset 2026-09-10.** Den forrige vurderingen her, at
    9-leddet-ormen manglet knekk-mekanikk helt, var feil. Mathias

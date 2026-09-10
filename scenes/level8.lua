@@ -1730,6 +1730,13 @@ camera:destroy()
 
       -- camera:setFocus( nil )
 
+-- Lagt til 2026-09-10: samme forsiktighetsregel som i level1.lua (se
+-- forklaring der). Denne banen har en enklere, engangs stov-effekt
+-- uten samme fare, men transition.cancel() er billig og gjør at
+-- ingen ventende transition noensinne kan fyre av mot en scene som
+-- allerede er revet ned.
+transition.cancel()
+
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener( "touch", trykk_knapp)
 Runtime:removeEventListener( "tap", trykk_knapp)

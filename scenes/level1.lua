@@ -2255,6 +2255,19 @@ camera:destroy()
 
       -- camera:setFocus( nil )
 
+-- Lagt til 2026-09-10: stov1-stov9-støveffekten (når en kroppsdel
+-- lander) venter 1 sekund før den fjerner seg selv og rearmerer delN
+-- sin egen kollisjonslytter. transition.to() sine onComplete-kall
+-- avbrytes IKKE automatisk av at scenen skjules, så om spilleren dør
+-- og går til retry mens en slik effekt fortsatt venter, fyres den opp
+-- til 1 sekund senere mot en delN som da allerede er revet ned av
+-- retry, og krasjer uhåndtert ("attempt to call method
+-- 'addEventListener' (a nil value)", siden en fjernet Corona-scene-
+-- objekt mister metodene sine). transition.cancel() uten argumenter
+-- avbryter alle ventende transitions, trygt her siden ingenting annet
+-- kjører transitions samtidig med selve banen.
+transition.cancel()
+
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener( "touch", trykk_knapp)
 Runtime:removeEventListener( "tap", trykk_knapp)

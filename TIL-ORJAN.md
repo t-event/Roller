@@ -988,3 +988,45 @@ Luac-sjekket alle fire filene. Ikke testet i faktisk nettleser, det er
 fortsatt akkurat den delen jeg ikke kan gjøre herfra. Dette er nå
 tredje forsøk på akkurat denne krasjen, så ekstra viktig å få bekreftet
 av dere før vi går videre til noe annet.
+
+## 2026-09-10, retry-krasjen var faktisk to forskjellige bugs
+
+`gotoretry.lua`-omveien virket. Mathias meldte tilbake en NY feil ved
+retry etter en død i bane 1, denne gangen "attempt to call method
+'addEventListener' (a nil value)", ikke lenger "compare nil with
+number". Det er faktisk gode nyheter: det er en annen, senere feil enn
+den vi jaktet på i sted, som betyr at selve `gotoretry`-fiksen løste
+det opprinnelige problemet, og vi har nå avdekket en HELT separat bug
+lenger inn.
+
+Fant den i `del1:addEventListener( "collision" )`-mønsteret, som
+finnes ni ganger i `level1.lua` (en per kroppsdel, `del1`-`del9`).
+Dette er faktisk gyldig, dokumentert Corona-bruk, ikke en glipp: når
+`addEventListener` kalles med bare eventnavnet og ingen egen
+lytter-funksjon, bruker Solar2D objektets eget `.collision`-felt som
+lytter (satt med `del1.collision = onLocalCollision1` osv, rett før
+første `addEventListener`-kall). Selve mønsteret (i
+`onLocalCollision1`-`onLocalCollision9`, kun i `level1.lua`, ikke i de
+andre åtte banene) er en "kjøletid"-effekt: når en kroppsdel treffer
+bakken, slås dens egen kollisjonslytter AV, en støv-sprite
+(`stov1`-`stov9`) spawnes og fades ut over 1 sekund, og når den
+`transition.to()`-en er FERDIG (`onComplete`), slås lytteren PÅ igjen.
+
+Problemet: `transition.to()` sine `onComplete`-kall avbrytes ikke
+automatisk av at scenen skjules. Om spilleren dør og trykker retry
+mens en slik 1-sekunds-effekt fortsatt venter, fyres `onComplete` opp
+til 1 sekund SENERE, og prøver da å kalle `:addEventListener` på en
+kroppsdel som `gotoretry.lua` allerede har revet ned. En fjernet
+Corona-visningsobjekt mister metodene sine, derav "a nil value" på
+selve metoden, ikke på objektet.
+
+Fikset med `transition.cancel()` (ingen argumenter, avbryter ALLE
+ventende transitions) i `scene:hide` sin "did"-fase i `level1.lua`,
+rett ved siden av den eksisterende Runtime-lytter-opprydningen. Lagt
+til samme linje i `level2.lua`-`level9.lua` også, for konsistens og
+fordi det er billig defensiv praksis, selv om bare `level1.lua` sin
+mer avanserte per-kroppsdel-støveffekt faktisk kan krasje på denne
+måten (de andre banenes støveffekt er enklere og fjerner bare seg
+selv, ikke noe delt objekt).
+
+Luac-sjekket alle ni filer. Ikke testet i faktisk nettleser.
