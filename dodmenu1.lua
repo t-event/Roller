@@ -92,7 +92,16 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener("collision", onCollision1)
-composer.gotoScene( "gotolevel1",{effect = "fade" , time = 1}) 
+local currentLevel = composer.getSceneName( "current" )
+local ok, err = pcall( composer.gotoScene, currentLevel, {effect = "fade" , time = 1} )
+if not ok then
+	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+	print( "CRASH going to " .. tostring(currentLevel) .. " (retry): " .. msg )
+	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+	bg:setFillColor( 0, 0, 0, 0.85 )
+	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+	t:setFillColor( 1, 0.3, 0.3 )
+end
 pausemenu.alpha=0
 physics.start()
 liv.endreliv(1)

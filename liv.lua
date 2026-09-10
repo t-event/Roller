@@ -123,15 +123,19 @@ function liv.lastliv()
 end
 
 function liv.endreliv( val )
-   
-      if liv_igjen == 1 then
-        print( "nullliv" )
-       -- liv_igjen = liv_igjen
-       liv_igjen = liv_igjen+2
-
-   else  liv_igjen = liv_igjen-val
+   liv_igjen = liv_igjen - val
+   if liv_igjen < 0 then
+      liv_igjen = 0
    end
    return true
+end
+
+-- Sant når spilleren er tom for liv. Ment å brukes til å vise
+-- "se reklame for å få liv tilbake"-skjermen når den er kodet
+-- (1 min reklame = 1 liv, lang reklame = f.eks 3 liv, per Ørjan).
+-- Selve reklame-integrasjonen er ikke bygget ennå.
+function liv.erTom()
+   return liv_igjen <= 0
 end
 
 function liv.addToScore( val )

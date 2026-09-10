@@ -29,7 +29,8 @@ level1.lua .. level9.lua            [selve banen, valgt via chooselevel-gridet]
      level2-9: showOverlay("gotolevel2")      [BUG: hardkodet, se "Kjente feil"]
 
 pausemenu1.lua (delt av alle baner)
-  ├─ "retry"      → gotoScene("gotolevel1")     [alltid level 1, ikke gjeldende bane]
+  ├─ "retry"      → gotoScene(composer.getSceneName("current"))   [fikset 2026-09-10,
+  │                  gikk før alltid til level 1 uansett hvilken bane du var på]
   ├─ "main menu"  → gotoScene("gotomenu") → gotoScene("menu")
   └─ "levels"     → gotoScene("gotochooselevel") → gotoScene("chooselevel")
                      └─ lm.init() (ogt_levelmanager.lua) bygger rutenettet
@@ -86,9 +87,9 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
   ingen fil i hele repoet refererer til `"pausemenu2"` gjennom `"pausemenu9"`
   i det hele tatt.
 - `dodmenu1.lua` — **i bruk, av ALLE ni baner**. Samme mønster som
-  pausemenu1, men **mangler pcall-/sjekkpunkt-sikkerhetsnettet** som
-  pausemenu1.lua fikk under feilsøkingen. Alle tre knappene (retry/
-  main menu/levels) kaller `composer.gotoScene()` helt direkte.
+  pausemenu1. Fikk pcall-sikkerhetsnettet på "retry"-knappen 2026-09-10
+  (samtidig som retry-til-feil-bane-fiksen), "main menu" og "levels"
+  mangler det fortsatt.
 - `dodmenu2.lua` til `dodmenu9.lua` — **100 % død kode**, samme bekreftelse
   som pausemenu2-9.
 
@@ -99,15 +100,16 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
 - `level2.lua`, `level3.lua`, `level4.lua` — **spillbare, men ufullstendig
   innhold.** Ifølge Ørjan er disse "ferdige", men bruker plassholder-grafikk
   (se under) og de samme (feil) kollisjonsformene som level1.
-- `level5.lua` til `level9.lua` — **ufullstendige, ifølge Ørjan.** Har i
-  tillegg egne knuste bilde-stier (samme mønster som level2-4 hadde før vi
-  fikset dem), ikke rettet siden disse ikke er prioritert. Bekreftet med
-  `diff`: alle fem er **100 % byte-identiske filer**, ikke bare samme
-  plassholderbilder. De knuste stiene er konkret: bildene refereres uten
-  mappe-prefiks (`"back_cave.png"`, `"dirt1.png"`, `"1.png"`-`"4.png"`),
-  mens filene faktisk ligger under `background/` og under sin egen
-  `levelN/`-mappe. `level2.lua`-`level4.lua` har korrekte stier og er
-  ikke rammet.
+- `level5.lua` til `level9.lua` — **ufullstendige, ifølge Ørjan.**
+  Var 100 % byte-identiske filer med knuste bildestier (bekreftet med
+  `diff`). **Stiene rettet 2026-09-10** (Ørjan: greit å gjøre siden
+  spillet ikke er under aktiv grafikk-utvikling), bildene refereres nå
+  med riktig mappe-prefiks (`background/back_cave.png`,
+  `level5/1.png` osv, samme mønster som `level2.lua`-`level4.lua`).
+  De fem filene er dermed ikke lenger byte-identiske (hver har sin
+  egen `levelN/`-sti), men deler fortsatt de samme plassholderbildene
+  og de samme (feil) kollisjonsformene som level1 (se punkt 1 under
+  "Kjente feil").
 - **Alle ni baner bruker identiske plassholderbilder** for banestykkene
   (`levelN/1.png` til `4.png`), unntatt level1 som har unike bilder.
   Bekreftet med MD5-sjekksum, se `TIL-ORJAN.md`.
@@ -133,14 +135,18 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
 - `liv.lua` — "liv" = spillerens liv/poengsum, lagres via `GGData.lua`.
   **Trekkes bare fra når du bruker en knapp i pause-/dødsmenyen
   (retry/main menu/levels), ikke av noe som skjer inni selve
-  spillingen**, og `liv.endreliv()` legger faktisk TIL 2 liv i stedet
-  for å trekke fra når telleren når 1 (`liv_igjen == 1`), så tallet
-  kan aldri nå null i praksis. Ingenting i koden sjekker uansett
-  `liv.returnScore()` mot null. Selve dødsskjermen
-  (`showOverlay("dodmenu1")`) trigges av en helt separat ting: en
-  fysikk-kollisjon mellom et "dod"-objekt og spillerens hode
-  (`del9`). Lives-tallet som vises er altså kosmetisk per nå, uten
-  konsekvens for spillet.
+  spillingen.** Ørjan bekreftet 2026-09-10: liv skal ha reell
+  betydning (ikke ferdig kodet), og skal kunne nå null, da skal
+  spilleren kunne se en reklame for å få liv tilbake (1 min reklame =
+  1 liv, lang reklame = flere). Bugen som hindret telleren fra
+  noensinne å nå null er fikset (`liv.endreliv()` la feilaktig til 2
+  liv i stedet for å trekke fra ved siste liv). Lagt til
+  `liv.erTom()` som helper for videre arbeid. **Selve
+  reklame-visningen er IKKE bygget** (krever et valg av annonse-SDK),
+  og ingenting kaller `liv.erTom()` ennå. Dødsskjermen
+  (`showOverlay("dodmenu1")`) trigges fortsatt av noe helt separat: en
+  fysikk-kollisjon mellom et "dod"-objekt og spillerens hode (`del9`),
+  uavhengig av live-telleren.
 - `mark.lua` — bygger spillerkarakterens kroppsdeler (hale/hode),
   fysikk-leddet sammen. **`require`t av `menu.lua` og `level1.lua`,
   men `mark.hent()` blir aldri faktisk kalt noe sted** (begge fanger
@@ -148,6 +154,18 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
   bygger i stedet spillerkroppen med ca 90-100 linjer kopiert kode
   rett i egen fil. Reelt sett dødt, bortsett fra at selve `require`-
   kallet kjører harmløst.
+  **Om kollisjonsboksene på marken (spurt av Ørjan 2026-09-10):**
+  `shapedefs.lua` har faktisk ferdige `"hale"`/`"hode"`-former, men de
+  brukes IKKE av `level1.lua` sin ormekropp. I stedet brukes
+  hånd-skrevne, innebygde former (`del1Shape`/`del9Shape`). Sjekket
+  hvorfor: `del1` (halen) krympes fra 55×35 til 27×17 rett før
+  kollisjonsformen legges på, og de innebygde formene stemmer med den
+  krympede størrelsen, mens `shapedefs.lua` sine `"hale"`/`"hode"`
+  er sporet fra bildet i original (ukrympet) størrelse. Å bytte dem
+  inn direkte ville gitt en dobbelt så stor usynlig kollisjonsboks.
+  Ikke rørt fysikk-koden på dette, se "Kjente feil" punkt 5 for
+  hvorfor (Ørjan sjekker om en nyere, 3-delt versjon av marken
+  finnes).
 - `gameUI.lua` — liten delt hjelpefunksjon (`dragBody`), i bruk.
 - `GGData.lua` — tredjeparts lagringsbibliotek, urørt.
 - `game.lua`, `livddadas.lua` — **død kode**, gamle/kommenterte varianter av
@@ -163,31 +181,56 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
 
 1. **Delte kollisjonsformer.** `shapedefs.lua` har bare ett sett former
    ("1"-"4"), men brukes av alle baner. Stemmer bare med level1 sine
-   bilder. (Dokumentert i `TIL-ORJAN.md` fra før.)
+   bilder. Ørjan har bekreftet (2026-09-10) at alle baner skal ha egne
+   formsett i `shapedefs.lua`, per i dag ligger bare level1 sitt der
+   (helt til slutt i fila). Venter på at de andre banenes former spores
+   i PhysicsEditor, ikke noe AI kan gjøre uten kildebildene i riktig
+   verktøy.
 2. **Plassholder-grafikk.** level2-9 deler identiske banestykke-bilder.
-   (Også i `TIL-ORJAN.md`.)
+   (Også i `TIL-ORJAN.md`.) Fortsatt uendret, venter på ny grafikk.
 3. **"Neste bane"-knappen er hardkodet til level 2**, i level2.lua til
    level9.lua (`showOverlay("gotolevel2")` i `goto2`-funksjonen), uansett
    hvilken bane som faktisk fullføres. `level1.lua` gjør det riktig (viser
    `gotochooselevel`, tilbake til banevalg-skjermen) — de andre åtte burde
-   trolig gjøre det samme.
-4. **"Retry" fra pausemenyen går alltid til bane 1**
-   (`composer.gotoScene("gotolevel1")` i `pausemenu1.lua`), ikke til banen
-   du faktisk var på.
+   trolig gjøre det samme. Ikke fikset ennå, Ørjan har ikke tatt stilling
+   til denne spesifikt.
+4. ~~"Retry" fra pausemenyen går alltid til bane 1~~ **Fikset
+   2026-09-10.** Ørjan bekreftet at retry skal starte banen du faktisk
+   var på. `pausemenu1.lua` og `dodmenu1.lua` bruker nå
+   `composer.getSceneName("current")` i stedet for hardkodet
+   `"gotolevel1"`. Ikke testet i faktisk nettleser ennå.
+5. **Marken skal kunne "knekke"** (brekke i to ved landing), beskrevet
+   av Ørjan som bygget av 3 biter med motoriserte ledd, men koden i
+   dette repoet har en 9-leddet ormekropp uten noen knekk-mekanikk.
+   Ørjan skal sjekke om han har en nyere versjon der dette faktisk er
+   kodet. Ikke rørt fysikk-koden på dette punktet før den versjonen er
+   funnet, siden det ville vært å gjette på en funksjon som kanskje
+   allerede finnes et annet sted.
+6. **Dobbeltklikk for å gjøre marken slapp virket ikke.** Fant koden
+   (`trykk_knapp` i `level1.lua`), den brukte `event.numTaps == 2` fra
+   Runtime "tap"-eventet, som ikke ser ut til å synkroniseres pålitelig
+   med HTML5-eksportens museklikk. I tillegg satte "touch ended"-fasen
+   alltid motorene på igjen uansett, så selv om dobbeltklikket ble
+   oppdaget ville neste berøring slått dem på igjen momentant.
+   **Fikset 2026-09-10:** dobbeltklikk oppdages nå selv, ved å måle tid
+   mellom to "began"-faser (300 ms vindu), og "ended" lar motorene være
+   av når marken er slapp. Ikke testet i faktisk nettleser ennå.
 
 ## Anbefalt ryddeplan
 
-1. ~~Slett trygt~~ **Gjort, men flyttet i stedet for slettet (2026-09-10):**
-   de 31 bekreftet ubrukte filene (`pausemenu2.lua`-`pausemenu9.lua`,
+1. ~~Slett trygt~~ **Gjort, flyttet i stedet for slettet (2026-09-10),
+   og Ørjan har bekreftet at dette er riktig fremgangsmåte** ("ta vare
+   på død kode på den måten det er gjort til nå"): de 31 bekreftet
+   ubrukte filene (`pausemenu2.lua`-`pausemenu9.lua`,
    `dodmenu2.lua`-`dodmenu9.lua`, `gotolevel3.lua`-`gotolevel9.lua`,
    `menu1.lua`, `menu backup.lua`, `options.lua`, `brett.lua`, `play.lua`,
-   `hoydehopp.lua`, `game.lua`, `livddadas.lua`) ligger nå i `dod-kode/`
+   `hoydehopp.lua`, `game.lua`, `livddadas.lua`) ligger i `dod-kode/`
    i stedet for prosjektroten, se `dod-kode/README.md` for hvor hver kom
    fra. Ingenting av dette gjorde noe i det hele tatt, spillet fungerer
-   identisk. Ikke slettet permanent ennå, i påvente av svar fra Ørjan
-   (spørsmål 6 i `sporsmal.md`).
-2. **Fiks "neste bane" og "retry"-bugene** (punkt 3 og 4 over) før mer
-   opprydding, siden de påvirker faktisk spillbarhet.
+   identisk.
+2. **"Retry"-bugen er fikset** (punkt 4 over). **"Neste bane"-bugen
+   (punkt 3) er fortsatt åpen**, Ørjan har ikke tatt stilling til den
+   spesifikt ennå.
 3. **Vurder å slå sammen** de 9 nesten-identiske `levelN.lua`-filene til én
    parameterisert fil som leser banenummer fra en tabell (bilder,
    kollisjonsformer, startposisjon), i stedet for kopiert kode. Stor jobb,

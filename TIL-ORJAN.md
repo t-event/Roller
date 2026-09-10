@@ -6,13 +6,15 @@ gjort med koden din, i vanlig språk, oppdatert etter hvert.
 
 ## Husk før dette regnes som ferdig
 
-- **Lås banene igjen.** `ogt_lmdata.lua` har `k.numUnlocked` satt til
-  9, og `ogt_levelmanager.lua` har en direkte override (`for x = 1,
-  k.totalLevels do k.levelLocked[x] = false end`, rett før
-  `levelInfo.locked = k.levelLocked`) som tvinger alt ulåst uansett
-  lagret fremgang. Begge er merket "TEMP for debugging", fjern dem når
-  feilsøkingen er ferdig, ellers er hele bane-progresjonen i spillet
-  meningsløs.
+- **Lås banene igjen, når Ørjan sier fra.** `ogt_lmdata.lua` har
+  `k.numUnlocked` satt til 9, og `ogt_levelmanager.lua` har en direkte
+  override (`for x = 1, k.totalLevels do k.levelLocked[x] = false end`,
+  rett før `levelInfo.locked = k.levelLocked`) som tvinger alt ulåst
+  uansett lagret fremgang. Begge er merket "TEMP for debugging".
+  Ørjan bekreftet 2026-09-10 at banene skal holdes åpne ENDA, for
+  fortsatt testing, så dette er bevisst latt urørt. Ikke fjern før han
+  sier fra at testingen er ferdig, ellers er hele bane-progresjonen i
+  spillet meningsløs.
 - **Fjern feilsøkings-sjekkpunktene.** `checkpoint(...)`-kallene i
   `main.lua`, `level1.lua`, `menu.lua`, `ogt_levelmanager.lua`, og
   pcall-innpakningene i `gotolevel1.lua`/`gotomenu.lua`/
@@ -428,3 +430,79 @@ GitHub Pages. Det som gjenstår er i hovedsak spørsmål til deg (se
 `sporsmal.md`) og de to kjente spillbarhets-bugene (neste bane / retry
 går til feil bane, se "Kjente feil" i `KODEBASE.md`), ikke noe som
 haster før du har svart på spørsmålene.
+
+## 2026-09-10, Ørjan svarte på spørsmålene i sporsmal.md
+
+Svarene og hva som ble gjort med hvert av dem (full spørsmålstekst i
+`sporsmal.md`):
+
+1. **Liv skal ha en betydning, bare ikke ferdig kodet ennå.** Man skal
+   starte med et visst antall liv, og ved null liv skal man kunne se
+   en reklame for å få liv tilbake (1 min reklame = 1 liv, lang
+   reklame = f.eks 3 liv). Fant og fikset selve bugen som hindret
+   telleren fra å nå null i det hele tatt (`liv.endreliv()` la
+   feilaktig til 2 liv i stedet for å trekke fra ved siste liv). Lagt
+   til `liv.erTom()` i `liv.lua` som en enkel sjekk videre kode kan
+   bruke. **Bygget IKKE selve reklame-integrasjonen**, det krever et
+   valg av annonse-SDK/nettverk som ikke er min avgjørelse å ta, og
+   ingenting kaller `liv.erTom()` ennå.
+2. **Marken skal kunne "knekke".** Ørjan beskriver den som bygget av
+   3 biter med motoriserte ledd som strekker seg ut og til slutt
+   knekker ved landing. Koden i dette repoet har i stedet en
+   9-leddet ormekropp (del1-del9) uten noen knekk-mekanikk i det hele
+   tatt, altså stemmer ikke det som ligger her med beskrivelsen.
+   Ørjan skal sjekke om han har en nyere versjon der dette faktisk er
+   kodet ferdig. Sjekket samtidig "kan du legge inn kollisjonsboksene
+   på marken": `shapedefs.lua` har faktisk ferdige `"hale"`/`"hode"`
+   kollisjonsformer, men de brukes ikke, `level1.lua` bruker egne
+   hånd-skrevne former i stedet. Grunnen: halen krympes fra 55×35 til
+   27×17 i koden før kollisjonsformen legges på, og de hånd-skrevne
+   formene stemmer med den krympede størrelsen, mens
+   `shapedefs.lua` sine er sporet fra bildet i original størrelse. Å
+   bytte dem inn direkte ville gitt en dobbelt så stor, usynlig
+   kollisjonsboks. **Rørte ikke fysikk-koden her**, siden det virker
+   som riktig steg er å vente på den nyere versjonen Ørjan skal lete
+   etter, fremfor å gjette på en knekk-mekanikk som kanskje allerede
+   finnes ferdig et annet sted.
+3. **Shapedefs.lua skal ha flere ting i seg.** Bekreftet: i dag ligger
+   bare level1 sine kollisjonsformer der (helt til slutt i fila), men
+   alle ni baner skal ha sine egne. Krever at formene spores i
+   PhysicsEditor fra hver banes bilder, noe som må gjøres av noen med
+   verktøyet og kildebildene, ikke noe jeg kan gjette meg fram til.
+   Ikke gjort.
+4. **og 5. Retry skal starte den banen du faktisk var på**, ikke alltid
+   bane 1. **Fikset**: `pausemenu1.lua` og `dodmenu1.lua` sin
+   "retry"-knapp bruker nå `composer.getSceneName("current")` for å
+   finne riktig bane i stedet for hardkodet `"gotolevel1"`.
+   `dodmenu1.lua` fikk samtidig samme pcall-sikkerhetsnett som
+   `pausemenu1.lua` allerede hadde på denne knappen. Ikke testet i
+   faktisk nettleser ennå, bør sjekkes på alle ni baner.
+6. **Ta vare på død kode slik det er gjort til nå.** Bekreftet at
+   `dod-kode/`-mappen (fra i går) var riktig fremgangsmåte, ingen
+   endring nødvendig.
+7. **Hold banene åpne for testing enda.** Bekreftet, `k.numUnlocked`
+   og opplåsings-overriden i `ogt_levelmanager.lua` er bevisst latt
+   urørt (se oppdatert notat øverst i denne fila under "Husk før
+   dette regnes som ferdig").
+8. **Rett stiene siden spillet ikke er under aktiv grafikk-utvikling.**
+   **Fikset**: `level5.lua`-`level9.lua` var 100 % identiske filer med
+   bilde-referanser uten mappe-prefiks. Hver av de fem har nå sin
+   egen, riktige `levelN/`-sti (ikke lenger byte-identiske med
+   hverandre), og bakgrunnsbildene har fått `background/`-prefiks.
+   Deler fortsatt plassholderbilder og feil kollisjonsformer med
+   level1, det er ikke noe stien alene kan fikse.
+
+**Ny feil meldt i samme melding, utenfor spørsmålslista:** dobbeltklikk
+skal gjøre marken helt slapp, men virket ikke. Fant koden
+(`trykk_knapp` i `level1.lua`), den brukte Runtime "tap"-eventets
+`event.numTaps == 2`, som ikke ser ut til å synkroniseres pålitelig med
+museklikk i HTML5-eksporten. I tillegg satte "touch ended"-fasen alltid
+motorene på igjen uansett, uavhengig av om marken nettopp var gjort
+slapp, så selv om dobbeltklikket hadde blitt riktig oppdaget ville
+neste berøring momentant slått motorene på igjen. **Fikset**:
+dobbeltklikk oppdages nå selv ved å måle tid mellom to `"began"`-faser
+(300 ms vindu), uavhengig av `numTaps`, og `"ended"`-fasen lar motorene
+være av når marken er slapp. **Ikke testet i faktisk nettleser ennå**,
+usikker på om 300 ms-vinduet føles riktig, si fra om det bør justeres.
+
+Alt kodet i dag er pushet, og en ny HTML5-build er trigget for å teste.
