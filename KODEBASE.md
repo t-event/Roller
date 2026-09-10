@@ -50,6 +50,10 @@ bare på selve appstart (`gotolevel1`) og via den hardkodede
 
 ## Fil-for-fil, gruppert
 
+Alt merket **død kode** under er siden 2026-09-10 flyttet til `dod-kode/`
+i stedet for prosjektroten (ikke slettet, se `dod-kode/README.md`).
+Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
+
 ### Kjerne / alltid i bruk
 - `main.lua` — appens startpunkt, laster ssk2, går til `gotolevel1`.
 - `config.lua` — skjermoppløsning (540×960, kun landscape), skaleringsmodus.

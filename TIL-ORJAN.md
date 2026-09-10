@@ -370,10 +370,18 @@ og i `KODEBASE.md`, men fant noen nye ting:
 
 ## Død kode (finnes i repoet, men brukes aldri)
 
+**Oppdatering 2026-09-10:** alle disse filene, pluss `pausemenu2.lua`-
+`pausemenu9.lua`, `dodmenu2.lua`-`dodmenu9.lua`, `gotolevel3.lua`-
+`gotolevel9.lua`, `game.lua` og `livddadas.lua`, er flyttet til
+`dod-kode/` i stedet for prosjektroten. Ikke slettet, bare samlet på ett
+sted, se `dod-kode/README.md`. Beskrivelsene under er fortsatt riktige,
+bare filstien er ny.
+
 Disse filene har egne bugs (knuste bilde-stier), men er ikke fikset
 fordi ingenting i spillet faktisk navigerer dit, verken via `require`
 eller `composer.gotoScene`/`showOverlay`. Trygge å ignorere, eller
-slette hvis du en dag vil rydde:
+slette permanent hvis du bekrefter du ikke trenger noe av det (se
+spørsmål 6 i `sporsmal.md`):
 
 - `brett.lua` — refererer `"backgroun1d.jpg"` (finnes ikke, sannsynlig
   skrivefeil for et bakgrunnsbilde). Selv uten den bugen navigeres det
@@ -394,11 +402,29 @@ slette hvis du en dag vil rydde:
 
 ## Hvor ting ligger
 
-- Selve spillkoden: repo-roten (`main.lua`, `level1.lua` osv, akkurat som
-  i Dropbox-mappen din).
+- Selve spillkoden som faktisk brukes: repo-roten (`main.lua`,
+  `level1.lua` osv, akkurat som i Dropbox-mappen din).
+- Bekreftet ubrukt kode: `dod-kode/`, se `dod-kode/README.md`.
 - Byggeoppskrift for nettleser-versjonen: `Util/recipe-html5.lua` og
   `Util/build-html5.sh`.
 - README.md har en kort oversikt og instruksjoner for å kjøre spillet i
   Solar2D Simulator som før.
+- `sporsmal.md` har åpne spørsmål til deg fra gjennomgangen, ikke noe
+  som haster, bare ting Mathias/AI ikke kunne avgjøre selv.
 
 Denne fila fylles på etter hvert som mer skjer.
+
+## 2026-09-10, avslutning for denne økta
+
+Oppsummert hva som er gjort i dag: fant og fikset retry-krasjen (se
+egen oppføring over), gjorde en grundig linje-for-linje gjennomgang av
+hele kodebasen og fant flere ting utover selve krasjen (også over),
+skrev spørsmål til deg i `sporsmal.md`, og flyttet 31 bekreftet ubrukte
+filer til `dod-kode/` i stedet for å slette dem. README.md er også
+rettet, den kalte hovedpersonen en "ball" der den faktisk er en mark.
+
+Ingen åpne krasjer akkurat nå, retry-fiksen er bygget og publisert på
+GitHub Pages. Det som gjenstår er i hovedsak spørsmål til deg (se
+`sporsmal.md`) og de to kjente spillbarhets-bugene (neste bane / retry
+går til feil bane, se "Kjente feil" i `KODEBASE.md`), ikke noe som
+haster før du har svart på spørsmålene.

@@ -1,13 +1,15 @@
 # Roller
 
 Et Corona/Solar2D Lua-spill laget av Ørjan for noen år siden, hans første
-prosjekt med koding. Ni baner med en rullende ball, pausemeny og
-dødsmeny. Bygget med [SSK2](https://github.com/roaminggamer/SSK2)
-(ligger i `ssk2/`).
+prosjekt med koding. Ni baner med en mark (leddet, rullende ormekropp,
+ikke en ball) som styres gjennom banen, pausemeny og dødsmeny. Bygget med
+[SSK2](https://github.com/roaminggamer/SSK2) (ligger i `ssk2/`).
 
-Importert rått fra en delt Dropbox-mappe, ingen filer er endret eller
-ryddet opp i. Tenkt som utgangspunkt for å se hva AI kan gjøre videre med
-det.
+Importert rått fra en delt Dropbox-mappe som utgangspunkt for å se hva AI
+kan gjøre videre med det. Siden da er en krasj i retry-knappen fikset, og
+bekreftet ubrukt kode er samlet i `dod-kode/` (se `dod-kode/README.md`).
+Se `TIL-ORJAN.md` for hele loggen, `KODEBASE.md` for hvordan spillet
+henger sammen, og `sporsmal.md` for åpne spørsmål til Ørjan.
 
 ## Kjøre spillet
 
