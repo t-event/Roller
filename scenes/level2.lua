@@ -84,7 +84,7 @@ local liv =require("lib.liv")
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "scenes.gotolevel2",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.gotochooselevel",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------

@@ -612,3 +612,31 @@ endringen så langt i dag, akkurat den typen som forårsaket
 retry-krasjen over. Test grundig: appstart, alle ni baner (både via
 banevalg og "neste bane"), pause/død-menyene sine tre knapper hver,
 og retry på flere baner.
+
+## 2026-09-10, siste kjente spillbarhets-bug fikset
+
+Mathias spurte om jeg heller burde bygge spillet helt på nytt etter
+Solar2D-dokumentasjonen. Svar: nei, for mye fungerende, innstilt
+innhold (fysikk, layout) står udokumentert i selve koden og ville
+risikert å gå tapt i et gjenoppbygg jeg ikke kan teste live selv, og
+Ørjan jobber fortsatt aktivt med spillet selv. Anbefalte å fortsette
+som i kveld, og ta det store steget (slå ni banefiler sammen til én
+parameterisert) som et bevisst, eget steg når banene er ferdige.
+
+Fortsatte deretter med "neste bane"-bugen (punkt 3 i "Kjente feil"),
+den siste åpne spillbarhets-bugen. Ørjan tok ikke stilling til den
+spesifikt i svarene sine, men `level1.lua` har alltid gjort det
+riktige (tilbake til banevalg etter fullført bane), så lot de andre
+åtte gjøre det samme i stedet for å gjette på noe annet.
+
+`level2.lua`-`level9.lua` sin `goto2`-funksjon viser nå
+`gotochooselevel` i stedet for det hardkodede, bugget
+`showOverlay("gotolevel2")`. Det gjorde `gotolevel2.lua` helt uten
+referanser (den var den eneste veien dit), så den er flyttet til
+`dod-kode/` sammen med resten av den døde koden, se
+`dod-kode/README.md`.
+
+Ingen kjente åpne spillbarhets-bugs igjen nå, bare de to som venter på
+nytt innhold fra Ørjan (kollisjonsformer, plassholder-grafikk).
+
+**Ikke testet i faktisk nettleser ennå.**

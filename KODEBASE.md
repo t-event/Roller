@@ -46,8 +46,8 @@ main.lua
 scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
   ├─ showOverlay("scenes.dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
   ├─ showOverlay("scenes.pausemenu1")      [alltid pausemenu1, uansett hvilken bane]
-  └─ level1: showOverlay("scenes.gotochooselevel")   [riktig, tilbake til banevalg]
-     level2-9: showOverlay("scenes.gotolevel2")      [BUG: hardkodet, se "Kjente feil"]
+  └─ showOverlay("scenes.gotochooselevel")   [alle ni baner, tilbake til banevalg,
+                  fikset 2026-09-10, level2-9 gikk før alltid til gotolevel2]
 
 scenes/pausemenu1.lua (delt av alle baner)
   ├─ "retry"      → gotoScene("scenes.level" .. lm.currentLevel)   [fikset 2026-09-10,
@@ -66,9 +66,9 @@ scenes/chooselevel.lua / gotochooselevel.lua
 ```
 
 **Viktigst å forstå:** Selve banevalget hopper rett til `levelN`, ikke via
-`gotolevelN`. `gotolevelN`-filene (splash-animasjonen med `last.png`) nås
-bare på selve appstart (`gotolevel1`) og via den hardkodede
-`showOverlay("gotolevel2")`-bugen i alle baners "neste bane"-knapp.
+`gotolevelN`. `gotolevel1.lua`-splashen nås bare på selve appstart, den
+eneste `gotolevelN`-fila som fortsatt er i bruk (`gotolevel2.lua` til
+`gotolevel9.lua` ligger i `dod-kode/`, se der for historikken).
 
 ## Fil-for-fil, gruppert
 
@@ -86,13 +86,15 @@ filene gjør.
 
 ### Splash-skjermer ("gotoX")
 - `gotolevel1.lua` — **i bruk**, appens faktiske startskjerm.
-- `gotolevel2.lua` — **i bruk, men bugget**: vises fra "neste bane"-knappen
-  i level2 til level9 (`goto2`/`showOverlay("gotolevel2")`), uansett hvilken
-  bane som faktisk fullføres. `level1.lua` gjør det riktig (går til
-  `gotochooselevel`, tilbake til banevalg), de andre åtte har en
-  kopiert/glemt hardkoding igjen fra et tidligere utviklingsstadium.
-- `gotolevel3.lua` til `gotolevel9.lua` — **død kode**, ingenting i spillet
-  navigerer dit.
+- `gotolevel2.lua` til `gotolevel9.lua` — **død kode** (`dod-kode/`).
+  `gotolevel2.lua` var **i bruk, men bugget** fram til 2026-09-10: vist
+  fra "neste bane"-knappen i level2 til level9
+  (`goto2`/`showOverlay("gotolevel2")`), uansett hvilken bane som faktisk
+  fullføres, og selv den gikk videre til bane 1, ikke bane 2. `level1.lua`
+  gjorde det riktig fra før (går til `gotochooselevel`, tilbake til
+  banevalg). Fikset ved å la alle ni baner gjøre som `level1.lua`, se
+  "Kjente feil". `gotolevel3.lua`-`gotolevel9.lua` var alltid dødt,
+  ingenting navigerte dit noensinne.
 - `gotomenu.lua`, `gotochooselevel.lua` — **i bruk**, splash mellom
   pausemeny og hhv. hovedmeny/banevalg.
 
@@ -215,12 +217,13 @@ filene gjør.
    verktøy.
 2. **Plassholder-grafikk.** level2-9 deler identiske banestykke-bilder.
    (Også i `TIL-ORJAN.md`.) Fortsatt uendret, venter på ny grafikk.
-3. **"Neste bane"-knappen er hardkodet til level 2**, i level2.lua til
-   level9.lua (`showOverlay("gotolevel2")` i `goto2`-funksjonen), uansett
-   hvilken bane som faktisk fullføres. `level1.lua` gjør det riktig (viser
-   `gotochooselevel`, tilbake til banevalg-skjermen) — de andre åtte burde
-   trolig gjøre det samme. Ikke fikset ennå, Ørjan har ikke tatt stilling
-   til denne spesifikt.
+3. ~~"Neste bane"-knappen er hardkodet til level 2~~ **Fikset 2026-09-10.**
+   Ørjan tok ikke stilling til denne spesifikt, men mest nærliggende var å
+   la level2.lua-level9.lua gjøre som `level1.lua` alltid gjorde riktig:
+   `goto2`-funksjonen viser nå `gotochooselevel` (tilbake til banevalg)
+   i stedet for det hardkodede, bugget `showOverlay("gotolevel2")`.
+   `gotolevel2.lua` mistet dermed sin eneste referanse og er flyttet til
+   `dod-kode/`. Ikke testet i faktisk nettleser ennå.
 4. ~~"Retry" fra pausemenyen går alltid til bane 1~~ **Fikset
    2026-09-10, i to omganger.** Ørjan bekreftet at retry skal starte
    banen du faktisk var på. Første forsøk brukte
@@ -265,9 +268,10 @@ filene gjør.
    i stedet for prosjektroten, se `dod-kode/README.md` for hvor hver kom
    fra. Ingenting av dette gjorde noe i det hele tatt, spillet fungerer
    identisk.
-2. **"Retry"-bugen er fikset** (punkt 4 over). **"Neste bane"-bugen
-   (punkt 3) er fortsatt åpen**, Ørjan har ikke tatt stilling til den
-   spesifikt ennå.
+2. **"Retry"- og "neste bane"-bugene er begge fikset** (punkt 3 og 4
+   over). Ingen kjente åpne spillbarhets-bugs igjen, kun de to som
+   venter på nytt innhold fra Ørjan (delte kollisjonsformer,
+   plassholder-grafikk, punkt 1 og 2 over).
 3. **Vurder å slå sammen** de 9 nesten-identiske `levelN.lua`-filene til én
    parameterisert fil som leser banenummer fra en tabell (bilder,
    kollisjonsformer, startposisjon), i stedet for kopiert kode. Stor jobb,

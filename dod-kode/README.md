@@ -1,10 +1,14 @@
 # Død kode
 
-Disse 31 filene er flyttet hit fra prosjektroten, ikke slettet. Alle er
-bekreftet 100 % ubrukte: ingen fil noe sted i prosjektet navigerer til dem
-med `composer.gotoScene`/`showOverlay`, og ingen `require`r dem. Bekreftet
-med grep/diff over hele kodebasen ved gjennomgangen 2026-09-10 (se
-`../TIL-ORJAN.md` og `../KODEBASE.md` for detaljene rundt hver enkelt).
+Disse filene er flyttet hit, ikke slettet. Alle er bekreftet 100 % ubrukte:
+ingen fil noe sted i prosjektet navigerer til dem med
+`composer.gotoScene`/`showOverlay`, og ingen `require`r dem. Bekreftet med
+grep/diff over hele kodebasen (se `../TIL-ORJAN.md` og `../KODEBASE.md` for
+detaljene rundt hver enkelt).
+
+31 av dem havnet her 2026-09-10 fra prosjektroten, den gangen alt lå flatt.
+Én til, `gotolevel2.lua`, havnet her senere samme dag fra `../scenes/`, se
+egen forklaring nederst.
 
 Ligger her i stedet for å bli slettet, slik at ingenting går tapt hvis noe
 av det viser seg å være verdt å hente ut igjen. Spillet fungerer akkurat
@@ -21,15 +25,21 @@ pcall-sikkerhetsnettet ble lagt til under feilsøkingen i går, det vil si
 eldre kopier. Spillet bruker i praksis bare `pausemenu1.lua` og
 `dodmenu1.lua` for alle ni baner.
 
-### Splash-skjermer for bane 3-9 (7 filer)
-`gotolevel3.lua`-`gotolevel9.lua`
+### Splash-skjermer for bane 2-9 (8 filer)
+`gotolevel2.lua`-`gotolevel9.lua`
 
-Splash-skjermen med `last.png`-animasjonen. `gotolevel1.lua` og
-`gotolevel2.lua` er fortsatt i bruk (`gotolevel2.lua` vises, riktignok
-feilaktig, fra "neste bane"-knappen i alle baner, se `TIL-ORJAN.md`). De
-resterende syv ble aldri koblet til noe i det hele tatt, og var dessuten
-kopiert rett fra `gotolevel1.lua` uten å bli tilpasset (gikk fortsatt til
-bane 1, ikke egen bane).
+Splash-skjermen med `last.png`-animasjonen. `gotolevel1.lua` (i
+`../scenes/`) er fortsatt i bruk, appens faktiske startskjerm.
+`gotolevel3.lua`-`gotolevel9.lua` ble aldri koblet til noe i det hele
+tatt, og var dessuten kopiert rett fra `gotolevel1.lua` uten å bli
+tilpasset (gikk fortsatt til bane 1, ikke egen bane).
+
+`gotolevel2.lua` var frem til 2026-09-10 den eneste av de åtte som faktisk
+ble vist, fra "neste bane"-knappen i alle baner (bugget: alltid til
+`gotolevel2` uansett hvilken bane som ble fullført, og selv den gikk
+videre til bane 1, ikke bane 2). Den bugen er fikset, "neste bane" viser
+nå banevalget i stedet, slik `level1.lua` alltid gjorde riktig. Dermed
+mistet `gotolevel2.lua` sin eneste referanse og havnet her.
 
 ### Hovedmeny-varianter (3 filer)
 `menu1.lua`, `menu backup.lua`
