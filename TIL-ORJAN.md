@@ -542,3 +542,34 @@ godkjent i dag:
   samme pcall-sikkerhetsnett som resten av kjeden dit.
 
 Ikke testet i faktisk nettleser ennå. Pushet og ny build trigget.
+
+## 2026-09-10, retry-fiksen krasjet hardt på ekte telefon
+
+Mathias testet på iPhone: hver eneste gang han trykket retry kom Chrome
+sin egen "kan ikke åpne denne siden"-feil (skjermbilde vedlagt), ikke
+vår røde sjekkpunkt-boks. Det er en helt annen alvorlighetsgrad enn de
+Lua-feilene pcall har fanget til nå, dette er nettleseren som gir opp
+hele siden.
+
+Mistanke: `composer.getSceneName("current")`, brukt i går sin
+retry-fiks, kalles fra INNSIDEN av et overlay (pausemenu1/dodmenu1).
+Den returnerer trolig overlayets eget navn ("pausemenu1"), ikke banen
+som faktisk ligger under, siden overlays er en egen greie i Composer
+sin scene-stack. Å be Composer gå til `"pausemenu1"` som en vanlig
+scene mens `"pausemenu1"` samtidig kjører som overlay er nok
+inkonsistent nok til å krasje dypt i selve motoren (WASM/HTML5-delen),
+utenfor det pcall i Lua kan fange opp. Derfor ingen rød boks, bare et
+nettleser-nivå havari.
+
+**Fikset med en mer robust metode, uten å stole på Composer sin egen
+"hvilken scene er jeg i"-introspeksjon:** hver `levelN.lua` (1-9)
+setter nå `lm.currentLevel = N` selv, helt i starten av `scene:create`.
+Retry i `pausemenu1.lua`/`dodmenu1.lua` bruker `"level" ..
+lm.currentLevel` direkte i stedet for å spørre Composer om noe. Siden
+`lm.currentLevel` settes av selve banefila uansett hvordan du kom dit
+(direkte fra appstart, fra banevalg, eller fra en tidligere retry),
+er dette pålitelig uansett vei inn.
+
+**Viktig: ikke testet i faktisk nettleser ennå**, siden jeg ikke kan
+kjøre HTML5-bygget selv. Dette er andre forsøk på samme bug, så vær
+ekstra oppmerksom når du tester denne gangen.

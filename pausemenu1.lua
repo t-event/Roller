@@ -112,7 +112,7 @@ print("Current Score3: ", liv.returnScore())
 print("Current Score4: ", liv.returnScore())
 print("Current Score5: ", liv.returnScore())
 liv.lagreliv()
-local destination = composer.getSceneName( "current" )
+local destination = "level" .. tostring(lm.currentLevel)
 if liv.erTom() then
 	-- Ingen liv igjen. Reklame-for-liv er ikke bygget ennå (krever et
 	-- annonse-SDK), så inntil videre: den som ikke vil/kan se reklame

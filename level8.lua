@@ -96,6 +96,7 @@ local liv =require("liv")
         
 
 function scene:create( event )
+lm.currentLevel = 8 -- så retry vet hvilken bane den skal restarte
 
 
     local sceneGroup = self.view

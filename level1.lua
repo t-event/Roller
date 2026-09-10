@@ -98,6 +98,7 @@ local mark =require("mark")
 
 function scene:create( event )
 checkpoint("level1:create_start")
+lm.currentLevel = 1 -- så retry vet hvilken bane den skal restarte
 
 
     local sceneGroup = self.view

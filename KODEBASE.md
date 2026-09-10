@@ -198,10 +198,20 @@ Beskrivelsene under er uendret siden det ikke påvirker hva filene gjør.
    trolig gjøre det samme. Ikke fikset ennå, Ørjan har ikke tatt stilling
    til denne spesifikt.
 4. ~~"Retry" fra pausemenyen går alltid til bane 1~~ **Fikset
-   2026-09-10.** Ørjan bekreftet at retry skal starte banen du faktisk
-   var på. `pausemenu1.lua` og `dodmenu1.lua` bruker nå
-   `composer.getSceneName("current")` i stedet for hardkodet
-   `"gotolevel1"`. Ikke testet i faktisk nettleser ennå.
+   2026-09-10, i to omganger.** Ørjan bekreftet at retry skal starte
+   banen du faktisk var på. Første forsøk brukte
+   `composer.getSceneName("current")`, som viste seg å krasje
+   nettleseren hardt (Chrome-feilen "kan ikke åpne denne siden", ikke
+   engang vår egen røde feilboks) hver eneste gang, testet av Mathias
+   på telefon. Mistanke: kalt fra et overlay (pausemenu1/dodmenu1)
+   returnerer den trolig overlayets eget navn, ikke banen under, og å
+   gotoScene til et scenenavn som samtidig kjører som overlay er nok
+   alvorlig nok til å krasje WASM-motoren i stedet for å gi en
+   fangbar Lua-feil. Byttet til en mer robust løsning: hver
+   `levelN.lua` setter `lm.currentLevel = N` selv, tidlig i
+   `scene:create`, og retry bruker `"level" .. lm.currentLevel`
+   direkte i stedet for å spørre Composer. Ikke testet i faktisk
+   nettleser ennå.
 5. **Marken skal kunne "knekke"** (brekke i to ved landing), beskrevet
    av Ørjan som bygget av 3 biter med motoriserte ledd, men koden i
    dette repoet har en 9-leddet ormekropp uten noen knekk-mekanikk.
