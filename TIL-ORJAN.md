@@ -1061,3 +1061,79 @@ Fikset i to lag denne gangen:
    kroppsdel, uansett hvorfor den overlevde.
 
 Luac-sjekket alle tre filene. Ikke testet i faktisk nettleser.
+
+## 2026-09-14, bane 2-4 byttet ut med Ørjans nyere versjon
+
+Mathias lastet opp en zip fra Ørjan: en nyere versjon av spillet der
+bane 1-4 skal fungere og mange bugs er fikset. Zippen var stor (289
+filer, 19 MB), langt mer enn en liten diff: egne pausemeny/dødsmeny/
+kollisjonsform-filer per bane i stedet for delte, pluss flere filer
+som ikke finnes i dette repoet i det hele tatt (`chooselevel.lua`,
+`game.lua`, `GGData.lua`, `options.lua`, `play.lua` m.fl.). Spurte
+Mathias hvordan jeg skulle prioritere; svaret var å bytte ut bane 2-4
+helt med Ørjans versjon, tilpasset til mappestrukturen vår, med våre
+egne rettelser lagt oppå. Bane 1 sto urørt, den var allerede oppdatert
+fra før.
+
+**Det faktiske funnet:** `level2.lua`, `level3.lua` og `level4.lua` i
+Ørjans zip er nesten dobbelt så store som våre gamle versjoner (2437
+linjer mot 1780), fordi de har fått nøyaktig samme fulle knekk-/
+støveffekt-system som `level1.lua` allerede hadde (`onLocalCollision1`-
+`onLocalCollision9`, ni "knott"-fysikkobjekter med weldJoints, aktiv
+`Runtime:addEventListener("collision", knekk)`). Den konkrete, store
+fiksen er egne `shapedefs2.lua`/`shapedefs3.lua`/`shapedefs4.lua`: hver
+bane har nå EGNE, riktig sporede bakke-kollisjonsformer i stedet for å
+dele bane 1 sine (dette var akkurat spørsmål 3 i `sporsmal.md`, om
+bane 2 sin bakke ikke stemte med hvor marken faktisk kolliderte). De
+nye formene hører sammen med NYE bakke-bilder (`level2/1.png` til
+`4.png` osv, alle fire pikslene forskjellige fra det vi hadde, sjekket
+med md5sum), så begge måtte byttes ut sammen, ellers ville formene og
+bildene ikke stemt overens.
+
+**Ikke tatt med, bevisst**: Ørjans egne per-bane `pausemenu2.lua`/
+`dodmenu2.lua`/`gotolevel2.lua` (og tilsvarende for 3/4). De hardkoder
+retry til sin egen bane (`gotoScene("gotolevelN")` rett fra
+`resume()`), som er en helt annen, mer duplisert løsning på nøyaktig
+det samme problemet vårt `lm.currentLevel`+`gotoretry.lua`-system
+allerede løser generisk for alle ni baner. I stedet lot jeg
+`level2.lua`-`level4.lua` fortsette å bruke VÅRE delte
+`scenes.pausemenu1`/`scenes.dodmenu1`/`scenes.gotoretry`, bare med
+egne `showOverlay`-kall pekende dit i stedet for til Ørjans
+per-bane-filer. Sparer tre sett med meny-filer, og disse har allerede
+fått alle retry-krasj-fiksene fra i går.
+
+**Feil funnet i Ørjans kode underveis, rettet ved porteringen:**
+- `trykk_knapp` var fortsatt en utilsiktet global funksjon
+  (`function trykk_knapp(event)`, ikke `local`), og dobbeltklikk brukte
+  fortsatt det upålitelige `event.numTaps == 2`-mønsteret vi allerede
+  hadde bevist ikke virker pålitelig i HTML5-eksport (se fiksen fra i
+  forgårs). Erstattet med nøyaktig samme `system.getTimer()`-baserte
+  løsning som i `level1.lua`.
+- En hel andre kopi av `trykk_knapp`-funksjonen (med en
+  `girned()`-hjelpefunksjon) lå som utkommentert `--[[ ]]`-dødkode rett
+  under den første, aldri kjørende. Fjernet.
+- Samme sårbarhet som i går sin `transition.cancel()`-fiks (den
+  ventende støveffekten kan fyre `onComplete` mot en fjernet kroppsdel
+  etter retry): lagt til `transition.cancel()` i `scene:hide` og
+  `.stage`-vakt rundt alle ni `delN:addEventListener("collision")`
+  gjenoppmonteringer, identisk med `level1.lua` sin fiks.
+- `lm.currentLevel = N` satt tidlig i `scene:create`, samme sted som i
+  de andre åtte banene, for at retry skal restarte riktig bane.
+- `camera`/`grp` merket med `_G.`-prefiks på definisjonsstedet, samme
+  konvensjon som resten av kodebasen.
+
+**Ikke rørt**: selve spill-logikken (fysikk, kollisjonssjekker,
+banedesign, knekk-mekanikken sin egen kode) er identisk med Ørjans
+versjon, bare sti-referanser (`require`) er tilpasset `scenes.`/`lib.`-
+mappestrukturen vår. Fant og lot stå en håndfull andre
+`--[[ ]]`-dødkodeblokker i disse filene (bl.a. en `firkant5`-`firkant8`
+bakgrunnsblokk som refererer bilder vi ikke har, `Brett1.png`/
+`verden6-8.png`, men siden blokken er utkommentert kjører den aldri og
+de manglende bildene spiller ingen rolle) — ikke en fullstendig
+dødkode-opprydning av disse tre filene denne gangen, det får bli en
+egen økt.
+
+Luac-sjekket alle seks filene (tre banefiler, tre shapedefs). Kunne
+selvsagt ikke teste i faktisk nettleser, spesielt de nye
+kollisjonsformene og at bane 2-4 nå faktisk er spillbare med korrekt
+bakke, bør prioriteres høyt når dere får testet.

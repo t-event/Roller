@@ -11,7 +11,7 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
+local physicsData = (require "lib.shapedefs2").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -26,13 +26,14 @@ local bredde = display.contentWidth
 local hoyde = display.contentHeight
 local lm = require("lib.ogt_levelmanager")
 local liv =require("lib.liv")
---local pausemenu = require("pausemenu")
+local mark =require("lib.mark")
 
--- Forhåndsdeklarert her (fil-scope) i stedet for utilsiktet global,
--- gjort 2026-09-10. Trengs synlig for BÅDE scene:create (der den
--- defineres) og scene:hide (der touch-lytteren fjernes igjen) siden de
--- er to separate funksjoner i denne fila, ikke nestet i hverandre.
+-- Forhandsdeklarert her (fil-scope) i stedet for utilsiktet global,
+-- se samme forklaring i level1.lua. Trengs synlig for BADE
+-- scene:create (der den defineres) og scene:hide (der
+-- touch-lytteren fjernes igjen).
 local trykk_knapp
+
 
 -- -----------------------------------------------------------------------------------------------------------------
 
@@ -57,11 +58,11 @@ local trykk_knapp
 
 
         local function goto( event )
+        print( "0" )
         physics.pause( )
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
-        Runtime:removeEventListener("collision", onCollision2)
-        composer.showOverlay( "scenes.dodmenu1",{isModal = true,effect = "fade",time = 500,})
+        composer.showOverlay( "scenes.dodmenu1",{isModal = true,effect = "fade",time = 1500,})
         end
 
 
@@ -82,10 +83,6 @@ local trykk_knapp
 
 -- -----------------------------------------------------------------------------------------------------------------
 
-        -- "Neste bane"-knappen. Viste før alltid gotolevel2 hardkodet
-        -- her, uansett hvilken bane som ble fullført, og selv den gikk
-        -- videre til bane 1, ikke bane 2 (rettet 2026-09-10). Går nå
-        -- til banevalget i stedet, samme som level1.lua alltid gjorde.
         local function goto2( event )
         --grp:remove(camera)
         physics.pause( )
@@ -106,36 +103,33 @@ local trykk_knapp
         
 
 function scene:create( event )
-lm.currentLevel = 2 -- så retry vet hvilken bane den skal restarte
 
 
     local sceneGroup = self.view
-    print ("level1 scene:create did")
+    print ("level2 scene:create did")
+lm.currentLevel = 2 -- sa retry vet hvilken bane den skal restarte
     
       ------aktiver for å kunne se hele brettet. Også aktiver local scaleFactor = 0.025-----
    -- grp = display.newGroup( )
     --
-   -- local scaleFactor = 0.6
+   -- local scaleFactor = 1
     
-    -- Bevisst global (2026-09-10, markert eksplisitt per Solar2D sin
-    -- egen anbefaling): lib/liv.lua sin liv.hent() skriver til denne
-    -- gruppa direkte og har ingen annen måte å nå den på.
     _G.camera = perspective.createView()
     physics.start( )
     --physics.pause( )
     --physics.setGravity(0 , 9.81 )
+    --physics.setGravity(0 , 0 )
     physics.setContinuous( true )
     liv.lastliv()
-
+local mark = mark.hent 
     local justerside   = 1705
     local justeroppned = 1044
 
 
-    --local scaleFactccor = 0.025
+    --local scaleFactor = 0.025
     --local scaleFactor = 0.050
     --local scaleFactor = 0.1
     local scaleFactor = 0.6
-     -- Bevisst global, se forklaring ved _G.camera over.
      _G.grp=sceneGroup
     camera.xScale = scaleFactor
     camera.yScale = scaleFactor
@@ -144,7 +138,7 @@ lm.currentLevel = 2 -- så retry vet hvilken bane den skal restarte
 
 
           local dod = display.newRect (0, 0, 70000, 50) 
-          dod.x = bredde -bredde-bredde
+          dod.x = bredde -bredde-bredde-900
           dod.y = hoyde
           dod:rotate( 31.48 ) 
           dod.myName = "dod"
@@ -171,9 +165,11 @@ lm.currentLevel = 2 -- så retry vet hvilken bane den skal restarte
 
  
 
-    local knapp1 = display.newImageRect( "pauseknapp.png", 75, 75 )
-    knapp1.x = bredde+bredde-((knapp1.width*2)*1.6)
-    knapp1.y = hoyde - hoyde + (knapp1.height*2)
+    local knapp1 = display.newImageRect( "pauseknapp.png", 50, 50 )
+    knapp1.x = bredde - (knapp1.width)
+    knapp1.y = knapp1.height
+    --knapp1.x = bredde+bredde-((knapp1.width*2)*1.6)
+    --knapp1.y = hoyde - hoyde + (knapp1.height*2)
     knapp1.alpha = 1
     grp:insert(knapp1)
    
@@ -190,7 +186,7 @@ timer.performWithDelay(3000, hent, 1)
 
 
 
-    local background = display.newImageRect( "background/dirt1.png", 1920*20, 1080*5 )
+    local background = display.newImageRect( "background/1dirt1.png", 1920*40, 1080*5 )
     background.anchorX = 0.5
     background.anchorY = 0.5
     background.x = bredde-bredde-bredde
@@ -199,7 +195,7 @@ timer.performWithDelay(3000, hent, 1)
     background.alpha = 1
 
 
-    local background1 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background1 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background1.anchorX = 1
     background1.anchorY = 0.5
     background1.x = bredde-bredde
@@ -207,7 +203,7 @@ timer.performWithDelay(3000, hent, 1)
     background1.rotation = 31.48 
     background1.alpha = 1
 
-    local background2 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background2 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background2.anchorX = 1
     background2.anchorY = 0.5
     background2.x = background1.x+ justerside  
@@ -215,7 +211,7 @@ timer.performWithDelay(3000, hent, 1)
     background2:rotate( background1.rotation )
     background2.alpha = 1
 
-    local background3 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background3 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background3.anchorX = 1
     background3.anchorY = 0.5
     background3.x = background2.x+ justerside
@@ -223,7 +219,7 @@ timer.performWithDelay(3000, hent, 1)
     background3:rotate( background1.rotation )
     background3.alpha = 1
 
-    local background4 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background4 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background4.anchorX = 1
     background4.anchorY = 0.5
     background4.x = background3.x+ justerside
@@ -231,7 +227,7 @@ timer.performWithDelay(3000, hent, 1)
     background4:rotate( background1.rotation )
     background4.alpha = 1
 
-    local background5 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background5 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background5.anchorX = 1
     background5.anchorY = 0.5
     background5.x = background4.x+ justerside
@@ -239,7 +235,7 @@ timer.performWithDelay(3000, hent, 1)
     background5:rotate( background1.rotation )
     background5.alpha = 1
 
-    local background6 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background6 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background6.anchorX = 1
     background6.anchorY = 0.5
     background6.x = background5.x+ justerside
@@ -247,7 +243,7 @@ timer.performWithDelay(3000, hent, 1)
     background6:rotate( background1.rotation )
     background6.alpha = 1
 
-    local background7 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background7 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background7.anchorX = 1
     background7.anchorY = 0.5
     background7.x = background6.x+ justerside
@@ -255,7 +251,7 @@ timer.performWithDelay(3000, hent, 1)
     background7:rotate( background1.rotation )
     background7.alpha = 1
 
-    local background8 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background8 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background8.anchorX = 1
     background8.anchorY = 0.5
     background8.x = background7.x+ justerside
@@ -263,7 +259,7 @@ timer.performWithDelay(3000, hent, 1)
     background8:rotate( background1.rotation )
     background8.alpha = 1
 
-    local background9 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background9 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background9.anchorX = 1
     background9.anchorY = 0.5
     background9.x = background8.x+ justerside
@@ -271,7 +267,7 @@ timer.performWithDelay(3000, hent, 1)
     background9:rotate( background1.rotation )
     background9.alpha = 1
 
-    local background10 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background10 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background10.anchorX = 1
     background10.anchorY = 0.5
     background10.x = background9.x+ justerside
@@ -280,7 +276,7 @@ timer.performWithDelay(3000, hent, 1)
     background10.alpha = 1
 
 
-    local background11 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background11 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background11.anchorX = 1
     background11.anchorY = 0.5
     background11.x = background10.x+ justerside
@@ -288,7 +284,7 @@ timer.performWithDelay(3000, hent, 1)
     background11:rotate( background1.rotation )
     background11.alpha = 1
 
-    local background12 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background12 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background12.anchorX = 1
     background12.anchorY = 0.5
     background12.x = background11.x+ justerside
@@ -296,9 +292,72 @@ timer.performWithDelay(3000, hent, 1)
     background12:rotate( background1.rotation )
     background12.alpha = 1
 
+    local background13 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background13.anchorX = 1
+    background13.anchorY = 0.5
+    background13.x = background12.x+ justerside
+    background13.y = background12.y+   justeroppned
+    background13:rotate( background1.rotation )
+    background13.alpha = 1
+
+    local background14 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background14.anchorX = 1
+    background14.anchorY = 0.5
+    background14.x = background13.x+ justerside
+    background14.y = background13.y+   justeroppned
+    background14:rotate( background1.rotation )
+    background14.alpha = 1
+
+    local background15 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background15.anchorX = 1
+    background15.anchorY = 0.5
+    background15.x = background14.x+ justerside
+    background15.y = background14.y+   justeroppned
+    background15:rotate( background1.rotation )
+    background15.alpha = 1
+
+    local background16 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background16.anchorX = 1
+    background16.anchorY = 0.5
+    background16.x = background15.x+ justerside
+    background16.y = background15.y+   justeroppned
+    background16:rotate( background1.rotation )
+    background16.alpha = 1
+
+    local background17 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background17.anchorX = 1
+    background17.anchorY = 0.5
+    background17.x = background16.x+ justerside
+    background17.y = background16.y+   justeroppned
+    background17:rotate( background1.rotation )
+    background17.alpha = 1
+
+    local background18 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background18.anchorX = 1
+    background18.anchorY = 0.5
+    background18.x = background17.x+ justerside
+    background18.y = background17.y+   justeroppned
+    background18:rotate( background1.rotation )
+    background18.alpha = 1
+
+    local background19 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background19.anchorX = 1
+    background19.anchorY = 0.5
+    background19.x = background18.x+ justerside
+    background19.y = background18.y+   justeroppned
+    background19:rotate( background1.rotation )
+    background19.alpha = 1
+
+    local background20 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background20.anchorX = 1
+    background20.anchorY = 0.5
+    background20.x = background19.x+ justerside
+    background20.y = background19.y+   justeroppned
+    background20:rotate( background1.rotation )
+    background20.alpha = 1
    ------
 
-    local background1a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background1a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background1a.anchorX = 1
     background1a.anchorY = 0.5
     background1a.x = bredde-bredde
@@ -306,7 +365,7 @@ timer.performWithDelay(3000, hent, 1)
     background1a.rotation = 31.48 
     background1a.alpha = 1
 
-    local background2a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background2a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background2a.anchorX = 1
     background2a.anchorY = 0.5
     background2a.x = background1a.x+ justerside  
@@ -314,7 +373,7 @@ timer.performWithDelay(3000, hent, 1)
     background2a:rotate( background1.rotation )
     background2a.alpha = 1
 
-    local background3a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background3a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background3a.anchorX = 1
     background3a.anchorY = 0.5
     background3a.x = background2a.x+ justerside
@@ -322,7 +381,7 @@ timer.performWithDelay(3000, hent, 1)
     background3a:rotate( background1.rotation )
     background3a.alpha = 1
 
-    local background4a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background4a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background4a.anchorX = 1
     background4a.anchorY = 0.5
     background4a.x = background3a.x+ justerside
@@ -330,7 +389,7 @@ timer.performWithDelay(3000, hent, 1)
     background4a:rotate( background1.rotation )
     background4a.alpha = 1
 
-    local background5a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background5a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background5a.anchorX = 1
     background5a.anchorY = 0.5
     background5a.x = background4a.x+ justerside
@@ -338,7 +397,7 @@ timer.performWithDelay(3000, hent, 1)
     background5a:rotate( background1.rotation )
     background5a.alpha = 1
 
-    local background6a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background6a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background6a.anchorX = 1
     background6a.anchorY = 0.5
     background6a.x = background5a.x+ justerside
@@ -346,7 +405,7 @@ timer.performWithDelay(3000, hent, 1)
     background6a:rotate( background1.rotation )
     background6a.alpha = 1
 
-    local background7a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background7a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background7a.anchorX = 1
     background7a.anchorY = 0.5
     background7a.x = background6a.x+ justerside
@@ -354,7 +413,7 @@ timer.performWithDelay(3000, hent, 1)
     background7a:rotate( background1.rotation )
     background7a.alpha = 1
 
-    local background8a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background8a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background8a.anchorX = 1
     background8a.anchorY = 0.5
     background8a.x = background7a.x+ justerside
@@ -362,7 +421,7 @@ timer.performWithDelay(3000, hent, 1)
     background8a:rotate( background1.rotation )
     background8a.alpha = 1
 
-    local background9a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background9a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background9a.anchorX = 1
     background9a.anchorY = 0.5
     background9a.x = background8a.x+ justerside
@@ -370,7 +429,7 @@ timer.performWithDelay(3000, hent, 1)
     background9a:rotate( background1.rotation )
     background9a.alpha = 1
 
-    local background10a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background10a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background10a.anchorX = 1
     background10a.anchorY = 0.5
     background10a.x = background9a.x+ justerside
@@ -379,7 +438,7 @@ timer.performWithDelay(3000, hent, 1)
     background10a.alpha = 1
 
 
-    local background11a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background11a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background11a.anchorX = 1
     background11a.anchorY = 0.5
     background11a.x = background10a.x+ justerside
@@ -387,7 +446,7 @@ timer.performWithDelay(3000, hent, 1)
     background11a:rotate( background1.rotation )
     background11a.alpha = 1
 
-    local background12a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background12a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background12a.anchorX = 1
     background12a.anchorY = 0.5
     background12a.x = background11a.x+ justerside
@@ -395,9 +454,73 @@ timer.performWithDelay(3000, hent, 1)
     background12a:rotate( background1.rotation )
     background12a.alpha = 1
 
+    local background13a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background13a.anchorX = 1
+    background13a.anchorY = 0.5
+    background13a.x = background12a.x+ justerside
+    background13a.y = background12a.y+   justeroppned
+    background13a:rotate( background1.rotation )
+    background13a.alpha = 1
+
+    local background14a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background14a.anchorX = 1
+    background14a.anchorY = 0.5
+    background14a.x = background13a.x+ justerside
+    background14a.y = background13a.y+   justeroppned
+    background14a:rotate( background1.rotation )
+    background14a.alpha = 1
+
+    local background15a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background15a.anchorX = 1
+    background15a.anchorY = 0.5
+    background15a.x = background14a.x+ justerside
+    background15a.y = background14a.y+   justeroppned
+    background15a:rotate( background1.rotation )
+    background15a.alpha = 1
+
+    local background16a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background16a.anchorX = 1
+    background16a.anchorY = 0.5
+    background16a.x = background15a.x+ justerside
+    background16a.y = background15a.y+   justeroppned
+    background16a:rotate( background1.rotation )
+    background16a.alpha = 1
+
+    local background17a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background17a.anchorX = 1
+    background17a.anchorY = 0.5
+    background17a.x = background16a.x+ justerside
+    background17a.y = background16a.y+   justeroppned
+    background17a:rotate( background1.rotation )
+    background17a.alpha = 1
+
+    local background18a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background18a.anchorX = 1
+    background18a.anchorY = 0.5
+    background18a.x = background17a.x+ justerside
+    background18a.y = background17a.y+   justeroppned
+    background18a:rotate( background1.rotation )
+    background18a.alpha = 1
+
+    local background19a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background19a.anchorX = 1
+    background19a.anchorY = 0.5
+    background19a.x = background18a.x+ justerside
+    background19a.y = background18a.y+   justeroppned
+    background19a:rotate( background1.rotation )
+    background19a.alpha = 1
+
+    local background20a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background20a.anchorX = 1
+    background20a.anchorY = 0.5
+    background20a.x = background19a.x+ justerside
+    background20a.y = background19a.y+   justeroppned
+    background20a:rotate( background1.rotation )
+    background20a.alpha = 1
+
     -------
 
-    local background1b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background1b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background1b.anchorX = 1
     background1b.anchorY = 0.5
     background1b.x = bredde-bredde
@@ -405,7 +528,7 @@ timer.performWithDelay(3000, hent, 1)
     background1b.rotation = 31.48 
     background1b.alpha = 1
 
-    local background2b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background2b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background2b.anchorX = 1
     background2b.anchorY = 0.5
     background2b.x = background1b.x+ justerside  
@@ -413,7 +536,7 @@ timer.performWithDelay(3000, hent, 1)
     background2b:rotate( background1.rotation )
     background2b.alpha = 1
 
-    local background3b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background3b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background3b.anchorX = 1
     background3b.anchorY = 0.5
     background3b.x = background2b.x+ justerside
@@ -421,7 +544,7 @@ timer.performWithDelay(3000, hent, 1)
     background3b:rotate( background1.rotation )
     background3b.alpha = 1
 
-    local background4b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background4b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background4b.anchorX = 1
     background4b.anchorY = 0.5
     background4b.x = background3b.x+ justerside
@@ -429,7 +552,7 @@ timer.performWithDelay(3000, hent, 1)
     background4b:rotate( background1.rotation )
     background4b.alpha = 1
 
-    local background5b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background5b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background5b.anchorX = 1
     background5b.anchorY = 0.5
     background5b.x = background4b.x+ justerside
@@ -437,7 +560,7 @@ timer.performWithDelay(3000, hent, 1)
     background5b:rotate( background1.rotation )
     background5b.alpha = 1
 
-    local background6b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background6b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background6b.anchorX = 1
     background6b.anchorY = 0.5
     background6b.x = background5b.x+ justerside
@@ -445,7 +568,7 @@ timer.performWithDelay(3000, hent, 1)
     background6b:rotate( background1.rotation )
     background6b.alpha = 1
 
-    local background7b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background7b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background7b.anchorX = 1
     background7b.anchorY = 0.5
     background7b.x = background6b.x+ justerside
@@ -453,7 +576,7 @@ timer.performWithDelay(3000, hent, 1)
     background7b:rotate( background1.rotation )
     background7b.alpha = 1
 
-    local background8b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background8b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background8b.anchorX = 1
     background8b.anchorY = 0.5
     background8b.x = background7b.x+ justerside
@@ -461,7 +584,7 @@ timer.performWithDelay(3000, hent, 1)
     background8b:rotate( background1.rotation )
     background8b.alpha = 1
 
-    local background9b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background9b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background9b.anchorX = 1
     background9b.anchorY = 0.5
     background9b.x = background8b.x+ justerside
@@ -469,7 +592,7 @@ timer.performWithDelay(3000, hent, 1)
     background9b:rotate( background1.rotation )
     background9b.alpha = 1
 
-    local background10b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background10b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background10b.anchorX = 1
     background10b.anchorY = 0.5
     background10b.x = background9b.x+ justerside
@@ -478,7 +601,7 @@ timer.performWithDelay(3000, hent, 1)
     background10b.alpha = 1
 
 
-    local background11b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background11b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background11b.anchorX = 1
     background11b.anchorY = 0.5
     background11b.x = background10b.x+ justerside
@@ -486,13 +609,77 @@ timer.performWithDelay(3000, hent, 1)
     background11b:rotate( background1.rotation )
     background11b.alpha = 1
 
-    local background12b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background12b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background12b.anchorX = 1
     background12b.anchorY = 0.5
     background12b.x = background11b.x+ justerside
     background12b.y = background11b.y+   justeroppned
     background12b:rotate( background1.rotation )
     background12b.alpha = 1
+
+    local background13b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background13b.anchorX = 1
+    background13b.anchorY = 0.5
+    background13b.x = background12b.x+ justerside
+    background13b.y = background12b.y+   justeroppned
+    background13b:rotate( background1.rotation )
+    background13b.alpha = 1
+
+    local background14b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background14b.anchorX = 1
+    background14b.anchorY = 0.5
+    background14b.x = background13b.x+ justerside
+    background14b.y = background13b.y+   justeroppned
+    background14b:rotate( background1.rotation )
+    background14b.alpha = 1
+
+    local background15b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background15b.anchorX = 1
+    background15b.anchorY = 0.5
+    background15b.x = background14b.x+ justerside
+    background15b.y = background14b.y+   justeroppned
+    background15b:rotate( background1.rotation )
+    background15b.alpha = 1
+
+    local background16b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background16b.anchorX = 1
+    background16b.anchorY = 0.5
+    background16b.x = background15b.x+ justerside
+    background16b.y = background15b.y+   justeroppned
+    background16b:rotate( background1.rotation )
+    background16b.alpha = 1
+
+    local background17b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background17b.anchorX = 1
+    background17b.anchorY = 0.5
+    background17b.x = background16b.x+ justerside
+    background17b.y = background16b.y+   justeroppned
+    background17b:rotate( background1.rotation )
+    background17b.alpha = 1
+
+    local background18b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background18b.anchorX = 1
+    background18b.anchorY = 0.5
+    background18b.x = background17b.x+ justerside
+    background18b.y = background17b.y+   justeroppned
+    background18b:rotate( background1.rotation )
+    background18b.alpha = 1
+
+    local background19b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background19b.anchorX = 1
+    background19b.anchorY = 0.5
+    background19b.x = background18b.x+ justerside
+    background19b.y = background18b.y+   justeroppned
+    background19b:rotate( background1.rotation )
+    background19b.alpha = 1
+
+    local background20b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background20b.anchorX = 1
+    background20b.anchorY = 0.5
+    background20b.x = background19b.x+ justerside
+    background20b.y = background19b.y+   justeroppned
+    background20b:rotate( background1.rotation )
+    background20b.alpha = 1
 
 
 
@@ -518,7 +705,7 @@ timer.performWithDelay(3000, hent, 1)
     del1.width = 27
     del1.height = 17
     local del1Shape = {-13,8, -13,-8, 11,3, 14,0, 11,-3}
-    physics.addBody(del1, "dynamic",  {density = 1.0, friction = 0.3, bounce = 0.2, shape=del1Shape})
+    physics.addBody(del1, "dynamic",  {density = 1.0, friction = 0.3, bounce = 0.0, shape=del1Shape})
       del1.alpha = 1
     grp:insert(del1)
 
@@ -580,7 +767,7 @@ timer.performWithDelay(3000, hent, 1)
     del9.y=del1.y+2
     del9.rotation = (0)
     local del9Shape = {-15,-5, -12,-10, -10,-10, 0,-9, 14,-11 ,0,-11, 14,6, -12,4}
-    physics.addBody(del9, "dynamic",  {density = 1.0, friction = 1.3, bounce = 0.2,shape=del9Shape})
+    physics.addBody(del9, "dynamic",  {density = 1.0, friction = 1.3, bounce = 0.0,shape=del9Shape})
     del9.myName = "del9"
     grp:insert(del9)
 
@@ -592,6 +779,18 @@ timer.performWithDelay(3000, hent, 1)
     physics.addBody( punkt,"dynamic")
     punkt.isSensor = true
     grp:insert(punkt)
+--[[
+     local punkt2 = display.newRect( 200, 200, 10, 10 )
+    punkt2.x = firkant4.x*2
+    punkt2.y = firkant4.y*2
+    punkt2.alpha = 1
+    punktsant   = true
+    physics.addBody( punkt2,"dynamic")
+    punkt2.isSensor = true
+    grp:insert(punkt2)
+    punkt2:addEventListener ("touch", gameUI.dragBody )
+]]--
+
 
     local pivot_joint  = physics.newJoint( "pivot", del1, del2, del1.x-14, del1.y )
     local pivot_joint1 = physics.newJoint( "pivot", del2, del3, del2.x-14, del2.y )
@@ -696,7 +895,7 @@ knott3.alpha = 0
 
 local knott4 = display.newRect( 10,10,10,10 )
 knott4.x = del4.x
-knott4.y = del4.y+10
+knott4.y = del4.y+15
 camera:add(knott4,1,false)
 physics.addBody( knott4, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
 knott4.isSensor = true
@@ -704,7 +903,7 @@ knott4.alpha = 0
 
 local knott5 = display.newRect( 10,10,10,10 )
 knott5.x = del5.x
-knott5.y = del5.y+10
+knott5.y = del5.y+20
 camera:add(knott5,1,false)
 physics.addBody( knott5, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
 knott5.isSensor = true
@@ -712,7 +911,7 @@ knott5.alpha = 0
 
 local knott6 = display.newRect( 10,10,10,10 )
 knott6.x = del6.x
-knott6.y = del6.y+10
+knott6.y = del6.y+15
 camera:add(knott6,1,false)
 physics.addBody( knott6, "dynamic",{density = 0.0, friction = 0.0, bounce = 0.0})
 knott6.isSensor = true
@@ -743,6 +942,7 @@ knott9.isSensor = true
 knott9.alpha = 0
 
 
+
 local weldJoint1 = physics.newJoint( "weld", knott1, del1, knott1.x, knott1.x )
 local weldJoint2 = physics.newJoint( "weld", knott2, del2, knott2.x, knott2.x )
 local weldJoint3 = physics.newJoint( "weld", knott3, del3, knott3.x, knott3.x )
@@ -768,8 +968,8 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
                                      
                                       local     firkant1 = display.newImageRect("level2/1.png", 7680,4702)
                                                 firkant1.x = 3500
-                                                --firkant1.x = 3850
                                                 firkant1.y = 2300
+                                        
                                                 physics.addBody(firkant1,"static", physicsData:get("1") )
                                                 firkant1.alpha = 1  
                                                 firkant1.myName = "firkant1"                                
@@ -794,7 +994,41 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
                                                 firkant4.myName = "firkant4"   
                                                 
+                                                --[[
                                                 
+                                      local     firkant5 = display.newImage("Brett1.png", 7680,4702)
+                                                firkant5.x = firkant4.x+firkant5.width
+                                                firkant5.y = firkant4.y+firkant5.height
+                                                physics.addBody(firkant5,"static", physicsData:get("Brett3") )
+                                                camera:add (firkant5,1,false)
+                                                
+                                                
+                                      local     function firkant6
+                                                firkant6 = display.newImage("verden6.png", 7680,4702)
+                                                firkant6.x = firkant5.x+firkant6.width
+                                                firkant6.y = firkant5.y+firkant6.height
+                                                physics.addBody(firkant6,"static", physicsData:get("verden6") )
+                                                camera:add (firkant6,1,false)
+                                                end
+                                                
+                                      local     function firkant7
+                                                firkant7 = display.newImage("verden7.png", 7680,4702)
+                                                firkant7.x = firkant6.x+firkant7.width
+                                                firkant7.y = firkant6.y+firkant7.height
+                                                physics.addBody(firkant7,"static", physicsData:get("verden7") )
+                                                camera:add (firkant7,1,false)
+                                                end
+                                                
+                                      local     function firkant8
+                                                firkant8 = display.newImage("verden8.png", 7680,4702)
+                                                firkant8.x = firkant7.x+firkant8.width
+                                                firkant8.y = firkant7.y+firkant8.height
+                                                physics.addBody(firkant8,"static", physicsData:get("verden8") )
+                                                camera:add (firkant8,1,false)
+                                                end
+                                                ]]--
+
+
 
 
 
@@ -838,33 +1072,32 @@ firkant4.type = "firkant4"
 ------------------------------------------------------------------
 local function onCollision(event)
 if event.phase == "began" then
-local agro = event.object1
-local hit = event.object2
-if      agro.type == "dod" and hit.type == "del1" then
+
+if      event.object1.type == "dod" and event.object2.type == "del1" then
     knapp1.alpha = 0
     --print( "dod og del1" )
-elseif  agro.type == "dod" and hit.type == "del2" then
+elseif  event.object1.type == "dod" and event.object2.type == "del2" then
     knapp1.alpha = 0
     --print( "dod og del2" )
-elseif  agro.type == "dod" and hit.type == "del3" then
+elseif  event.object1.type == "dod" and event.object2.type == "del3" then
     knapp1.alpha = 0
     --print( "dod og del3" )
-elseif  agro.type == "dod" and hit.type == "del4" then
+elseif  event.object1.type == "dod" and event.object2.type == "del4" then
     knapp1.alpha = 0
     --print( "dod og del4" )
-elseif  agro.type == "dod" and hit.type == "del5" then
+elseif  event.object1.type == "dod" and event.object2.type == "del5" then
     knapp1.alpha = 0
     --print( "dod og del5" )
-elseif  agro.type == "dod" and hit.type == "del6" then
+elseif  event.object1.type == "dod" and event.object2.type == "del6" then
     knapp1.alpha = 0
     --print( "dod og del6" )
-elseif  agro.type == "dod" and hit.type == "del7" then
+elseif  event.object1.type == "dod" and event.object2.type == "del7" then
     knapp1.alpha = 0
     --print( "dod og del7" )
-elseif  agro.type == "dod" and hit.type == "del8" then
+elseif  event.object1.type == "dod" and event.object2.type == "del8" then
     knapp1.alpha = 0
     --print( "dod og del8" )
-elseif  agro.type == "dod" and hit.type == "del9" then
+elseif  event.object1.type == "dod" and event.object2.type == "del9" then
     knapp1.alpha = 0
     --print( "dod og del9" )
 
@@ -903,127 +1136,451 @@ Runtime:addEventListener("collision", onCollision1)
 ------------------------------------------------------------------
 
 
-local function ferdi()
-    print( "hdh" )
-      transition.cancel(tran)
-end
-
-local tran 
--- Gjort lokal 2026-09-10 (var utilsiktet global, aldri kalt fra
--- noe annet sted i spillet).
-local function kill(obj)
-display.remove(obj)
-obj=nil
-end    
+stovteller1=0
+stovteller2=0
+stovteller3=0
+stovteller4=0
+stovteller5=0
+stovteller6=0
+stovteller7=0
+stovteller8=0
+stovteller9=0
 
 
 
 
+local function onLocalCollision1( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del1" and event.other.type == "firkant1") or
+         (self.type == "del1" and event.other.type == "firkant2") or
+         (self.type == "del1" and event.other.type == "firkant3") or
+         (self.type == "del1" and event.other.type == "firkant4") then
+       
+        del1:removeEventListener( "collision" )
 
-
-
-
-
-
-
+ 
+ local  stov1       = display.newImageRect("stov.png", 20,20)
+        stov1.width  = 10+(math.random(10, 50)) 
+        stov1.height = stov1.width
+        stov1.x      = self.x+(math.random(1, 10)) 
+        stov1.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov1.alpha  = 1.0
+        stov1:rotate( rot )
+        --grp:insert(stov1)
+        camera:add (stov1,1,false)
  
 
 
+local tran= transition.to (stov1, {
 
-
-local function onCollision2(event)
-
-if event.phase == "ended" then
-
-if  
-    
-    (event.object1.type == "del1" and event.object2.type == "firkant1") or
-    (event.object1.type == "del2" and event.object2.type == "firkant1") or
-    (event.object1.type == "del3" and event.object2.type == "firkant1") or
-    (event.object1.type == "del4" and event.object2.type == "firkant1") or
-    (event.object1.type == "del5" and event.object2.type == "firkant1") or
-    (event.object1.type == "del6" and event.object2.type == "firkant1") or
-    (event.object1.type == "del7" and event.object2.type == "firkant1") or
-    (event.object1.type == "del8" and event.object2.type == "firkant1") or
-    (event.object1.type == "del9" and event.object2.type == "firkant1") or
-    (event.object1.type == "del1" and event.object2.type == "firkant2") or
-    (event.object1.type == "del2" and event.object2.type == "firkant2") or
-    (event.object1.type == "del3" and event.object2.type == "firkant2") or
-    (event.object1.type == "del4" and event.object2.type == "firkant2") or
-    (event.object1.type == "del5" and event.object2.type == "firkant2") or
-    (event.object1.type == "del6" and event.object2.type == "firkant2") or
-    (event.object1.type == "del7" and event.object2.type == "firkant2") or
-    (event.object1.type == "del8" and event.object2.type == "firkant2") or
-    (event.object1.type == "del9" and event.object2.type == "firkant2") or
-    (event.object1.type == "del1" and event.object2.type == "firkant3") or
-    (event.object1.type == "del2" and event.object2.type == "firkant3") or
-    (event.object1.type == "del3" and event.object2.type == "firkant3") or
-    (event.object1.type == "del4" and event.object2.type == "firkant3") or
-    (event.object1.type == "del5" and event.object2.type == "firkant3") or
-    (event.object1.type == "del6" and event.object2.type == "firkant3") or
-    (event.object1.type == "del7" and event.object2.type == "firkant3") or
-    (event.object1.type == "del8" and event.object2.type == "firkant3") or
-    (event.object1.type == "del9" and event.object2.type == "firkant3") or
-    (event.object1.type == "del1" and event.object2.type == "firkant4") or
-    (event.object1.type == "del2" and event.object2.type == "firkant4") or
-    (event.object1.type == "del3" and event.object2.type == "firkant4") or
-    (event.object1.type == "del4" and event.object2.type == "firkant4") or
-    (event.object1.type == "del5" and event.object2.type == "firkant4") or
-    (event.object1.type == "del6" and event.object2.type == "firkant4") or
-    (event.object1.type == "del7" and event.object2.type == "firkant4") or
-    (event.object1.type == "del8" and event.object2.type == "firkant4") or
-    (event.object1.type == "del9" and event.object2.type == "firkant4") then
-
-
-
-
-
---end
-
-local   stov        = display.newImageRect("stov.png", 20,20)
-        stov.width  = 10+(math.random(10, 50)) 
-        stov.height = stov.width
-        stov.x      = event.object1.x+(math.random(1, 10)) 
-        stov.y      = event.object1.y-(math.random(1, 10))
-        rot         = (math.random(1,360)) 
-        stov.alpha  = 0.1
-        stov:rotate( rot )
-        grp:insert(stov)
-        camera:add (stov,1,false)
-
-
-
-
-
-local tran= transition.to (stov, {
-
-                                    x          = stov.x      - (math.random(-50, 50)),
-                                    y          = stov.y      - (math.random( 1, 50)),
-                                    width      = stov.width  + (math.random(1, 50)),
-                                    height     = stov.height + (math.random(1, 50)),
+                                    x          = stov1.x      - (math.random(-50, 50)),
+                                    y          = stov1.y      - (math.random( 1, 50)),
+                                    width      = stov1.width  + (math.random(1, 50)),
+                                    height     = stov1.height + (math.random(1, 50)),
                                     alpha      = 0,
-                                    time       = 2000,
-                                    onComplete = function ()display.remove( stov ) stov = nil
-    end} ) 
-
-                                    
-              
-    ---if tran ~= nil then
-  --  transition.cancel(tran)
-   -- end
-
-            return stov
-         end   
-   end
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov1 )
+                                        stov1 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del1.stage then del1:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov1
+         end
+    --return true
+    end
 end
-Runtime:addEventListener("collision", onCollision2)
-----------------------------------------------------------------------------------
+ 
+local function onLocalCollision2( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del2" and event.other.type == "firkant1") or
+         (self.type == "del2" and event.other.type == "firkant2") or
+         (self.type == "del2" and event.other.type == "firkant3") or
+         (self.type == "del2" and event.other.type == "firkant4") then
+
+        del2:removeEventListener( "collision" )
+
+       
+ local  stov2        = display.newImageRect("stov.png", 20,20)
+        stov2.width  = 10+(math.random(10, 50)) 
+        stov2.height = stov2.width
+        stov2.x      = self.x+(math.random(1, 10)) 
+        stov2.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov2.alpha  = 1.0
+        stov2:rotate( rot )
+        --grp:insert(stov2)
+        camera:add (stov2,1,false)
+ 
 
 
+local tran= transition.to (stov2, {
+
+                                    x          = stov2.x      - (math.random(-50, 50)),
+                                    y          = stov2.y      - (math.random( 1, 50)),
+                                    width      = stov2.width  + (math.random(1, 50)),
+                                    height     = stov2.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov2 )
+                                        stov2 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del2.stage then del2:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov2
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision3( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del3" and event.other.type == "firkant1") or
+         (self.type == "del3" and event.other.type == "firkant2") or
+         (self.type == "del3" and event.other.type == "firkant3") or
+         (self.type == "del3" and event.other.type == "firkant4") then
+
+         del3:removeEventListener( "collision" )
+
+       
+ local  stov3        = display.newImageRect("stov.png", 20,20)
+        stov3.width  = 10+(math.random(10, 50)) 
+        stov3.height = stov3.width
+        stov3.x      = self.x+(math.random(1, 10)) 
+        stov3.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov3.alpha  = 1.0
+        stov3:rotate( rot )
+        --grp:insert(stov3)
+        camera:add (stov3,1,false)
+ 
 
 
+local tran= transition.to (stov3, {
+
+                                    x          = stov3.x      - (math.random(-50, 50)),
+                                    y          = stov3.y      - (math.random( 1, 50)),
+                                    width      = stov3.width  + (math.random(1, 50)),
+                                    height     = stov3.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov3 )
+                                        stov3 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del3.stage then del3:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov3
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision4( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del4" and event.other.type == "firkant1") or
+         (self.type == "del4" and event.other.type == "firkant2") or
+         (self.type == "del4" and event.other.type == "firkant3") or
+         (self.type == "del4" and event.other.type == "firkant4") then
+
+         del4:removeEventListener( "collision" )
+
+       
+ local  stov4        = display.newImageRect("stov.png", 20,20)
+        stov4.width  = 10+(math.random(10, 50)) 
+        stov4.height = stov4.width
+        stov4.x      = self.x+(math.random(1, 10)) 
+        stov4.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov4.alpha  = 1.0
+        stov4:rotate( rot )
+        --grp:insert(stov4)
+        camera:add (stov4,1,false)
+ 
 
 
+local tran= transition.to (stov4, {
+
+                                    x          = stov4.x      - (math.random(-50, 50)),
+                                    y          = stov4.y      - (math.random( 1, 50)),
+                                    width      = stov4.width  + (math.random(1, 50)),
+                                    height     = stov4.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov4 )
+                                        stov4 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del4.stage then del4:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov4
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision5( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del5" and event.other.type == "firkant1") or
+         (self.type == "del5" and event.other.type == "firkant2") or
+         (self.type == "del5" and event.other.type == "firkant3") or
+         (self.type == "del5" and event.other.type == "firkant4") then
+
+         del5:removeEventListener( "collision" )
+
+       
+ local  stov5        = display.newImageRect("stov.png", 20,20)
+        stov5.width  = 10+(math.random(10, 50)) 
+        stov5.height = stov5.width
+        stov5.x      = self.x+(math.random(1, 10)) 
+        stov5.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov5.alpha  = 1.0
+        stov5:rotate( rot )
+        --grp:insert(stov5)
+        camera:add (stov5,1,false)
+ 
+
+
+local tran= transition.to (stov5, {
+
+                                    x          = stov5.x      - (math.random(-50, 50)),
+                                    y          = stov5.y      - (math.random( 1, 50)),
+                                    width      = stov5.width  + (math.random(1, 50)),
+                                    height     = stov5.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov5 )
+                                        stov5 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del5.stage then del5:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov5
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision6( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del6" and event.other.type == "firkant1") or
+         (self.type == "del6" and event.other.type == "firkant2") or
+         (self.type == "del6" and event.other.type == "firkant3") or
+         (self.type == "del6" and event.other.type == "firkant4") then
+
+         del6:removeEventListener( "collision" )
+
+       
+ local  stov6        = display.newImageRect("stov.png", 20,20)
+        stov6.width  = 10+(math.random(10, 50)) 
+        stov6.height = stov6.width
+        stov6.x      = self.x+(math.random(1, 10)) 
+        stov6.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov6.alpha  = 1.0
+        stov6:rotate( rot )
+        --grp:insert(stov6)
+        camera:add (stov6,1,false)
+ 
+
+
+local tran= transition.to (stov6, {
+
+                                    x          = stov6.x      - (math.random(-50, 50)),
+                                    y          = stov6.y      - (math.random( 1, 50)),
+                                    width      = stov6.width  + (math.random(1, 50)),
+                                    height     = stov6.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov6 )
+                                        stov6 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del6.stage then del6:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov6
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision7( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del7" and event.other.type == "firkant1") or
+         (self.type == "del7" and event.other.type == "firkant2") or
+         (self.type == "del7" and event.other.type == "firkant3") or
+         (self.type == "del7" and event.other.type == "firkant4") then
+
+         del7:removeEventListener( "collision" )
+
+       
+ local  stov7        = display.newImageRect("stov.png", 20,20)
+        stov7.width  = 10+(math.random(10, 50)) 
+        stov7.height = stov7.width
+        stov7.x      = self.x+(math.random(1, 10)) 
+        stov7.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov7.alpha  = 1.0
+        stov7:rotate( rot )
+        --grp:insert(stov7)
+        camera:add (stov7,1,false)
+ 
+
+
+local tran= transition.to (stov7, {
+
+                                    x          = stov7.x      - (math.random(-50, 50)),
+                                    y          = stov7.y      - (math.random( 1, 50)),
+                                    width      = stov7.width  + (math.random(1, 50)),
+                                    height     = stov7.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov7 )
+                                        stov7 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del7.stage then del7:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov7
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision8( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del8" and event.other.type == "firkant1") or
+         (self.type == "del8" and event.other.type == "firkant2") or
+         (self.type == "del8" and event.other.type == "firkant3") or
+         (self.type == "del8" and event.other.type == "firkant4") then
+
+         del8:removeEventListener( "collision" )
+
+       
+ local  stov8        = display.newImageRect("stov.png", 20,20)
+        stov8.width  = 10+(math.random(10, 50)) 
+        stov8.height = stov8.width
+        stov8.x      = self.x+(math.random(1, 10)) 
+        stov8.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov8.alpha  = 1.0
+        stov8:rotate( rot )
+        --grp:insert(stov8)
+        camera:add (stov8,1,false)
+ 
+
+
+local tran= transition.to (stov8, {
+
+                                    x          = stov8.x      - (math.random(-50, 50)),
+                                    y          = stov8.y      - (math.random( 1, 50)),
+                                    width      = stov8.width  + (math.random(1, 50)),
+                                    height     = stov8.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov8 )
+                                        stov8 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del8.stage then del8:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov8
+         end
+    --return true
+    end
+end
+
+local function onLocalCollision9( self, event )
+ 
+    if ( event.phase == "began" ) then
+        
+     if  (self.type == "del9" and event.other.type == "firkant1") or
+         (self.type == "del9" and event.other.type == "firkant2") or
+         (self.type == "del9" and event.other.type == "firkant3") or
+         (self.type == "del9" and event.other.type == "firkant4") then
+
+         del9:removeEventListener( "collision" )
+
+       
+ local  stov9        = display.newImageRect("stov.png", 20,20)
+        stov9.width  = 10+(math.random(10, 50)) 
+        stov9.height = stov9.width
+        stov9.x      = self.x+(math.random(1, 10)) 
+        stov9.y      = self.y-(math.random(1, 10))
+        rot         = (math.random(1,360)) 
+        stov9.alpha  = 1.0
+        stov9:rotate( rot )
+        --grp:insert(stov9)
+        camera:add (stov9,1,false)
+ 
+
+
+local tran= transition.to (stov9, {
+
+                                    x          = stov9.x      - (math.random(-50, 50)),
+                                    y          = stov9.y      - (math.random( 1, 50)),
+                                    width      = stov9.width  + (math.random(1, 50)),
+                                    height     = stov9.height + (math.random(1, 50)),
+                                    alpha      = 0,
+                                    time       = 1000,
+                                    onComplete = function ()
+                                        display.remove( stov9 )
+                                        stov9 = nil
+                                        -- Vaktet, se level1.lua sin TIL-ORJAN.md-forklaring.
+                                        if del9.stage then del9:addEventListener( "collision" ) end
+             end} ) 
+                                    return stov9
+         end
+    --return true
+    end
+end
+
+del1.collision = onLocalCollision1
+del1:addEventListener( "collision" )
+------------------------------------
+del2.collision = onLocalCollision2
+del2:addEventListener( "collision" )
+------------------------------------
+del3.collision = onLocalCollision3
+del3:addEventListener( "collision" )
+------------------------------------
+del4.collision = onLocalCollision4
+del4:addEventListener( "collision" )
+------------------------------------
+del5.collision = onLocalCollision5
+del5:addEventListener( "collision" )
+------------------------------------
+del6.collision = onLocalCollision6
+del6:addEventListener( "collision" )
+------------------------------------
+del7.collision = onLocalCollision7
+del7:addEventListener( "collision" )
+------------------------------------
+del8.collision = onLocalCollision8
+del8:addEventListener( "collision" )
+------------------------------------
+del9.collision = onLocalCollision9
+del9:addEventListener( "collision" )
+----------------------------------
 
 
 
@@ -1037,11 +1594,30 @@ Runtime:addEventListener("collision", onCollision2)
 
 local function knekk(event)
 if event.phase == "began" then
-local agro = event.object1
-local hit = event.object2
+
 
 if  (event.object1.type == "knott1" and event.object2.type == "knott2") then
 
+--[[
+knapp1.alpha = 0
+Runtime:removeEventListener("collision", onCollision)
+Runtime:removeEventListener( "touch", trykk_knapp)
+Runtime:removeEventListener( "tap", trykk_knapp)
+Runtime:removeEventListener("collision", knekk)
+pivot_joint.isMotorEnabled  = false
+pivot_joint1.isMotorEnabled = false
+pivot_joint2.isMotorEnabled = false
+pivot_joint3.isMotorEnabled = false
+pivot_joint4.isMotorEnabled = false
+pivot_joint5.isMotorEnabled = false
+pivot_joint6.isMotorEnabled = false
+pivot_joint7.isMotorEnabled = false
+display.remove(pivot_joint)
+display.remove(knott1)
+knott1 = nil
+camera:setFocus( del9 )
+timer.performWithDelay( 3000, goto)
+--]]
 print( "knott1 og knott2" )
 
 elseif  (event.object1.type == "knott2" and event.object2.type == "knott3") then
@@ -1470,13 +2046,20 @@ camera:add (blod2,1,false)
                 end         
        end
 end
--- Slått på 2026-09-10 (var kommentert bort, selve knekk-mekanikken var
--- ellers ferdig kodet: blod, fjerning av motor-joints og dødsmeny
--- fungerer, bare selve lytteren manglet). Se forklaring i TIL-ORJAN.md.
 Runtime:addEventListener("collision", knekk)
 ----------------------------------------------------------------------------------
 
 
+--[[
+
+for i=1, 10 do
+local rock1 = display.newImageRect ("rock1.png", 10, 6 )
+physics.addBody(rock1,"dynamic", physicsData:get("rock1") )
+rock1.x = 300+ (math.random(1000, 30000))
+rock1.y = 0
+camera:add (rock1,1,false)
+end
+]]--
 
  del1.y = del1.y
  ---------------------------------------------------------
@@ -1510,7 +2093,7 @@ Runtime:addEventListener("collision", knekk)
 
 
     ----------------------------------
-        camera:add (knapp1,2,false)
+    --camera:add (knapp1,2,false)
     ----------------------------------
     camera:add (background,6,false)
     ----------------------------------
@@ -1526,6 +2109,14 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10b,5,false)
     camera:add (background11b,5,false)
     camera:add (background12b,5,false)
+    camera:add (background13b,3,false)
+    camera:add (background14b,3,false)
+    camera:add (background15b,3,false)
+    camera:add (background16b,3,false)
+    camera:add (background17b,3,false)
+    camera:add (background18b,3,false)
+    camera:add (background19b,3,false)
+    camera:add (background20b,3,false)
     ----------------------------------
     camera:add (background1a,4,false)
     camera:add (background2a,4,false)
@@ -1539,6 +2130,14 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10a,4,false)
     camera:add (background11a,4,false)
     camera:add (background12a,4,false)
+    camera:add (background13a,3,false)
+    camera:add (background14a,3,false)
+    camera:add (background15a,3,false)
+    camera:add (background16a,3,false)
+    camera:add (background17a,3,false)
+    camera:add (background18a,3,false)
+    camera:add (background19a,3,false)
+    camera:add (background20a,3,false)
     ----------------------------------
     
     camera:add (background1,3,false)
@@ -1553,12 +2152,23 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10,3,false)
     camera:add (background11,3,false)
     camera:add (background12,3,false)
+    camera:add (background13,3,false)
+    camera:add (background14,3,false)
+    camera:add (background15,3,false)
+    camera:add (background16,3,false)
+    camera:add (background17,3,false)
+    camera:add (background18,3,false)
+    camera:add (background19,3,false)
+    camera:add (background20,3,false)
+
+
     -----------------------------------
     camera:add (firkant1,1,false)
     camera:add (firkant2,1,false)
     camera:add (firkant3,1,false)
     camera:add (firkant4,1,false)
     ----------------------------------
+   -- camera:add (punkt2,1,false)
     camera:add (punkt,1,false)
     camera:add (del1,1,false)
     camera:add (del2,1,false)
@@ -1577,7 +2187,9 @@ Runtime:addEventListener("collision", knekk)
     
     local levelWidth = camera:layer(6).width
     local levelHeight = camera:layer(6).height
-    camera:setParallax( 0.30, 0.25, 0.20, 0.15, 0.10 )
+   -- camera:setParallax( 0.30, 0.25, 0.20, 0.15, 0.10, 0.1 )
+    --camera:setParallax( 0.90, 0.80, 0.70, 0.60, 0.50, 0.4 )
+    camera:setParallax(  0.99, 0.80, 0.95, 0.90, 0.80, 0.70 )
     camera:setBounds(0, firkant4.x+firkant4.width/3 , 0, firkant4.y+firkant4.height/3)
     camera.damping = 10
     --camera.damping = 30
@@ -1593,14 +2205,11 @@ grp.yScale = scaleFactor
 
 
 
--- Dobbeltklikk skal gjøre marken helt slapp (motorene på leddene av).
--- Samme fiks som level1.lua (2026-09-10): brukte før Runtime "tap"-
--- eventet sin event.numTaps == 2, som ikke synkroniserte pålitelig med
--- HTML5-eksportens musekklikk. "ended"-fasen satte i tillegg alltid
--- motorene på igjen uansett, så selv et riktig oppdaget dobbeltklikk
--- ville blitt slått av ved neste berøring. Oppdager nå dobbeltklikk selv
--- ved å måle tid mellom to "began"-faser, og "ended" lar motorene være
--- av når marken er slapp.
+-- Dobbeltklikk skal gjore marken helt slapp (motorene av). Byttet fra
+-- Runtime "tap"-eventet sin event.numTaps == 2 (upalitelig i HTML5,
+-- samme feil som level1.lua) til a sjekke tiden mellom to "began"-
+-- faser selv. Fikset samtidig at "ended" ikke lenger alltid slo
+-- motorene pa igjen uansett, se forklaring i level1.lua/TIL-ORJAN.md.
  local isLimp = false
  local sisteBegan = 0
  local dobbeltklikkVindu = 300 -- ms
@@ -1666,6 +2275,7 @@ grp.yScale = scaleFactor
     end
 end
 Runtime:addEventListener( "touch", trykk_knapp)
+Runtime:addEventListener( "tap", trykk_knapp)
 
 
 
@@ -1696,15 +2306,29 @@ knapp1:addEventListener( "touch", trykk_knapp1)
 end
 
 
+--[[  
+local function cord(event)
+    if event.phase == "began" then
+            print ("X = ".. reff.x ,"","Y = ".. reff.y)
+
+    end
+
+
+Runtime:addEventListener( "touch", cord )
+
+
+
+end
+--]]
 
 function scene:show( event )
 
     local sceneGroup = self.view
     local phase = event.phase
     if ( phase == "will" ) then
-        print ("level1 scene:show will")
+        print ("level2 scene:show will")
     elseif ( phase == "did" ) then
-        print ("level1 scene:show did")
+        print ("level2 scene:show did")
         --last:pause()
         composer.removeScene("scenes.chooselevel")
         display.remove( last )
@@ -1721,21 +2345,20 @@ function scene:hide( event )
         --physics.stop( )
        --punktsant = false
       
-       print ("level1 scene:hide will")
+       print ("level2 scene:hide will")
    elseif ( phase == "did" ) then
-       print ("level1 scene:hide did")
+       print ("level2 scene:hide did")
+
+-- Avbryter ventende transitions (stov-stoveffektene under) her,
+-- se forklaring i TIL-ORJAN.md/KODEBASE.md for hvorfor dette
+-- trengs (samme fiks som level1.lua).
+transition.cancel()
+
 camera:destroy()
         camera=nil
 
 
       -- camera:setFocus( nil )
-
--- Lagt til 2026-09-10: samme forsiktighetsregel som i level1.lua (se
--- forklaring der). Denne banen har en enklere, engangs stov-effekt
--- uten samme fare, men transition.cancel() er billig og gjør at
--- ingen ventende transition noensinne kan fyre av mot en scene som
--- allerede er revet ned.
-transition.cancel()
 
 Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener( "touch", trykk_knapp)
@@ -1745,7 +2368,7 @@ Runtime:removeEventListener("collision", knekk)
 
 composer.removeScene ("scenes.pausemenu1")
 
-       composer.removeScene ("scenes.level1")
+       composer.removeScene ("scenes.level2")
 
 
 
@@ -1762,7 +2385,7 @@ end
 function scene:destroy( event )
 
     local sceneGroup = self.view
-        print ("level1 scene:destroy did")
+        print ("level2 scene:destroy did")
     
         
 end

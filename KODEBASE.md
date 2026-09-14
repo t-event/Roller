@@ -138,24 +138,31 @@ filene gjør.
 
 ### Baner
 - `level1.lua` — **ferdig, fungerer.** Egen, unik grafikk for banestykkene
-  (`level1/1-4.png`). Kollisjonsformene i `shapedefs.lua` ("1","2","3","4")
+  (`level1/1-4.png`). Kollisjonsformene i `lib/shapedefs.lua` ("1","2","3","4")
   ble sporet fra denne banens bilder.
-- `level2.lua`, `level3.lua`, `level4.lua` — **spillbare, men ufullstendig
-  innhold.** Ifølge Ørjan er disse "ferdige", men bruker plassholder-grafikk
-  (se under) og de samme (feil) kollisjonsformene som level1.
-- `level5.lua` til `level9.lua` — **ufullstendige, ifølge Ørjan.**
+- `level2.lua`, `level3.lua`, `level4.lua` — **byttet ut 2026-09-14** med
+  Ørjans nyere versjon (mottatt som zip fra Mathias). Egne, riktig sporede
+  kollisjonsformer i `lib/shapedefs2.lua`/`shapedefs3.lua`/`shapedefs4.lua`
+  (ikke lenger `lib/shapedefs.lua` sine, som var sporet fra bane 1 og ikke
+  stemte, se "Kjente feil" nedenfor), sammen med nye bakke-bilder
+  (`level2/1-4.png` osv, alle byttet ut samtidig med formene siden de hører
+  sammen). Har nå samme fulle knekk-/støveffekt-system som `level1.lua`
+  (`onLocalCollision1`-`onLocalCollision9`, ni "knott"-fysikkobjekter).
+  Portert til `scenes.`/`lib.`-mappestrukturen og alle våre etablerte
+  rettelser (retry via `scenes.gotoretry`, `lm.currentLevel`-sporing,
+  dobbeltklikk-fiksen, `transition.cancel()`+`.stage`-vakt), se
+  `TIL-ORJAN.md` for detaljene og hva som bevisst IKKE ble tatt med fra
+  Ørjans zip (egne per-bane pausemeny/dødsmeny-filer, blant annet).
+- `level5.lua` til `level9.lua` — **fortsatt ufullstendige, ifølge Ørjan.**
   Var 100 % byte-identiske filer med knuste bildestier (bekreftet med
   `diff`). **Stiene rettet 2026-09-10** (Ørjan: greit å gjøre siden
   spillet ikke er under aktiv grafikk-utvikling), bildene refereres nå
   med riktig mappe-prefiks (`background/back_cave.png`,
-  `level5/1.png` osv, samme mønster som `level2.lua`-`level4.lua`).
-  De fem filene er dermed ikke lenger byte-identiske (hver har sin
-  egen `levelN/`-sti), men deler fortsatt de samme plassholderbildene
-  og de samme (feil) kollisjonsformene som level1 (se punkt 1 under
-  "Kjente feil").
-- **Alle ni baner bruker identiske plassholderbilder** for banestykkene
-  (`levelN/1.png` til `4.png`), unntatt level1 som har unike bilder.
-  Bekreftet med MD5-sjekksum, se `TIL-ORJAN.md`.
+  `level5/1.png` osv). De fem filene er dermed ikke lenger byte-identiske
+  (hver har sin egen `levelN/`-sti), men deler fortsatt de samme
+  plassholderbildene og de samme (feil, sporet fra bane 1) kollisjonsformene
+  i `lib/shapedefs.lua` (se "Kjente feil"). Ørjans zip dekket bare bane 1-4,
+  så disse fem venter fortsatt på tilsvarende retting.
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
@@ -225,15 +232,19 @@ filene gjør.
 
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
 
-1. **Delte kollisjonsformer.** `shapedefs.lua` har bare ett sett former
-   ("1"-"4"), men brukes av alle baner. Stemmer bare med level1 sine
-   bilder. Ørjan har bekreftet (2026-09-10) at alle baner skal ha egne
-   formsett i `shapedefs.lua`, per i dag ligger bare level1 sitt der
-   (helt til slutt i fila). Venter på at de andre banenes former spores
-   i PhysicsEditor, ikke noe AI kan gjøre uten kildebildene i riktig
-   verktøy.
-2. **Plassholder-grafikk.** level2-9 deler identiske banestykke-bilder.
-   (Også i `TIL-ORJAN.md`.) Fortsatt uendret, venter på ny grafikk.
+1. ~~Delte kollisjonsformer~~ **Bane 1-4 løst 2026-09-14, bane 5-9
+   fortsatt åpent.** `lib/shapedefs.lua` har bare ett sett former
+   ("1"-"4"), sporet fra level1 sine bilder, men ble likevel brukt av
+   ALLE baner — stemte bare for bane 1. Ørjan sendte en nyere versjon
+   av spillet med egne, riktig sporede formsett for bane 2-4
+   (`lib/shapedefs2.lua`/`shapedefs3.lua`/`shapedefs4.lua`, hentet inn
+   sammen med nye bakke-bilder som formene faktisk hører sammen med).
+   Bane 5-9 venter fortsatt på egne formsett i PhysicsEditor, ikke noe
+   AI kan gjøre uten kildebildene i riktig verktøy.
+2. **Plassholder-grafikk.** level5-9 deler fortsatt identiske
+   banestykke-bilder (level1-4 har hver sine egne, ekte bilder siden
+   2026-09-14). (Også i `TIL-ORJAN.md`.) Venter på ny grafikk for
+   resten.
 3. ~~"Neste bane"-knappen er hardkodet til level 2~~ **Fikset 2026-09-10.**
    Ørjan tok ikke stilling til denne spesifikt, men mest nærliggende var å
    la level2.lua-level9.lua gjøre som `level1.lua` alltid gjorde riktig:
