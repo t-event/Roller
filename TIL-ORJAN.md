@@ -1924,3 +1924,127 @@ Luac-sjekket alle 11 endrede filer (`pausemenu1.lua`, `dodmenu1.lua`,
 `level1.lua`-`level9.lua`), kjørte fullt syntakssøk over repoet. Kan
 ikke teste i faktisk nettleser herfra, så si fra om noe av dette ikke
 stemmer etter neste bygg.
+
+## 2026-09-15, bane 5/6: tak-kollisjon, pigger ved hullene, og gradert farge
+
+Samme melding fra Mathias hadde også fire punkter om selve bane 5/6-
+kunsten. Alle fire førte til en ordentlig omskriving av
+terreng-generatoren (`make_level5_terrain.py`/`make_level6_terrain.py`,
+scratch-scriptene som bygger `level5/6/1-4.png` og
+`lib/shapedefs5/6.lua`), ikke bare parameterjustering.
+
+**"Når man kommer seg til flis nr 2 så lander man oppå taket.. det blir
+feil."** Regnet ut, denne gangen med et script i stedet for for hånd:
+tak-kurven og gulv-kurven ble laget helt uavhengig av hverandre, hver
+klippet til sitt eget "plausible" område (gulv: så grunt som ~H*0.08
+nær en flis sin venstrekant; tak: så dypt som H*0.32). De områdene
+overlapper. Målte det direkte: flis 4 sin egen venstrekant hadde taket
+strekke seg 239 enheter LENGER NED enn gulvet på samme kolonne, altså
+helt solid fjell fra topp til bunn der, ingen åpen tunnel i det hele
+tatt. En mark som gled inn i den kolonnen landet på undersiden av
+taket, fordi det var den første faste flaten den traff ovenfra, ikke
+gulvet lenger unna. Fikset ved å regne ut taket i forhold til gulvet:
+`ceiling_curve()` tar nå inn `tile_curve()` sin egen gulv-kurve og
+klipper seg selv til aldri å komme nærmere enn `MIN_TUNNEL` (220px)
+til gulvet på samme kolonne. Der selv det ikke er nok plass (helt ytterst
+til venstre på enkelte fliser, der gulvet er grunnest), fjernes taket
+fullstendig for den kolonnen i stedet for å tvinge et utrygt kompromiss
+tilbake inn (en første versjon av denne klipingen brukte
+`np.clip(curve, H*0.02, None)` som en nedre grense ETTER
+gulv-klipingen, som i praksis kunne løfte taket tilbake forbi grensen
+igjen akkurat i dette tilfellet, fanget opp ved å måle på nytt).
+Bekreftet numerisk over alle fire flisene på begge banene: minste
+klaring er nå 121-260 enheter uansett, aldri negativ.
+
+**"Over takene på flisene må taket gå helt opp, slik at man ikke ser
+bakgrunnen over."** Taket har alltid fylt fra rad 0 (toppen av selve
+bildet) og ned til tak-kurven, så det er ingen bokstavelig bakgrunn
+synlig OVER taket innenfor én flis sitt eget bilde. Usikker på om dette
+sikter til den diagonale "trappe"-plasseringen av flisene (samme mønster
+som alle ni banene bruker, der hver flis er forskjøvet en hel
+flis-bredde/høyde fra forrige, så de bare møtes i ett hjørne), eller om
+taket noen steder ble for TYNT til å lese som "solid fjell". Kan ikke
+bekrefte i en nettleser herfra, så gjorde det ene jeg kunne gjøre noe
+med: hevet tak-kurven sin nedre grense fra H*0.03 til H*0.05, så det
+alltid er et tydelig tykt fjell-lag der taket faktisk finnes, ikke bare
+en 70px flis. Si fra om det fortsatt ser feil ut, og evt. hvor i bildet
+(hvilken flis, omtrent hvor i banen).
+
+**"Ørjan vil heller ikke at det skal være pigger ved hullene i
+banene."** Denne tok fem forsøk før den faktisk ble riktig, alle
+loggført i selve koden (se de lange kommentarene over `_tile_layout`
+og `apply_gap_taper` i terreng-scriptet) fordi hvert forsøk så
+fornuftig ut på tallene alene og likevel feilet visuelt, først oppdaget
+ved faktisk å rendre og beskjære et bilde av et hull i full oppløsning,
+ikke ved å resonnere fra tallene:
+
+1. Første forsøk (bredere, skrå-proporsjonal avrunding + fri
+   plassering) fikk luftlommenes avrundingssoner til å overlappe nesten
+   over hele flisen, og etterlot bare tynne nåler av gulv mellom dem,
+   verre enn problemet det skulle løse.
+2. Andre forsøk (garantert ikke-overlappende "øy"-oppsett + fast
+   150px avrunding) løste overlappet, men hvert enkelt hull var
+   fortsatt en tynn kniv: en fast 150px kjøring som letter overflaten
+   fra der den naturlig er (så grunt som ~250px) og helt ned til H
+   (~2100px unna på det verste) er en nesten loddrett vegg uansett hvor
+   glatt letting-funksjonen er.
+3. Tredje og fjerde forsøk prøvde å skalere avrundings-bredden med hvor
+   dypt fallet faktisk var, første gang kalibrert altfor aggressivt
+   (spiste hele flisen igjen), andre gang kalibrert riktigere men
+   fortsatt samme grunnfeil: et hull må uansett nå helt ned til H et
+   sted, og jo grunnere gulvet er der hullet havner, jo lengre (og
+   dermed jo mer nål-aktig) blir den avrundede overgangen uansett,
+   siden løsningen fortsatt tynnet gulvet til null tykkelse akkurat
+   ved hull-kanten.
+4. Femte forsøk brukte en helt annen modell: et ekte hulerom er ikke
+   bakke som tynnes bort til ingenting, det er en TYKK bakke med et
+   hull KLIPPET ut av den, avrundet bare i de to øverste hjørnene der
+   hullet møter overflaten (som en dørkarm). Overflaten holder nå sin
+   naturlige høyde helt fram til rett ved hullet, avrundet med en ekte
+   kvart-sirkel av fast radius (`FILLET_RADIUS = 110`) som aldri
+   senker overflaten mer enn 110px, uansett hvor dypt/grunt gulvet er
+   der. Selve veggen ved siden av hullet beholder dermed sin fulle,
+   naturlige tykkelse, bare det ene hjørnet er avrundet. Bekreftet med
+   et nærbilde i full oppløsning: ser nå ut som separate, avrundede
+   bakkestykker med luft mellom, ikke nåler.
+
+Samtidig la også til variasjon i antall hull per flis (1-3, var alltid
+nøyaktig 2 før) og bredde per hull (70-130px, var alltid nøyaktig
+100px), som del av **"lag banene litt mer dynamisk og naturlig som om
+at det faktisk er i en hule"**. La også til et tredje, finere
+støy-lag (64 kontrollpunkter, liten amplitude) oppå de to
+eksisterende i selve gulv-kurven, så lange strekk ikke lenger leser
+som én jevn helling.
+
+**"Ønsker at bakken ser mer realistisk ut som på bane 1, 2, 3 og 4.
+fargen graderes."** Sammenlignet direkte med `level4/2.png`: den
+"rim"-fargede kanten der ikke er en tynn stripe langs KUN den øverste
+flaten av én sammenhengende bakke-kurve (det gamle bane 5/6-oppsettet),
+den pakker seg rundt HVER enkelt eksponerte kant av HVER separate
+steinbit, siden den ekte kunsten er tegnet som mange atskilte biter, ikke
+én kurve. Skrevet om `_shade()` til `_shade_by_distance()`: bruker nå
+en ekte 2D-avstandstransform (`scipy.ndimage.distance_transform_edt`,
+avstand til nærmeste gjennomsiktige piksel i alle retninger) i stedet
+for "avstand rett opp fra denne kolonnens egen overflate". Pakker nå
+rim-fargen rundt hull-kanter og undersiden av taket også, ikke bare
+toppen av gulvet, akkurat som i den ekte kunsten.
+
+Regenererte `level5/1-4.png`, `level6/1-4.png`,
+`lib/shapedefs5.lua` og `lib/shapedefs6.lua` (fysikkformene er fortsatt
+regnet direkte fra samme kurver kunsten tegnes fra, så de stemmer
+eksakt overens per konstruksjon, samme prinsipp som før). Samme
+frø-forskyvning som vanlig for bane 6 (`np.random.seed(17)` i stedet
+for `7`, alle støy-frø +1000, se koden for hele lista). Fant og fikset
+en frø-kollisjon underveis: det nye tredje støy-laget brukte ved en
+feil samme kildeverdi som "texture"-laget sin planlagte bane 6-verdi,
+rettet før noe ble commitet.
+
+Bekreftet med nærbilder i full oppløsning før commit (hull-kanter,
+takklaring ved spawn, generell fargegradering), og numerisk at
+tak/gulv-klaringen er trygt positiv over alle fire flisene på begge
+banene. Luac-sjekket `lib/shapedefs5.lua`/`shapedefs6.lua`, kjørte
+hitbox-visualiseringen på nytt for begge banene (samme teknikk som
+forrige runde) for å bekrefte kollisjonsformene faktisk følger den nye
+kunsten. Kan ikke bekrefte i en faktisk nettleser herfra, spesielt ikke
+"taket går helt opp"-punktet, så si fra om noe av dette fortsatt ser
+feil ut etter neste bygg.

@@ -274,6 +274,34 @@ filene gjør.
   bane 5 sin bakgrunnsfiks eller kant-avrunding ennå (de ble bedt om
   spesifikt for bane 5).
 
+  **Runde til, samme dag (etter mer nettleser-testing):** fire separate
+  rettelser i generator-scriptet, alle i `TIL-ORJAN.md` sin
+  2026-09-15-oppføring "tak-kollisjon, pigger ved hullene, og gradert
+  farge" i detalj. Kort: (1) `ceiling_curve()` regnet før helt
+  uavhengig av `tile_curve()` (gulvet), og kunne dermed strekke seg
+  LENGER ned enn gulvet enkelte steder (opptil 239px inni gulvet på
+  det verste), som gjorde at marken landet oppå taket i stedet for på
+  gulvet. Regner nå taket i forhold til gulvet, garantert minst
+  `MIN_TUNNEL` (220px) klaring, eller fjerner taket helt der selv ikke
+  det er plass. (2) Tak sin nedre klipp-grense hevet fra H*0.03 til
+  H*0.05 for et tydeligere solid fjell-lag. (3) `apply_gap_taper()`
+  skrevet om fra bunnen (femte forsøk, se kommentarene i selve
+  scriptet for de fire mislykkede forsøkene før): hull-kanter avrundes
+  nå med en ekte kvart-sirkel av fast radius (`FILLET_RADIUS`) som
+  aldri senker gulvet mer enn radiusen, i stedet for å tynne gulvet
+  til null tykkelse (som alltid ga et nål/pigg-utseende uansett hvor
+  glatt avrundingen matematisk var). Antall hull per flis varierer nå
+  (1-3, var alltid 2), bredden varierer (70-130px, var alltid 100px),
+  og et tredje, finere støy-lag er lagt til gulv-kurven for mindre
+  mekanisk utseende. (4) `_shade()` byttet til `_shade_by_distance()`:
+  bruker en ekte 2D-avstandstransform (nærmeste gjennomsiktige piksel i
+  alle retninger, ikke bare rett opp) for rim/fill-fargeovergangen,
+  målt direkte mot `level4/2.png`, som pakker rim-fargen rundt ALLE
+  eksponerte kanter (hull, undersiden av taket) i stedet for bare den
+  øverste gulv-flaten. Regenererte alle åtte `level5/6/1-4.png` og
+  begge `shapedefs5/6.lua`. Samme frø-mønster for bane 6 som før
+  (`+1000` på alle nye støy-frø òg).
+
 **Fargeprogresjon (mørkere jo lenger ut i spillet):** designprinsipp
 fra Mathias, hver bane skal være mørkere enn forrige, som å dra dypere
 ned i en hule, men VELDIG gradvis, spilleren skal knapt merke det.
