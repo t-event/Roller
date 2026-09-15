@@ -1137,3 +1137,56 @@ Luac-sjekket alle seks filene (tre banefiler, tre shapedefs). Kunne
 selvsagt ikke teste i faktisk nettleser, spesielt de nye
 kollisjonsformene og at bane 2-4 nå faktisk er spillbare med korrekt
 bakke, bør prioriteres høyt når dere får testet.
+
+## 2026-09-15, lette gjennom resten av Ørjans zip for mer å hente
+
+Mathias ba meg studere koden i zippen grundigere for å se om det var
+mer Ørjan hadde lagt til enn det som allerede ble hentet inn (bane
+2-4 og de nye kollisjonsformene). Sammenlignet systematisk alle delte
+moduler og skjermer mot det vi har:
+
+**Ingenting mer å hente** fra `liv.lua`, `mark.lua`,
+`ogt_levelmanager.lua`, `menu.lua`, `chooselevel.lua`, `GGData.lua`,
+`perspective.lua`, `gameUI.lua`, `config.lua`, `gotomenu.lua`,
+`gotochooselevel.lua`, `pausemenu1.lua`/`dodmenu1.lua`, og
+`level5.lua`-`level9.lua` — for alle disse er versjonen i zippen
+FAKTISK ELDRE/mindre fikset enn det vi allerede har (mangler bl.a.
+`liv.erTom()`, pcall-sikkerhetsnettet i navigasjonen,
+`checkpoint()`-sporing, `transition.cancel()`, og for bane 5-9 fortsatt
+kommentert bort `knekk`-lytter og delte (feil) kollisjonsformer). Bane
+5-9 var altså ikke en del av Ørjans "4 baner fungerer"-opprydning i det
+hele tatt.
+
+De ekstra filene som ikke fantes i `scenes/`/`lib/` i det hele tatt
+(`game.lua`, `livddadas.lua`, `brett.lua`, `hoydehopp.lua`,
+`menu1.lua`, `options.lua`, `play.lua`) viste seg å være nøyaktig de
+samme filene som allerede ble identifisert som død kode og arkivert i
+`dod-kode/` under den aller første oppryddingsøkten. Bekreftet med
+md5sum, byte-for-byte identiske (unntatt en triviell sti i
+`menu1.lua`, ikke et reelt innholdsforskjell).
+
+**To reelle funn, begge fra `main.lua`/`ogt_lmdata.lua`:**
+
+1. `k.numUnlocked` (i `lib/ogt_lmdata.lua`) sto til `k.totalLevels`
+   (alle ni baner åpne), merket i vår egen kommentar som en midlertidig
+   debug-overstyring fra en tidligere økt. Ørjans nyere `ogt_lmdata.lua`
+   setter den eksplisitt til `4`, som stemmer nøyaktig med at bare
+   bane 1-4 faktisk er ferdige. Satt tilbake til 4, slik at spillere
+   ikke kan navigere inn i de fortsatt ødelagte banene 5-9 fra
+   banevalg-skjermen.
+2. `main.lua` hoppet rett til bane 1 ved oppstart
+   (`composer.gotoScene("scenes.gotolevel1")`), og hoppet dermed helt
+   over hovedmenyen. Ørjans nyere `main.lua` går fortsatt via menyen
+   (`gotoScene("gotomenu")`). Spurte Mathias, som ville ha menyen
+   tilbake. Endret `main.lua` til `composer.gotoScene("scenes.gotomenu")`.
+   Sjekket at `menu.lua` faktisk har en fungerende vei videre:
+   "storyknapp"-bildet har en "tap"-lytter (`spill()`) som etter 2
+   sekunder går til `scenes.chooselevel`, så ingenting mangler i den
+   veien. Ørjans meny hadde i tillegg noen widget-knapper ("Play",
+   "Options", "High Jump") som peker til bekreftet død kode
+   (`options.lua`/`hoydehopp.lua`), men disse knappene finnes ikke i
+   VÅR `menu.lua` i utgangspunktet, så ingenting å fjerne der.
+
+Luac-sjekket `main.lua` og `lib/ogt_lmdata.lua`. Ikke testet i faktisk
+nettleser at hele kjeden main → meny → banevalg faktisk fungerer som
+forventet.

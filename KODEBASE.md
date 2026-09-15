@@ -46,8 +46,10 @@ relative til prosjektroten uansett hvilken `.lua`-fil som laster dem.
 
 ```
 main.lua
-  └─ gotoScene("scenes.gotolevel1")        [alltid, uansett]
-       └─ (1.5s) removeScene + gotoScene("scenes.level1")
+  └─ gotoScene("scenes.gotomenu")        [endret 2026-09-15, matcher Ørjans
+                  nyere versjon; gikk før rett til gotolevel1/bane 1]
+       └─ (1.5s) gotoScene("scenes.menu")
+            └─ trykk "storyknapp" → (2s) gotoScene("scenes.chooselevel")
 
 scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
   ├─ showOverlay("scenes.dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
@@ -68,7 +70,8 @@ scenes/pausemenu1.lua (delt av alle baner)
 scenes/dodmenu1.lua (delt av alle baner)
   └─ samme struktur som pausemenu1.lua, "retry"/"main menu"/"levels", samme
      "gotoretry"-omvei. Om liv.erTom() går "retry" til "scenes.gotolevel1"
-     i stedet (start på nytt fra bane 1), samme som main.lua ved appstart.
+     i stedet (start på nytt fra bane 1) — samme splash som brukes for
+     "ingen liv igjen", uavhengig av at appstart nå går via menyen.
 
 scenes/chooselevel.lua / gotochooselevel.lua
   → lm.init() i lib/ogt_levelmanager.lua, som leser lib/ogt_lmdata.lua
@@ -92,7 +95,8 @@ Beskrivelsene under er ellers uendret siden flyttingen ikke påvirker hva
 filene gjør.
 
 ### Kjerne / alltid i bruk
-- `main.lua` — appens startpunkt, laster ssk2, går til `gotolevel1`.
+- `main.lua` — appens startpunkt, laster ssk2, går til hovedmenyen
+  (`gotomenu`, endret 2026-09-15, se "Faktisk scene-flyt" over).
 - `config.lua` — skjermoppløsning (540×960, kun landscape), skaleringsmodus.
 - `build.settings` — orientering, feilsøkingsinnstillinger.
 
@@ -176,6 +180,12 @@ filene gjør.
   i `selectLevel`) manglet pcall-sikkerhetsnettet som resten av kjeden
   dit (pausemeny → gotochooselevel → chooselevel → init/makeGrid) fikk
   under feilsøkingen, har det nå også.
+  `k.numUnlocked` (hvor mange baner som er åpne fra start) satt tilbake
+  til **4** 2026-09-15 (sto til `k.totalLevels`/9, en midlertidig
+  debug-overstyring fra en tidligere økt), etter at Ørjans egen nyere
+  `ogt_lmdata.lua` bekreftet 4 som riktig verdi — det er nøyaktig så
+  mange baner som faktisk er ferdige, se `level2.lua`-punktet lenger
+  ned og "Kjente feil".
 
 ### Delte spillobjekter
 - `perspective.lua` — kamerasystem (parallakse, lag), tredjepartsbibliotek

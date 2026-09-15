@@ -19,7 +19,12 @@ if system.getInfo( "platformName" ) ~= "HTML5" then
 	bbb = ssk.meters.create_mem( true )
 end
 
-composer.gotoScene( "scenes.gotolevel1" )
+-- Går via hovedmenyen igjen fra 2026-09-15, matcher Ørjans nyere
+-- versjon av spillet. Gikk tidligere rett til bane 1
+-- (composer.gotoScene("scenes.gotolevel1")), som hoppet over
+-- menu.lua helt. menu.lua sin "storyknapp" leder videre til
+-- scenes.chooselevel (banevalg) når den trykkes.
+composer.gotoScene( "scenes.gotomenu" )
 
  
 

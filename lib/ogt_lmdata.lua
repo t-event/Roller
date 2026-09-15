@@ -109,7 +109,14 @@ k.gridOffsetY = 0 	-- vertical offset for the entire grid on the page
 
 -- misc variables
 
-k.numUnlocked = k.totalLevels -- TEMP for debugging: all levels unlocked. Was: 1 -- how many of the first levels are unlocked (minimum 1)
+-- Var k.totalLevels (alle ni åpne) som en midlertidig debug-innstilling.
+-- Satt til 4 igjen 2026-09-15: Ørjans nyere versjon av spillet låser
+-- eksplisitt til 4, siden det bare er bane 1-4 som faktisk er ferdige
+-- (riktige kollisjonsformer, ekte bakgrunnsbilder, knekk-mekanikk).
+-- Bane 5-9 har fortsatt plassholder-grafikk og feil kollisjon, se
+-- KODEBASE.md "Kjente feil". Opprinnelig verdi før debug-overstyringen
+-- var 1 (kun første bane åpen).
+k.numUnlocked = 4 -- how many of the first levels are unlocked (minimum 1)
 
 k.rememberPage = true -- if true, shows page from last selected level
 k.currentPage = 1 	-- probably won't change this (much) manually
