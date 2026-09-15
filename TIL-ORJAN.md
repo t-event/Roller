@@ -1677,3 +1677,39 @@ Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå. Sendte oppdaterte referansebilder (samme
 flis-i-relativ-posisjon-metode som før) til Mathias for
 tilbakemelding før dette regnes som ferdig.
+
+## 2026-09-15, bane 5/6: skal bli mørkere jo lenger ut i spillet, som en hule
+
+Mathias forklarte et designprinsipp jeg ikke kjente til: hver bane
+skal bli mørkere enn den forrige etter hvert som man kommer lenger,
+som om man drar dypere ned i en hule (bane 1 tydelig lysere enn bane
+2, og så videre). Påpekte samtidig at fargen jeg brukte for bane 5/6
+var hentet fra feil sted, den var i praksis nærmere bane 1 sin lysere
+tone. Bane 1 er opplæringsbanen og skal få eget tutorial-innhold
+senere, ikke representativ for selve mørke-progresjonen. Bane 3/4 er
+riktig sammenligningsgrunnlag.
+
+Målte etterpå presist fra bane 3 og 4 sin faktiske kunst (ikke bare
+antatt): dyp bakkefarge (median langt inne i et bakkestykke) ligger på
+ca (38, 14, 1), og selve kantlinja (median innenfor ~4 piksler fra
+alfakanten) på ca (63, 27, 4). Begge banene ga nesten identiske tall,
+god baseline. Til sammenligning var fargen jeg egentlig brukte for
+bane 5/6, (41,16,2)/(98,55,18), særlig kantfargen alt for lys og
+mettet mot ekte bane 3/4.
+
+Satt opp en enkel progresjons-regel i terreng-scriptet: bane 5 er ett
+"mørke-steg" (faktor 0,85) mørkere enn bane 3/4-baseline på rød og
+grønn kanal, bane 6 to steg (faktor 0,85²≈0,72). Blåkanalen holdes
+igjen på det samme bunnivået (1) som bane 3/4 allerede bruker i stedet
+for å skaleres videre ned, siden den store fargeendringen i spillets
+etablerte palett (nesten ikke blått igjen fra bane 1 til bane 2) alt
+har skjedd, bane 5/6 skal bare fortsette å dempe rødt/grønt gradvis
+derfra.
+
+Regenererte kun `level5/1-4.png` og `level6/1-4.png` (selve fargen
+påvirker ikke kollisjonsformen, `lib/shapedefs5/6.lua` uendret).
+Filstørrelsene ble marginalt mindre (mørkere farger komprimerer
+vanligvis litt bedre).
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå.

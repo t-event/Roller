@@ -263,6 +263,16 @@ filene gjør.
   bane 5 sin bakgrunnsfiks eller kant-avrunding ennå (de ble bedt om
   spesifikt for bane 5).
 
+**Fargeprogresjon (mørkere jo lenger ut i spillet):** designprinsipp
+fra Mathias, hver bane skal være mørkere enn forrige, som å dra dypere
+ned i en hule. Målt presist fra bane 3/4 sin faktiske kunst (ikke bane
+1, som er opplæringsbanen og en outlier): dyp bakkefarge ~(38,14,1),
+kantfarge ~(63,27,4). Bane 5 sin farge er dette ett "mørke-steg"
+(faktor 0,85 på rød/grønn kanal) mørkere, bane 6 to steg (0,85²).
+Blåkanalen holdes på bunnivå (1) i stedet for å skaleres videre ned,
+den store overgangen skjedde allerede mellom bane 1 og 2 i den ekte
+kunsten. Se `TIL-ORJAN.md` for målingene.
+
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
   "level select grid"-bibliotek (paginert rutenett, lås/opplåsing,
