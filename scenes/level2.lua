@@ -91,7 +91,11 @@ local trykk_knapp
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
-        composer.showOverlay( "scenes.gotochooselevel",{isModal = true,effect = "fade",time = 500,})
+        -- Endret 2026-09-15: gikk før alltid til banevalget
+        -- ("gotochooselevel"), går nå automatisk videre til neste bane
+        -- via "gotonextlevel" (som selv faller tilbake til banevalget
+        -- om dette var siste bane), se scenes/gotonextlevel.lua.
+        composer.showOverlay( "scenes.gotonextlevel",{isModal = true,effect = "fade",time = 500,})
         end
 
 -- -----------------------------------------------------------------------------------------------------------------

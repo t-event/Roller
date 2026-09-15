@@ -1388,3 +1388,46 @@ ved neste testing: at "ingen liv"-skjermen faktisk dukker opp i stedet
 for å gå til bane 1 direkte, at begge reklameplaceholderne legger til
 riktig antall liv og går videre til riktig bane, og at "fortsett
 uten"-knappen fortsatt fungerer som før.
+
+## 2026-09-15, går automatisk videre til neste bane når man klarer en
+
+Mathias ba om at man ikke lenger skal måtte innom banevalget selv når
+man klarer en bane. Alle ni banefiler (`level1.lua`-`level9.lua`) har
+en identisk `goto2()`-funksjon som kjøres når "mål"-sensoren (`mal2`)
+treffer marken (`del4`), altså akkurat idet banen er fullført. Den
+viste før alltid `showOverlay("scenes.gotochooselevel")`, rett til
+banevalget, uansett hvilken bane som ble fullført.
+
+Bygget ny splash-scene `scenes/gotonextlevel.lua`, samme trygge
+mønster som `gotoretry.lua` (venter 0,8 sekund med en liten
+loading-animasjon, så `removeScene`+`gotoScene` med `pcall`-sikring),
+men som regner ut destinasjonen selv:
+
+- Er det en neste bane (`lm.anotherLevel()`, sjekker
+  `lm.currentLevel+1 <= k.totalLevels`)? Gå dit
+  (`scenes.level` .. tallet), og øk `lm.currentLevel` tilsvarende
+  (samme variabel `gotoretry.lua` leser for å vite hvilken bane den
+  skal restarte, så senere retry på den nye banen peker riktig sted).
+- Ellers (siste bane fullført): gå til `scenes.gotochooselevel` som
+  før.
+
+Alle ni `goto2()`-funksjonene endret til å vise
+`scenes.gotonextlevel` i stedet for `scenes.gotochooselevel` direkte.
+Selve `lm.unlockNextLevel()`-kallet rett før (låser opp neste bane i
+banevalget) er urørt, det trengs uansett siden spilleren fortsatt kan
+velge å gå tilbake til banevalget senere.
+
+Viktig å vite: bane 6-9 er fortsatt ufullstendige (plassholder-grafikk
+og feil kollisjonsformer, se "Kjente feil" i `KODEBASE.md`). Dette var
+allerede nåbart via banevalget fra før (alle baner er midlertidig låst
+opp for testing), så denne endringen åpner ikke noe nytt der, den gjør
+bare at man havner der automatisk i stedet for å måtte trykke seg dit
+selv om man fullfører bane 5.
+
+Luac-sjekket alle ti berørte filene (de ni banene + den nye splashen),
+og kjørte et fullt syntakssøk over hele repoet etterpå. Ikke testet i
+faktisk nettleser ennå. Ting å sjekke ved neste testing: at man
+faktisk havner på riktig neste bane (ikke bane 1) når man fullfører en
+bane, at det fortsatt fungerer å fullføre siste bane (går til
+banevalget), og at retry på den nye banen restarter riktig bane
+etterpå.

@@ -54,8 +54,10 @@ main.lua
 scenes/level1.lua .. level9.lua     [selve banen, valgt via chooselevel-gridet]
   ├─ showOverlay("scenes.dodmenu1")        [alltid dodmenu1, uansett hvilken bane]
   ├─ showOverlay("scenes.pausemenu1")      [alltid pausemenu1, uansett hvilken bane]
-  └─ showOverlay("scenes.gotochooselevel")   [alle ni baner, tilbake til banevalg,
-                  fikset 2026-09-10, level2-9 gikk før alltid til gotolevel2]
+  └─ mål nådd ("mal2" vs "del4")  → lm.unlockNextLevel() → showOverlay("scenes.gotonextlevel")
+                  [alle ni baner. Endret 2026-09-15, gikk før alltid til
+                  "gotochooselevel"/banevalget (fikset dit 2026-09-10, level2-9
+                  gikk før alltid til gotolevel2). Se scenes/gotonextlevel.lua.]
 
 scenes/pausemenu1.lua (delt av alle baner)
   ├─ "retry"      → gotoScene("scenes.gotoretry")   [egen mellomscene, fikset
@@ -77,6 +79,12 @@ scenes/adoffer.lua (ny 2026-09-15, "ingen liv igjen"-skjermen)
   ├─ "se kort reklame"  → placeholder-nedtelling → liv.addToScore(1) → gotoScene("scenes.gotoretry")
   ├─ "se lang reklame"  → placeholder-nedtelling → liv.addToScore(3) → gotoScene("scenes.gotoretry")
   └─ "fortsett uten"    → gotoScene("scenes.gotolevel1")   [samme fallback som før]
+
+scenes/gotonextlevel.lua (ny 2026-09-15, "banen er fullført"-splashen)
+  └─ (0.8s) removeScene + gotoScene("scenes.level" .. (lm.currentLevel+1))
+                  [om lm.anotherLevel() er usann (siste bane fullført):
+                  gotoScene("scenes.gotochooselevel") i stedet, tilbake til
+                  banevalget som før]
 
 scenes/chooselevel.lua / gotochooselevel.lua
   → lm.init() i lib/ogt_levelmanager.lua, som leser lib/ogt_lmdata.lua
@@ -122,7 +130,15 @@ filene gjør.
   gjorde det riktig fra før (går til `gotochooselevel`, tilbake til
   banevalg). Fikset ved å la alle ni baner gjøre som `level1.lua`, se
   "Kjente feil". `gotolevel3.lua`-`gotolevel9.lua` var alltid dødt,
-  ingenting navigerte dit noensinne.
+  ingenting navigerte dit noensinne. **Ikke å forveksle** med den nye
+  `gotonextlevel.lua` under, en helt annen (og riktig virkende) fil som
+  faktisk går videre til neste bane.
+- `gotonextlevel.lua` — **ny fil, 2026-09-15, i bruk**. Vises fra alle ni
+  baners `goto2()` når `mal2`/`del4`-målet nås (fullført bane), i stedet
+  for at koden gikk rett til `gotochooselevel` (banevalget). Går videre
+  til `scenes.level` .. `(lm.currentLevel+1)` om det finnes en neste bane
+  (`lm.anotherLevel()`), ellers til `gotochooselevel` som før (siste
+  bane fullført). Samme trygge splash-mønster som `gotoretry.lua`.
 - `gotomenu.lua`, `gotochooselevel.lua` — **i bruk**, splash mellom
   pausemeny og hhv. hovedmeny/banevalg.
 - `adoffer.lua` — **ny fil, 2026-09-15, i bruk**. Vises fra
@@ -295,13 +311,19 @@ filene gjør.
    banestykke-bilder (level1-4 har hver sine egne, ekte bilder siden
    2026-09-14). (Også i `TIL-ORJAN.md`.) Venter på ny grafikk for
    resten.
-3. ~~"Neste bane"-knappen er hardkodet til level 2~~ **Fikset 2026-09-10.**
-   Ørjan tok ikke stilling til denne spesifikt, men mest nærliggende var å
-   la level2.lua-level9.lua gjøre som `level1.lua` alltid gjorde riktig:
-   `goto2`-funksjonen viser nå `gotochooselevel` (tilbake til banevalg)
-   i stedet for det hardkodede, bugget `showOverlay("gotolevel2")`.
-   `gotolevel2.lua` mistet dermed sin eneste referanse og er flyttet til
-   `dod-kode/`. Ikke testet i faktisk nettleser ennå.
+3. ~~"Neste bane"-knappen er hardkodet til level 2~~ **Fikset 2026-09-10,
+   utvidet 2026-09-15.** Ørjan tok ikke stilling til denne spesifikt,
+   men mest nærliggende var å la level2.lua-level9.lua gjøre som
+   `level1.lua` alltid gjorde riktig: `goto2`-funksjonen viste
+   `gotochooselevel` (tilbake til banevalg) i stedet for det
+   hardkodede, buggede `showOverlay("gotolevel2")`. `gotolevel2.lua`
+   mistet dermed sin eneste referanse og ble flyttet til `dod-kode/`.
+   Mathias ba 2026-09-15 om at man i stedet skal gå automatisk videre
+   til neste bane når man klarer en. `goto2` viser nå den nye
+   `scenes/gotonextlevel.lua` i stedet for `gotochooselevel` direkte,
+   den nye splashen går videre til neste bane (`lm.anotherLevel()`) og
+   faller selv tilbake til `gotochooselevel` når siste bane er
+   fullført. Ikke testet i faktisk nettleser ennå.
 4. ~~"Retry" fra pausemenyen går alltid til bane 1~~ **Fikset
    2026-09-10, i to omganger.** Ørjan bekreftet at retry skal starte
    banen du faktisk var på. Første forsøk brukte
