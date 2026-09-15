@@ -36,6 +36,14 @@ local liv =require("lib.liv")
 -- defineres) og scene:hide (der touch-lytteren fjernes igjen) siden de
 -- er to separate funksjoner i denne fila, ikke nestet i hverandre.
 local trykk_knapp
+-- Samme grunn, funnet 2026-09-15: goSomewhere/goto/goto1/goto2 ligger
+-- på fil-nivå, mens onCollision/onCollision1/onCollision2 ble
+-- deklarert med "local function" inni scene:create. Referansene i
+-- goto/goto1/goto2 sine Runtime:removeEventListener()-kall pekte
+-- dermed på udefinerte globaler (alltid nil), ikke de faktiske
+-- lytterne - fjernet ingenting, lekket for hver gang banen ble
+-- forlatt. Se KODEBASE.md "Kjente feil".
+local onCollision, onCollision1, onCollision2
 
 -- -----------------------------------------------------------------------------------------------------------------
 
@@ -843,7 +851,7 @@ firkant4.type = "firkant4"
 
 
 ------------------------------------------------------------------
-local function onCollision(event)
+onCollision = function(event)
 if event.phase == "began" then
 local agro = event.object1
 local hit = event.object2
@@ -890,7 +898,7 @@ end
 Runtime:addEventListener("collision", onCollision)
 ------------------------------------------------------------------
 
-local function onCollision1(event)
+onCollision1 = function(event)
 if event.phase == "began" then
 local agro = event.object1
 local hit = event.object2
@@ -943,7 +951,7 @@ end
 
 
 
-local function onCollision2(event)
+onCollision2 = function(event)
 
 if event.phase == "ended" then
 
@@ -1115,7 +1123,17 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
 
-local eventTimer = timer.performWithDelay( 3000, goto)
+-- Rettet 2026-09-15: var "local eventTimer" (7 like steder i denne
+-- fila, ett per knott-par som kan knekke), men pausemenu1.lua,
+-- dodmenu1.lua og gotomenu.lua prover ALLE aa avbryte akkurat denne
+-- tidsforsinkede goto()-timeren med timer.cancel(eventTimer) naar
+-- spilleren trykker retry/main menu/levels. Siden "local" gjorde den
+-- usynlig utenfor selve denne fila, traff de kallene alltid en
+-- udefinert global (alltid nil) i stedet, og avbrøt ingenting - en
+-- ventende knekk-timer kunne fortsatt fyre av goto() flere sekunder
+-- etter at spilleren allerede hadde forlatt banen. Bevisst global naa
+-- (_G.eventTimer), samme mønster som _G.camera/_G.grp.
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 elseif  (event.object1.type == "knott3" and event.object2.type == "knott4") then
 
@@ -1175,7 +1193,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-local eventTimer = timer.performWithDelay( 3000, goto)
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 
 elseif  (event.object1.type == "knott4" and event.object2.type == "knott5") then
@@ -1236,7 +1254,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-local eventTimer = timer.performWithDelay( 3000, goto)
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 
 elseif  (event.object1.type == "knott5" and event.object2.type == "knott6") then
@@ -1297,7 +1315,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-local eventTimer = timer.performWithDelay( 3000, goto)
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 elseif  (event.object1.type == "knott6" and event.object2.type == "knott7") then
 
@@ -1357,7 +1375,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-local eventTimer = timer.performWithDelay( 3000, goto)
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 elseif  (event.object1.type == "knott7" and event.object2.type == "knott8") then
 
@@ -1417,7 +1435,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-local eventTimer = timer.performWithDelay( 3000, goto)
+_G.eventTimer = timer.performWithDelay( 3000, goto)
 
 elseif  (event.object1.type == "knott8" and event.object2.type == "knott9") then
 
@@ -1477,7 +1495,7 @@ camera:add (blod2,1,false)
                              time = 2000,
                              onComplete = function ()display.remove( blod ) end } )
             
-  local eventTimer = timer.performWithDelay( 3000, goto)
+  _G.eventTimer = timer.performWithDelay( 3000, goto)
 
                 end         
        end
@@ -1798,4 +1816,4 @@ scene:addEventListener( "destroy", scene )
 
 -- -------------------------------------------------------------------------------
 
-return scene
+return scene

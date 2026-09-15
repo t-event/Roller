@@ -2121,3 +2121,96 @@ Luac-sjekket alle 11 endrede filer (`levelN.lua` × 9,
 ikke bekrefte "resume tar liv"-punktet eller teste noe av dette i en
 faktisk nettleser herfra, så si fra om noe fortsatt ikke stemmer etter
 neste bygg.
+
+## 2026-09-15, full gjennomgang av hele kodebasen med luacheck
+
+Mathias ba om å gå over ALLE filene og fikse det som ikke er ok, ikke
+bare de konkrete punktene han selv la merke til. `luac -p` (brukt hele
+denne økten) sjekker bare at syntaksen er gyldig, den fanger ikke opp
+feil variabelnavn eller feil bruk av globale variabler - nøyaktig den
+type feil `collision1`-buggen tidligere i dag var. Installerte
+`luacheck` (via `luarocks`, ikke installert fra før) for å sjekke det
+systematisk. Måtte kjøre den mot midlertidige kopier med `goto` byttet
+ut med `gotoFn`, siden spillets kode (skrevet for Lua 5.1, der `goto`
+bare er et vanlig navn) bruker `goto` som funksjonsnavn mange steder,
+mens `luacheck` sin parser alltid behandler `goto` som Lua 5.2+ sitt
+eget nøkkelord uansett `--std`-innstilling. Linjenumrene i rapporten
+stemmer fortsatt siden dette bare bytter ut ett ord, ikke omstrukturerer
+noe.
+
+Fant to reelle, alvorlige feil, begge i alle ni `levelN.lua` (samme
+klasse feil som `collision1` fra tidligere i dag, bare ikke fanget opp
+av den første gjennomgangen siden `luac -p` ikke ser denne typen feil):
+
+**`onCollision`/`onCollision1`/`onCollision2` var utilsiktede globaler
+sett fra `goSomewhere`/`goto`/`goto1`/`goto2`.** Disse fire funksjonene
+ligger på fil-nivå (kjøres kun én gang når banen lastes), mens
+`onCollision`/`onCollision1`/`onCollision2` ble deklarert med
+`local function` lenger nede i fila, inni `scene:create`. I Lua
+avgjøres hvilken variabel et navn peker på ved hvor i KILDEKODEN den
+brukes, ikke ved kjøretid, så `Runtime:removeEventListener("collision",
+onCollision)` i disse fire funksjonene pekte alltid på en udefinert
+GLOBAL (alltid nil), ikke den faktiske kollisjonslytteren - selv om
+`onCollision` var en helt gyldig, korrekt lokal variabel på det
+tidspunktet funksjonen faktisk KJØRTE (siden hele fila kjører
+sekvensielt ved banestart, før noen spiller kan trykke noe). Disse
+opprydnings-kallene fjernet dermed ingenting, hver gang spilleren
+forlot banen (pause, død, fullført bane) via en av disse fire
+funksjonene. Siden Runtime-lyttere er globale og ikke fjernes automatisk
+når en scene rives ned (nøyaktig det Solar2D sin egen dokumentasjon
+advarer mot, se "Kjente feil" punkt 7 i KODEBASE.md), hopet disse
+lytterne seg opp for hver eneste gang en bane ble forlatt - en lang
+spilleøkt kunne ende opp med dusinvis av gamle, foreldede kollisjons-
+håndterere fortsatt hengende på Runtime, som fortsatt referanserte
+objekter fra tidligere, allerede fjernede baner. Fikset ved å
+forhåndsdeklarere `onCollision`/`onCollision1`(/`onCollision2` der den
+finnes) på fil-nivå, samme mønster som `trykk_knapp` allerede brukte
+(se "Kjente feil" punkt 7), og endre de senere `local function
+onCollision(...)`-definisjonene til vanlige tilordninger
+(`onCollision = function(...)`) mot den forhåndsdeklarerte variabelen i
+stedet for å skygge den med en ny, scene:create-lokal en.
+
+**`eventTimer` var utilsiktet lokal i alle ni banefiler, men
+pause-/dødsmenyen og `gotomenu.lua` prøver å avbryte den på tvers av
+filer.** Hver bane setter en 3-sekunders forsinket timer
+(`timer.performWithDelay(3000, goto)`) når en kroppsdel knekker, som
+etter forsinkelsen viser dødsmenyen automatisk. `pausemenu1.lua`,
+`dodmenu1.lua` og `gotomenu.lua` kaller ALLE `timer.cancel(eventTimer)`
+når spilleren trykker retry/main menu/levels, tydelig i den hensikt å
+avbryte akkurat denne ventende timeren om spilleren forlater banen på
+annen måte før den rekker å fyre av selv. Men banefilenes egen
+`eventTimer` var deklarert med `local` (7 like steder per fil, ett per
+par kroppsdeler som kan knekke), usynlig utenfor selve fila - de tre
+andre filenes `timer.cancel(eventTimer)`-kall traff dermed alltid en
+helt egen, alltid udefinert global variabel, ikke banens faktiske
+timer. Resultat: en ventende knekk-dødstimer kunne fortsette å telle
+ned og fyre av `goto()` flere sekunder ETTER at spilleren allerede
+hadde forlatt banen via pause-/dødsmenyen, mot en scene som da allerede
+var revet ned. Sannsynligvis en medvirkende årsak til flere av de
+"marken fortsetter å bevege seg"/uforklarlige overgangs-symptomene
+denne økten allerede har jaktet på, utover den allerede fikset
+`physics.start()`-bugen. Fikset ved å gjøre `eventTimer` til en bevisst
+global (`_G.eventTimer`), samme etablerte mønster som `_G.camera`/
+`_G.grp`, i alle ni banefiler - de tre andre filenes eksisterende
+`timer.cancel(eventTimer)`-kall fungerer nå riktig uten at de selv
+trengte å endres.
+
+Sjekket også (luacheck fant, men vurdert som ufarlige, ikke rørt):
+`scaleFactor` sendes som udefinert global (alltid nil) til
+`shapedefs.lua` sin `physicsData()` i alle scene-filer, men den
+funksjonen har `local s = scale or 1.0` som fallback, og den tiltenkte
+verdien var uansett alltid 1.0 på dette stedet - null faktisk
+oppførselsforskjell om det "fikses" eller ikke. `rot`/`reff`/`angel`/
+`punktsant`/`stovteller1-9`/`last` (lastesprite) er også utilsiktede
+globaler flere steder, men brukes alle synkront innenfor samme
+funksjonskall der de settes (ingen tilsvarende krysse-fil eller
+krysse-funksjon-tidspunkt-feil som de to over), så de er rotete men
+ikke bevist skadelige - latt urørt denne runden. `lib/gameUI.lua` sine
+"globaler" er faktisk trygge: fila bruker det gamle `module(...,
+package.seeall)`-mønsteret fra Lua 5.1, som `luacheck` ikke skjønner,
+funksjonene ender opp som `gameUI.dragBody` osv., ikke ekte globaler.
+
+Luac-sjekket alle ni banefiler på nytt, kjørte `luacheck` på nytt for å
+bekrefte at both `onCollision`- og `eventTimer`-varslene er borte,
+kjørte fullt syntakssøk over hele repoet. Kan ikke bekrefte i en
+faktisk nettleser herfra.

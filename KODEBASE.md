@@ -614,6 +614,37 @@ kolonne-for-kolonne-sjekkede klaringen.
    fullstendig forklaring, inkludert hvorfor dette trolig også forklarer
    observerte "feilmeldinger" ved banefullføring uavhengig av antall
    liv igjen.
+9. **Samme feilklasse, to til, funnet 2026-09-15 med `luacheck`** (som
+   fanger feil variabelnavn/global-bruk, i motsetning til `luac -p` som
+   bare sjekker syntaks — se `TIL-ORJAN.md` for hvordan den ble kjørt
+   mot denne kodebasen, som bruker `goto` som funksjonsnavn):
+   - `onCollision`/`onCollision1`/`onCollision2` var `local function`
+     inni `scene:create`, mens `goSomewhere`/`goto`/`goto1`/`goto2`
+     (fil-nivå, kjøres når banen lastes) refererte dem i sine egne
+     `Runtime:removeEventListener()`-kall. Siden Lua avgjør
+     variabel-referanser ved hvor i kildekoden de STÅR, ikke når koden
+     kjører, pekte de referansene alltid på udefinerte globaler (alltid
+     nil), ikke de faktiske lytterne — fjernet ingenting hver gang
+     spilleren forlot banen (pause/død/fullført), nøyaktig den typen
+     Runtime-lytter-lekkasje Solar2D advarer mot i punkt 7 over.
+   - `eventTimer` (kroppsdel-knekk sin 3-sekunders forsinkede
+     dødsskjerm-timer) var `local`, mens `pausemenu1.lua`/
+     `dodmenu1.lua`/`gotomenu.lua` alle prøver å avbryte akkurat den med
+     `timer.cancel(eventTimer)` når spilleren forlater banen på annen
+     måte. Samme problem, denne gangen på tvers av FILER: de tre andre
+     filenes kall traff alltid en egen, alltid udefinert global, aldri
+     banens faktiske timer, så en ventende knekk-dødstimer kunne fyre
+     av `goto()` flere sekunder etter at spilleren allerede hadde
+     forlatt banen.
+
+   **Fikset**: `onCollision`/`onCollision1`/`onCollision2`
+   forhåndsdeklarert på fil-nivå (samme mønster som `trykk_knapp` i
+   punkt 7), `eventTimer` gjort til bevisst global (`_G.eventTimer`,
+   samme mønster som `_G.camera`/`_G.grp`). Alle ni banefiler. Bekreftet
+   med `luacheck` at begge varselklassene er borte etter fiksen. Se
+   `TIL-ORJAN.md` for hvilke andre `luacheck`-funn som ble sjekket og
+   vurdert ufarlige (`scaleFactor`, `rot`, `reff`, `angel`, `punktsant`,
+   `stovteller1-9`, `last`).
 
 ## Anbefalt ryddeplan
 
