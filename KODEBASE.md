@@ -190,16 +190,17 @@ filene gjør.
   dobbeltklikk-fiksen, `transition.cancel()`+`.stage`-vakt), se
   `TIL-ORJAN.md` for detaljene og hva som bevisst IKKE ble tatt med fra
   Ørjans zip (egne per-bane pausemeny/dødsmeny-filer, blant annet).
-- `level5.lua` til `level9.lua` — **fortsatt ufullstendige, ifølge Ørjan.**
+- `level7.lua` til `level9.lua` — **fortsatt ufullstendige, ifølge Ørjan.**
   Var 100 % byte-identiske filer med knuste bildestier (bekreftet med
   `diff`). **Stiene rettet 2026-09-10** (Ørjan: greit å gjøre siden
   spillet ikke er under aktiv grafikk-utvikling), bildene refereres nå
   med riktig mappe-prefiks (`background/back_cave.png`,
-  `level5/1.png` osv). De fem filene er dermed ikke lenger byte-identiske
+  `level7/1.png` osv). Disse filene er dermed ikke lenger byte-identiske
   (hver har sin egen `levelN/`-sti), men deler fortsatt de samme
   plassholderbildene og de samme (feil, sporet fra bane 1) kollisjonsformene
   i `lib/shapedefs.lua` (se "Kjente feil"). Ørjans zip dekket bare bane 1-4,
-  så disse fem venter fortsatt på tilsvarende retting.
+  så disse tre venter fortsatt på tilsvarende retting. Bane 5 og 6 fikk
+  hver sin egen prosedyregenererte bane 2026-09-15, se under.
 - `level5.lua` — **egen, prosedyregenerert bane, 2026-09-15.** Første
   bane med ordentlig innhold utover bane 1-4: nedoverbakke (samme
   diagonale flis-plassering som alle andre baner, se "Faktisk
@@ -230,6 +231,15 @@ filene gjør.
   "value noise" mellom en håndfull kontrollpunkter). Se `TIL-ORJAN.md`
   for alle detaljene, inkludert generator-scriptet (ligger i en
   økt-scratchpad, ikke i selve repoet).
+- `level6.lua` — **egen, prosedyregenerert bane, 2026-09-15.** Bygget
+  rett med den ferdig fiksede generatoren fra bane 5 (riktig
+  visningsskala, 40 kollisjons-linjestykker per flis, jevn
+  "value noise"-kurve), bare med andre tilfeldighetsfrø så terrenget
+  ser annerledes ut enn bane 5, og uten hullet (vanlig diagonal
+  flis-cascade, ingen ekstra avstand mellom flisene, samme som bane
+  1-4). Ny `lib/shapedefs6.lua`, byttet ut fra den delte, feile
+  `lib/shapedefs.lua`. `del1`-formen (marken) kopiert uendret fra
+  `lib/shapedefs4.lua`, identisk med bane 5 sin.
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig

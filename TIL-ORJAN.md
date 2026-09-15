@@ -1543,3 +1543,30 @@ nærheten av det gamle 1500+-hullet). Filstørrelsene er uendret
 
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå.
+
+## 2026-09-15, bane 6 fikk samme behandling som bane 5
+
+Mathias sa "kjør på" etter bane 5-fiksene over, tolket det som klarsignal
+til å ta fatt på neste åpenbare ting fra "hva mer skal fikses"-lista:
+bane 6-9 har fortsatt plassholder-grafikk og feil (bane 1-sporede)
+kollisjonsformer.
+
+Bygget bane 6 med akkurat samme, nå ferdig fiksede generator som bane 5
+(riktig visningsskala bakt inn fra start, 40 kollisjons-linjestykker per
+flis, jevn "value noise"-kurve), bare med andre tilfeldighetsfrø
+(`seed=17`, og forskjøvet kontrollpunkt-frø +1000) slik at terrenget
+faktisk ser annerledes ut enn bane 5, ikke en klone. Ingen hull denne
+gangen, bane 6 bruker vanlig diagonal flis-plassering som bane 1-4 (det
+var bare bane 5 som fikk et bevisst hull for å teste
+falle-gjennom-mekanikken).
+
+Sjekket avstanden fra markens startpunkt til bakken på nytt: ca 610
+enheter, godt innenfor den målte 627-751-referansen fra ekte bane
+4-kunst, nærmere target enn bane 5 sin egen (som var ca 423 pga
+tilfeldighet i kontrollpunktene). Ny `lib/shapedefs6.lua`, samme
+`del1`-form kopiert fra `lib/shapedefs4.lua`. `scenes/level6.lua`
+byttet fra `lib.shapedefs` (den delte, feile) til `lib.shapedefs6`.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå. Bane 7-9 står igjen med samme jobb, ikke gjort
+ennå, ingen konkret grunn til å prioritere én av dem over de andre.

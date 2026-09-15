@@ -11,7 +11,10 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
+-- Byttet 2026-09-15 fra den delte lib.shapedefs (sporet fra bane 1, feil
+-- for denne banen) til egen, prosedyregenerert lib.shapedefs6, samme
+-- teknikk som bane 5. Se TIL-ORJAN.md.
+local physicsData = (require "lib.shapedefs6").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
