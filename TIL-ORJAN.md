@@ -2430,3 +2430,71 @@ liv-sjekken. Nå havner du i banen du trykket på.
 Som ellers denne økten: jeg har ikke nettleser her, så dette er regnet
 og lest, ikke spilt. Skjermen er verdt et raskt blikk i test, særlig at
 kjøpsboksen ikke ligger oppå noe.
+
+## 2026-09-15, reklameskjermen lå halvveis utenfor skjermen, min feil
+
+Mathias sendte skjermbilde: "Det ble ikke helt bra". To av de tre
+kjøpspakkene og "fortsett uten"-knappen var ikke synlige i det hele
+tatt, de lå under nederste skjermkant.
+
+Årsaken er en ren tabbe fra min side, og verdt å skrive ned fordi den
+gjelder alt som skal legges på skjermen i dette spillet.
+
+`config.lua` sier `width = 540, height = 960`. Jeg leste det som at
+flaten er 540 bred og 960 høy, og la knappene under hverandre ned til
+y = 875. Men `build.settings` har `orientation.default =
+"landscapeRight"`, og Corona bytter om innholdsflaten i landskap. Det
+spillet faktisk har er **960 bredt og 540 høyt**. Alt jeg la under
+y = 540 fantes ikke på skjermen.
+
+Målte det på Mathias sitt skjermbilde i stedet for å gjette:
+
+- Knappene var 956 piksler brede der 520 enheter skulle bli det, altså
+  1,835 piksler per enhet.
+- Bildet er 2556 x 1179 piksler, altså en synlig flate på 1393 x 642
+  enheter.
+- Den grønne knappen hadde senter 580 piksler ned = 316 enheter, mens
+  jeg hadde plassert den på 265. Differansen på 51 er nøyaktig
+  `display.screenOriginY`, altså letterbox-kanten over innholdsflaten:
+  540 + 2 x 51 = 642, som stemmer med målt høyde.
+
+Alle tre tallene stemmer med "960 x 540 innholdsflate, letterbox", så
+diagnosen er sikker og ikke gjettet.
+
+### Hva som er gjort
+
+Skjermen er bygget om til **to kolonner**, som er riktig form når man
+har rikelig med bredde og lite høyde: reklame til venstre (to knapper),
+kjøp til høyre (tre pakker), og "fortsett uten" i full bredde nederst.
+Knappene er lavere enn før (64 mot 90 enheter) og teksten litt mindre.
+
+Bakgrunnen dekker nå hele den synlige flaten, ikke bare innholdsflaten.
+Den var 540 x 960 før, altså feil vei OG for liten, så banen bak ville
+vist seg i letterbox-kantene. Bruker samme uttrykk som `gotoretry.lua`
+allerede gjorde:
+
+```lua
+local skjermBredde = display.viewableContentWidth - display.screenOriginX * 2
+```
+
+Det gir 1393 x 642 med tallene over, altså nøyaktig den flaten jeg
+målte i skjermbildet. Formelen er dermed bekreftet mot virkeligheten,
+ikke bare lest i dokumentasjonen.
+
+Kjøpsboksen er komprimert på samme måte, fra et spenn på 380 enheter
+til 325, så den får plass innenfor 540 med god margin i begge ender.
+
+### Denne gangen tegnet jeg det ut først
+
+Jeg regnet klaringen mellom alle elementene som sist, men det var jo
+nettopp det som ikke fanget feilen: regnestykket var riktig, flaten jeg
+regnet mot var feil. Så jeg tegnet i tillegg begge skjermene som bilder
+i riktige proporsjoner og så på dem før push. Begge ser ut som de skal.
+
+Fortsatt ikke spilt, jeg har ikke nettleser her, men dette er nå sett
+og ikke bare regnet.
+
+**Til deg som jobber videre:** husk at `display.contentWidth` er 960 og
+`display.contentHeight` er 540 i dette spillet, motsatt av det
+`config.lua` ser ut til å si. Bruk alltid `display.contentWidth` og
+`display.contentHeight`, aldri tallene fra `config.lua` direkte.

@@ -12,6 +12,16 @@ local hoyde = display.contentHeight
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 
+-- Hele den synlige flaten, inkludert letterbox-kantene utenfor
+-- innholdsflaten. Samme uttrykk som gotoretry.lua bruker. Brukes bare til
+-- bakgrunnene, så de dekker helt ut til kanten uansett vindusform. Alt
+-- annet plasseres innenfor innholdsflaten, som letterBox garanterer at
+-- alltid er synlig i sin helhet.
+local skjermVenstre = display.screenOriginX
+local skjermTopp = display.screenOriginY
+local skjermBredde = display.viewableContentWidth - skjermVenstre * 2
+local skjermHoyde = display.viewableContentHeight - skjermTopp * 2
+
 -- -----------------------------------------------------------------------------------
 -- Ny fil, 2026-09-15. Vist når spilleren trykker retry (fra pausemeny
 -- eller dødsmeny) mens liv.erTom() er sann, i stedet for at koden bare
@@ -25,6 +35,21 @@ local centerY = display.contentCenterY
 -- kjøpe liv om man ikke vil se reklame. Legg til diverse pakker"), så
 -- skjermen nå har tre veier videre: se reklame, kjøpe forsøk, eller
 -- starte på nytt fra bane 1.
+--
+-- VIKTIG OM LAYOUT, feil gjort 2026-09-15 og rettet samme dag:
+-- Første utgave la knappene under hverandre i én kolonne ned til y = 875
+-- og var regnet mot "540 bredt, 960 høyt" fra config.lua. Det er feil vei.
+-- build.settings har orientation landscapeRight, og Corona bytter om
+-- innholdsflaten i landskap, så det spillet faktisk har er 960 BREDT og
+-- 540 HØYT. Alt under y = 540 falt utenfor skjermen, altså to av de tre
+-- pakkene og "fortsett uten". Målt på Mathias sitt skjermbilde: knappene
+-- var 956 piksler brede der 520 enheter skulle bli det, altså 1,835
+-- piksler per enhet, og den synlige flaten 1393 x 642 enheter.
+--
+-- Derfor: bruk display.contentWidth/contentHeight (som allerede er
+-- byttet om for oss), aldri tallene fra config.lua direkte, og legg
+-- innholdet i to kolonner. Liggende format har rikelig med bredde og
+-- lite høyde.
 --
 -- ALT SOM KOSTER ELLER GIR NOE ER PLACEHOLDER:
 --
@@ -57,16 +82,23 @@ local PAKKER = {
 	{ id = "forsok_100", forsok = 100, pris = "79 kr", farge = { 0.60, 0.44, 0.12 } },
 }
 
--- Layout. Innholdsflaten er 540 x 960, så alt må få plass innenfor det.
-local KNAPP_BREDDE = 520
-local KNAPP_HOYDE = 90
-local KNAPP_AVSTAND = 100
+-- Layout, i innholdsenheter. Se forklaringen over: flaten er 960 x 540.
+local KNAPP_HOYDE = 64
+local KNAPP_AVSTAND = 78
+local KOL_BREDDE = 440
+local KOL_AVSTAND = 240
+local BRED_KNAPP = 520
+
+local Y_OVERSKRIFT = 46
+local Y_KOLONNETITTEL = 106
+local Y_RAD1 = 166
+local Y_FORTSETT = 430
 
 function scene:create( event )
 	local sceneGroup = self.view
 	print ("adoffer scene:create did")
 
-	local bg = display.newRect( centerX, centerY, bredde, hoyde )
+	local bg = display.newRect( centerX, centerY, skjermBredde, skjermHoyde )
 	bg:setFillColor( 0, 0, 0, 0.88 )
 	sceneGroup:insert( bg )
 
@@ -76,22 +108,26 @@ function scene:create( event )
 	local overlayGruppe = display.newGroup()
 	sceneGroup:insert( overlayGruppe )
 
-	local function lagTekst( y, tekst, storrelse, gruppe )
-		local t = display.newText( { text = tekst, x = centerX, y = y, font = native.systemFontBold, fontSize = storrelse, width = KNAPP_BREDDE, align = "center" } )
+	local function lagTekst( x, y, tekst, storrelse, maksBredde, gruppe )
+		local t = display.newText( { text = tekst, x = x, y = y, font = native.systemFontBold, fontSize = storrelse, width = maksBredde, align = "center" } )
 		t:setFillColor( 1, 1, 1 )
 		gruppe:insert( t )
 		return t
 	end
 
-	local function lagKnapp( y, tekst, farge )
-		local knapp = display.newRoundedRect( centerX, y, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
+	local function lagKnapp( x, y, knappBredde, tekst, farge, gruppe )
+		gruppe = gruppe or knappGruppe
+		local knapp = display.newRoundedRect( x, y, knappBredde, KNAPP_HOYDE, 14 )
 		knapp:setFillColor( farge[1], farge[2], farge[3] )
-		knappGruppe:insert( knapp )
-		local label = display.newText( { text = tekst, x = centerX, y = y, font = native.systemFontBold, fontSize = 28, width = KNAPP_BREDDE - 40, align = "center" } )
+		gruppe:insert( knapp )
+		local label = display.newText( { text = tekst, x = x, y = y, font = native.systemFontBold, fontSize = 26, width = knappBredde - 30, align = "center" } )
 		label:setFillColor( 1, 1, 1 )
-		knappGruppe:insert( label )
+		gruppe:insert( label )
 		return knapp
 	end
+
+	local venstreX = centerX - KOL_AVSTAND
+	local hoyreX = centerX + KOL_AVSTAND
 
 	-- Ordlyd endret 2026-09-15 fra "liv" til "forsøk", så den henger sammen
 	-- med livtelleren i banene: den viser nå hvor mange forsøk du har igjen
@@ -99,20 +135,22 @@ function scene:create( event )
 	-- Med den visningen ville "+1 liv" her sett ut som om ingenting skjedde
 	-- (telleren står på 0 både før og under det ekstra forsøket), mens
 	-- "+1 forsøk" stemmer nøyaktig: du får ett forsøk til.
-	lagTekst( 140, "Ingen forsøk igjen", 46, knappGruppe )
+	lagTekst( centerX, Y_OVERSKRIFT, "Ingen forsøk igjen", 40, bredde, knappGruppe )
 
-	lagTekst( 196, "Se reklame", 26, knappGruppe )
-	local kortKnapp = lagKnapp( 265, "Kort reklame (+" .. KORT_REKLAME_LIV .. " forsøk)", { 0.16, 0.5, 0.2 } )
-	local langKnapp = lagKnapp( 265 + KNAPP_AVSTAND, "Lang reklame (+" .. LANG_REKLAME_LIV .. " forsøk)", { 0.16, 0.4, 0.6 } )
+	-- Venstre kolonne: reklame.
+	lagTekst( venstreX, Y_KOLONNETITTEL, "Se reklame", 24, KOL_BREDDE, knappGruppe )
+	local kortKnapp = lagKnapp( venstreX, Y_RAD1, KOL_BREDDE, "Kort reklame (+" .. KORT_REKLAME_LIV .. " forsøk)", { 0.16, 0.5, 0.2 } )
+	local langKnapp = lagKnapp( venstreX, Y_RAD1 + KNAPP_AVSTAND, KOL_BREDDE, "Lang reklame (+" .. LANG_REKLAME_LIV .. " forsøk)", { 0.16, 0.4, 0.6 } )
 
-	lagTekst( 432, "Eller kjøp forsøk, uten reklame", 26, knappGruppe )
+	-- Høyre kolonne: kjøp.
+	lagTekst( hoyreX, Y_KOLONNETITTEL, "Eller kjøp, uten reklame", 24, KOL_BREDDE, knappGruppe )
 	local pakkeKnapper = {}
 	for i, pakke in ipairs( PAKKER ) do
-		local y = 500 + (i - 1) * KNAPP_AVSTAND
-		pakkeKnapper[i] = lagKnapp( y, pakke.forsok .. " forsøk  -  " .. pakke.pris, pakke.farge )
+		local y = Y_RAD1 + (i - 1) * KNAPP_AVSTAND
+		pakkeKnapper[i] = lagKnapp( hoyreX, y, KOL_BREDDE, pakke.forsok .. " forsøk  -  " .. pakke.pris, pakke.farge )
 	end
 
-	local avKnapp = lagKnapp( 830, "Fortsett uten (start fra bane 1)", { 0.4, 0.16, 0.16 } )
+	local avKnapp = lagKnapp( centerX, Y_FORTSETT, BRED_KNAPP, "Fortsett uten (start fra bane 1)", { 0.4, 0.16, 0.16 } )
 
 	-- Felles for de to placeholder-boksene under: tømmer overlay-gruppa og
 	-- legger en ugjennomsiktig flate over hele skjermen, så man ikke kan
@@ -122,7 +160,7 @@ function scene:create( event )
 		for i = overlayGruppe.numChildren, 1, -1 do
 			display.remove( overlayGruppe[i] )
 		end
-		local flate = display.newRect( centerX, centerY, bredde, hoyde )
+		local flate = display.newRect( centerX, centerY, skjermBredde, skjermHoyde )
 		flate:setFillColor( 0, 0, 0, 1 )
 		overlayGruppe:insert( flate )
 	end
@@ -148,8 +186,8 @@ function scene:create( event )
 	-- PLACEHOLDER for ekte reklame-SDK, se forklaring øverst i fila.
 	local function visReklamePlaceholder( sekunder, forsokBelonning )
 		nyttOverlay()
-		lagTekst( centerY - 40, "REKLAME (placeholder)", 34, overlayGruppe )
-		local nedtelling = lagTekst( centerY + 40, tostring(sekunder), 60, overlayGruppe )
+		lagTekst( centerX, centerY - 60, "REKLAME (placeholder)", 32, bredde, overlayGruppe )
+		local nedtelling = lagTekst( centerX, centerY + 30, tostring(sekunder), 56, bredde, overlayGruppe )
 
 		local igjen = sekunder
 		local function tikk()
@@ -168,19 +206,12 @@ function scene:create( event )
 	-- Google Play / App Store, med giForsokOgFortsett() i svar-lytteren.
 	local function visKjopPlaceholder( pakke )
 		nyttOverlay()
-		lagTekst( centerY - 210, "KJØP (placeholder)", 34, overlayGruppe )
-		lagTekst( centerY - 140, pakke.forsok .. " forsøk for " .. pakke.pris, 40, overlayGruppe )
-		lagTekst( centerY - 60, "Ingen betaling er koblet til spillet ennå.\nTrykker du bekreft får du forsøkene gratis.", 24, overlayGruppe )
+		lagTekst( centerX, centerY - 150, "KJØP (placeholder)", 30, bredde, overlayGruppe )
+		lagTekst( centerX, centerY - 96, pakke.forsok .. " forsøk for " .. pakke.pris, 34, bredde, overlayGruppe )
+		lagTekst( centerX, centerY - 30, "Ingen betaling er koblet til spillet ennå.\nTrykker du bekreft får du forsøkene gratis.", 20, BRED_KNAPP + 120, overlayGruppe )
 
-		local bekreft = display.newRoundedRect( centerX, centerY + 60, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
-		bekreft:setFillColor( 0.16, 0.5, 0.2 )
-		overlayGruppe:insert( bekreft )
-		lagTekst( centerY + 60, "Bekreft", 30, overlayGruppe )
-
-		local avbryt = display.newRoundedRect( centerX, centerY + 170, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
-		avbryt:setFillColor( 0.35, 0.35, 0.38 )
-		overlayGruppe:insert( avbryt )
-		lagTekst( centerY + 170, "Avbryt", 30, overlayGruppe )
+		local bekreft = lagKnapp( centerX, centerY + 45, BRED_KNAPP, "Bekreft", { 0.16, 0.5, 0.2 }, overlayGruppe )
+		local avbryt = lagKnapp( centerX, centerY + 125, BRED_KNAPP, "Avbryt", { 0.35, 0.35, 0.38 }, overlayGruppe )
 
 		bekreft:addEventListener( "tap", function()
 			giForsokOgFortsett( pakke.forsok )

@@ -159,7 +159,10 @@ filene gjør.
   (`liv.addToScore`), lagrer og går til `gotoretry`, så bare
   `visKjopPlaceholder()` skal byttes ut med et ekte `store.purchase(
   pakke.id )` den dagen produktene finnes. Priser og antall er tall uten
-  dekning i noen butikk. Se `TIL-ORJAN.md` for detaljer.
+  dekning i noen butikk. Lagt ut i **to kolonner** (reklame til venstre,
+  kjøp til høyre, "fortsett uten" i full bredde nederst) fordi
+  innholdsflaten er liggende, se punkt 12 i "Kjente feil". Se
+  `TIL-ORJAN.md` for detaljer.
 
 ### Menyer
 - `menu.lua` — **i bruk**, hovedmeny (bg1-5, "spill"-knapp til `chooselevel`).
@@ -758,6 +761,25 @@ kolonne-for-kolonne-sjekkede klaringen.
     feilboksen fra `pcall`-innpakningen. **Fikset** ved å flytte
     `k.currentLevel`/`k.displayText` opp FØR liv-sjekken, så valget
     huskes uansett hvilken vei `selectLevel()` går ut.
+
+12. **Innholdsflaten er 960 x 540, ikke 540 x 960 (fallgruve, ikke en
+    feil i spillet).** `config.lua` sier `width = 540, height = 960`,
+    men `build.settings` har `orientation.default = "landscapeRight"`,
+    og Corona bytter om innholdsflaten i landskap. Ved kjøring er
+    `display.contentWidth` = 960 og `display.contentHeight` = 540.
+    Leser man tallene rett ut av `config.lua` og legger noe på y = 700,
+    havner det utenfor skjermen. Det skjedde med første utgave av
+    kjøpspakkene på `scenes/adoffer.lua` 2026-09-15: to av tre pakker og
+    "fortsett uten" var usynlige. Bekreftet ved måling på et skjermbilde
+    fra Mathias: knappene var 956 piksler brede der 520 enheter skulle
+    bli det (1,835 px/enhet), synlig flate 1393 x 642 enheter, og
+    forskyvningen på 51 enheter er `display.screenOriginY` for
+    letterbox-kanten (540 + 2 x 51 = 642). **Regel:** bruk alltid
+    `display.contentWidth`/`display.contentHeight`, aldri tallene fra
+    `config.lua`. Skal noe dekke hele den synlige flaten inkludert
+    letterbox-kantene, bruk
+    `display.viewableContentWidth - display.screenOriginX * 2` (samme
+    uttrykk som `gotoretry.lua` bruker, verifisert mot målingen over).
 
 ## Anbefalt ryddeplan
 
