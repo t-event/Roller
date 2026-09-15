@@ -212,7 +212,21 @@ filene gjør.
   i `lib/shapedefs.lua` (se "Kjente feil"). Ørjans zip dekket bare bane 1-4,
   så disse tre venter fortsatt på tilsvarende retting. Bane 5 og 6 fikk
   hver sin egen prosedyregenererte bane 2026-09-15, se under.
-- `level5.lua` — **egen, prosedyregenerert bane, 2026-09-15.** Første
+> **VIKTIG, 2026-09-15, sent på dagen: all prosedyregenerert grafikk for
+> bane 5 og 6 er kastet og erstattet med ekte, håndtegnet kunst fra bane
+> 1-4.** Mathias sammenlignet bildene side om side: "5 og 6 ser ikke like
+> bra ut, vil ha identisk bakke og tak utseende som de første banene da
+> det ser mye bedre ut." Den eneste måten å få *identisk* utseende på er
+> å bruke de samme bildene, ikke å etterligne dem. Hver flis i bane 5/6
+> er nå en kopi av en faktisk flis fra bane 2/3/4, og kollisjonsformen
+> følger med fra samme bane sin `shapedefs`-fil, så bilde og form hører
+> sammen per konstruksjon. Se "Bane 5 og 6 etter byttet" rett under
+> `level6.lua`. **Alt som står om generator-scriptet, luftlommer,
+> hengende tak, `ceiling_curve()`, `apply_gap_taper()` og fargemåling i
+> avsnittene nedenfor er historikk** fra før byttet, beholdt fordi det
+> forklarer hvorfor ting ble prøvd, men ingenting av det er i bruk nå.
+
+- `level5.lua` — **egen bane, 2026-09-15.** Første
   bane med ordentlig innhold utover bane 1-4: nedoverbakke (samme
   diagonale flis-plassering som alle andre baner, se "Faktisk
   scene-flyt") og et hull man kan falle gjennom og dø i (`firkant3`
@@ -273,6 +287,41 @@ filene gjør.
   `lib/shapedefs4.lua`, identisk med bane 5 sin. Har IKKE fått
   bane 5 sin bakgrunnsfiks eller kant-avrunding ennå (de ble bedt om
   spesifikt for bane 5).
+
+### Bane 5 og 6 etter byttet (2026-09-15, gjeldende)
+
+Flisene og kollisjonsformene kommer nå rett fra bane 2/3/4. Ingen
+generator er involvert lenger, og `level5.lua`/`level6.lua` selv er
+uendret (de peker på samme filnavn som før):
+
+| Plass | Bane 5 | Bane 6 |
+|---|---|---|
+| flis 1 | `level3/1.png` + `shapedefs3` sin `["1"]` | `level4/1.png` + `shapedefs4` sin `["1"]` |
+| flis 2 | `level2/2.png` + `shapedefs2` sin `["2"]` | `level3/2.png` + `shapedefs3` sin `["2"]` |
+| flis 3 | `level4/3.png` + `shapedefs4` sin `["3"]` | `level2/3.png` + `shapedefs2` sin `["3"]` |
+| flis 4 | `level3/4.png` + `shapedefs3` sin `["4"]` | `level4/4.png` + `shapedefs4` sin `["4"]` |
+
+Hver flis er hentet fra den PLASSEN den hadde i sin egen bane (flis 1
+brukes som flis 1 osv.), fordi bakken starter og slutter i ulik høyde
+avhengig av plass i rekka. Målte start- og slutthøyde på alle 16
+håndtegnede flisene først, og kontrollerte at fallet fra én flis til
+neste havner innenfor spennet som allerede finnes i bane 1-4 (673-5244
+enheter). Kombinasjonene over gir 1144-3606, altså godt innenfor.
+Kontrollerte også at marken ikke spawner inni fjell med de valgte flis
+1-ene (`level1/1.png` ville gjort nettopp det, den er en flat plate helt
+øverst, så den er ikke brukt).
+
+Bildene er tonet ett hakk mørkere for bane 5 og to for bane 6 (samme
+0,98-faktor per hakk som før, kun rød/grønn), som er den eneste
+forskjellen fra originalkunsten. Det er gjort ved å endre selve
+palett-tabellen i PNG-ene, så pikslene ellers er bit for bit like
+originalen, og filene holder seg små (90-200 kB, mot 1,6 MB for de
+prosedyregenererte).
+
+Bane 5 har fortsatt den ekstra halve flis-lengden mellom flis 2 og 3
+(`firkant3` i `level5.lua`), altså et bevisst hull. Med den nye kunsten
+er spranget 3974 enheter bortover og 3751 nedover, som krever rundt 790
+enheter/s fart ut fra kanten. Ikke testet i praksis, se `TIL-ORJAN.md`.
 
   **Runde til, samme dag (etter mer nettleser-testing):** fire separate
   rettelser i generator-scriptet, alle i `TIL-ORJAN.md` sin

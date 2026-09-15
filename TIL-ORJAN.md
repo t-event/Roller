@@ -2291,3 +2291,75 @@ fjernes nå først.
 Luac-sjekket alle endrede filer, kjørte `luacheck` på `lib/liv.lua`
 (null varsler nå) og fullt syntakssøk over repoet. Kan ikke teste i
 faktisk nettleser herfra.
+
+## 2026-09-15, bane 5 og 6 bygget om av ekte kunst i stedet for generert
+
+**"Studer bildene på bane 1, 2, 3 og 4. Så ser du på bildene til bane 5
+og 6. 5 og 6 ser ikke like bra ut, vil ha identisk bakke og tak
+utseende som de første banene da det ser mye bedre ut."**
+
+La bildene ved siden av hverandre og så det med en gang. Den
+håndtegnede kunsten i bane 1-4 er myke, organiske steinformer med en
+lys, varm kant langs oversiden og et glatt mørkt indre, ofte flere
+separate biter som ligger lagvis. Den genererte kunsten min var
+firkantede plater med nesten loddrette sider, hardt kornete støy over
+hele flaten, og en jevn kantfarge rundt HELE formen i stedet for bare
+der lyset ville truffet. Den lignet rett og slett ikke.
+
+Konklusjonen jeg burde tatt for lenge siden: den eneste måten å få
+IDENTISK utseende på er å bruke de samme bildene, ikke å etterligne
+dem. Jeg har brukt fem forsøk denne økten på å få generert terreng til
+å ligne håndtegnet terreng, og det konvergerte aldri.
+
+Bane 5 og 6 er nå satt sammen av ekte fliser fra bane 2, 3 og 4, og
+kollisjonsformen følger med fra samme bane sin shapedefs-fil. Det betyr
+at formen er den samme håndsporede formen som allerede brukes for
+nøyaktig det bildet i sin opprinnelige bane, så bilde og kollisjon
+stemmer overens per konstruksjon, ikke fordi jeg har regnet dem fram.
+
+- Bane 5: flis 1 fra bane 3, flis 2 fra bane 2, flis 3 fra bane 4,
+  flis 4 fra bane 3.
+- Bane 6: flis 1 fra bane 4, flis 2 fra bane 3, flis 3 fra bane 2,
+  flis 4 fra bane 4.
+
+Altså ingen av dem er en kopi av én enkelt bane, det er nye
+kombinasjoner. Tre ting sjekket først, siden fliser fra ulike baner
+ikke automatisk passer sammen:
+
+1. **Skjøtene.** Målte hvor bakken starter og slutter i alle 16
+   håndtegnede flisene. Hver flis må brukes på den PLASSEN den hadde i
+   sin egen bane (flis 1 som flis 1 osv.), fordi bakken ligger høyere i
+   bildet tidlig i en bane og lavere mot slutten. Kontrollerte at fallet
+   fra én flis til neste i de nye kombinasjonene havner innenfor spennet
+   som allerede finnes i bane 1-4 (673-5244 enheter): de nye ligger på
+   1144-3606.
+2. **Spawn.** Sjekket at marken ikke starter inni fjell med de valgte
+   flis 1-ene. `level1/1.png` ville gjort nettopp det (den er en flat
+   plate helt øverst), så den er ikke brukt. De tre andre er frie.
+3. **Fallgrensa.** "Falt ut av verdenen"-sjekken fra tidligere i dag er
+   målt på nytt mot den nye kunsten, alle ni baner: minste klaring
+   mellom bakken og dødsgrensa er 870 enheter for bane 5 og 892 for
+   bane 6, positiv overalt.
+
+Tegnet i tillegg kollisjonsformene oppå den nye kunsten og så på
+resultatet: de følger de tegnede steinbitene presist, inkludert de
+tynne hengende bitene øverst. Det er også de hengende bitene i selve
+flisene som gir "tak"-utseendet i bane 1-4, så det følger med på
+kjøpet, og den kunstige takstripen min er borte.
+
+Bildene er tonet ett hakk mørkere for bane 5 og to for bane 6 (samme
+0,98-faktor som før, kun rød/grønn), slik at den gradvise
+mørkningen du ba om består. Det er gjort ved å endre palett-tabellen i
+selve PNG-en, så pikslene ellers er bit for bit identiske med
+originalen. Filene gikk samtidig fra 1,6 MB til 90-200 kB hver, altså
+rundt 11 MB mindre å laste ned for spillet totalt.
+
+**Én ting du bør teste spesielt:** bane 5 har fortsatt det bevisste
+hullet mellom flis 2 og 3 (den ekstra halve flis-lengden), fra da banen
+ble laget tidligere i dag. Med den nye kunsten er spranget 3974 enheter
+bortover og 3751 nedover, som krever rundt 790 enheter/s fart ut fra
+kanten. Regnet grovt på det: en friksjonsfri sklie ned hele forrige
+flis ville gitt rundt 1660, så 790 skal være mulig, men marken er en
+leddet mark og ikke en kloss, så jeg vet ikke hva den faktisk holder.
+Er hullet uoverkommelig, fjerner jeg det med én linje i `level5.lua`
+(`firkant3` settes da opp som i alle de andre banene).
