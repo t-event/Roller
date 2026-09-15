@@ -1755,3 +1755,52 @@ bakken (fortsatt 423 for bane 5, 610 for bane 6, sjekket på nytt).
 
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå.
+
+## 2026-09-15, bane 5/6: genererte et bilde med kollisjonsformene tegnet oppå kunsten, fant en reell feil
+
+Bygget et script (i scratchpad, ikke i repoet) som leser de faktiske
+tallene fra `lib/shapedefs5.lua` og tegner hver kollisjonsform som et
+rødt omriss oppå den ferdige banekunsten, i riktig relativ posisjon
+(samme oppsett som layout-referansebildet fra tidligere). Sendte dette
+til Mathias for å faktisk vise kollisjonsformene, ikke bare beskrive
+dem.
+
+Han svarte "Fiks hitboxene. Taket må også være hitbox på". To ting:
+
+1. **Reell feil i selve kollisjonsformene, funnet ved å se på bildet.**
+   `SEGMENTS_PER_TILE = 40` gir jevnt fordelte samplingspunkter hver
+   ~96 piksel, men en luftlomme sin avrunding (`GAP_TAPER = 70`
+   piksler) er SMALERE enn det. Ett enkelt linjestykke kunne dermed gå
+   fra normal bakkehøyde helt til bunnen av bildet (der bakken er
+   spisset ut til nesten ingenting) uten noe samplingspunkt innimellom,
+   og skapte en høy, tynn, feilaktig SOLID kollisjonsvegg som skar
+   tvers gjennom det som skulle være åpent rom, godt synlig som en
+   loddrett strek i referansebildet. Fikset med `_dense_grid()`: samme
+   jevne 40-punkts grunnfordeling, men med ekstra tette samplingspunkter
+   presset inn rundt hver overgang (luftlomme-kantene, og
+   kant-avrundingen ved bane-start/slutt), slik at kollisjonen faktisk
+   følger den raske overgangen i stedet for å hoppe over den.
+2. **Taket hadde ingen kollisjon i det hele tatt**, det var bevisst
+   rent visuelt fra forrige runde ("ingen kollisjon på taket, for ikke
+   å legge til en ny type hindring ingen ba om"). Omgjort: taket har nå
+   egne kollisjonsformer, samme trapes-strip-teknikk som bakken, bare
+   speilvendt (fra toppen av flisen, y=0, ned til tak-kurven, i stedet
+   for fra bakke-kurven og ned til bunnen). Samme tette
+   samplings-teknikk brukt her óg, rundt tak-klaringen ved markens
+   startpunkt.
+
+Sjekket numerisk etterpå at klaringen ved markens startpunkt
+(verdenskoordinat 0,0) fortsatt er trygt positiv: 125 enheter for bane
+5, 157 for bane 6, uendret fra forrige runde siden selve tak-kurven
+ikke ble endret, bare hvor mange kollisjonsformer som nå faktisk følger
+den. Regenererte begge banenes `lib/shapedefs5/6.lua` (antall fixtures
+gikk fra ~40 til over 130 per flis, ingen kjent øvre grense i Box2D som
+bekymrer ved dette antallet på en statisk kropp). Selve bildene
+(`level5/6 sine .png`-filer) uendret, kollisjon påvirker ikke
+grafikken.
+
+Genererte nye referansebilder med kollisjonsformene tegnet oppå kunsten
+for begge banene på nytt for å bekrefte fiksen visuelt før commit.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå.

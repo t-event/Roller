@@ -283,6 +283,20 @@ helt i starten av flis 1, markens faktiske startpunkt (verdenskoordinat
 startet, så uten dette sto marken visuelt inni fjellet ved spawn
 (`apply_ceiling_spawn_clearance()`). Se `TIL-ORJAN.md` for tallene.
 
+**Kollisjonsformene, funnet ved å faktisk tegne dem oppå kunsten:**
+`SEGMENTS_PER_TILE = 40` sine jevnt fordelte samplingspunkter (~96px
+mellomrom) var bredere enn en luftlomme sin kant-avrunding (70px),
+så ett enkelt linjestykke kunne gå fra normal bakkehøyde til bunnen
+av bildet uten noe punkt innimellom, en høy tynn feilaktig SOLID
+kollisjonsvegg tvers gjennom det som skulle være åpent rom. Fikset
+med `_dense_grid()`: samme 40-punkts grunnfordeling, med ekstra tette
+punkter presset inn rundt hver rask overgang (luftlomme-kanter,
+kant-avrunding). Taket har nå også egne kollisjonsformer (var rent
+visuelt før), samme trapes-teknikk speilvendt fra toppen (y=0) ned
+til tak-kurven. Antall fixtures per flis gikk fra ~40 til over 130.
+Se `TIL-ORJAN.md` for detaljene og hvordan feilen ble oppdaget
+(et referansebilde med kollisjonsformene tegnet oppå kunsten).
+
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
   "level select grid"-bibliotek (paginert rutenett, lås/opplåsing,
