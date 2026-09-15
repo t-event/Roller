@@ -1713,3 +1713,45 @@ vanligvis litt bedre).
 
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå.
+
+## 2026-09-15, bane 5/6: tre presiseringer fra Mathias etter forrige runde
+
+Tre konkrete ting etter å ha sett resultatet av hule-gangene og
+mørke-progresjonen:
+
+1. **"Det skal ikke være åpenrom mellom flisene. Bare mellomrom inni
+   flisene. Rund av kantene på åpenrommene i flisene."** Selve
+   plasseringen var allerede riktig (`gap_centers()` holder seg godt
+   innenfor én flis sine grenser, aldri ved skjøtene), men luftlommene
+   var rektangulære utstansinger med rette, loddrette kanter, så det
+   så ut som firkantede søyler i stedet for en naturlig hule-åpning.
+   Lagt til `apply_gap_taper()`, samme prinsipp som kant-avrundingen
+   fra i sted, bare brukt på begge sider av hver luftlomme: bakken
+   spisser seg ut til nesten ingenting over `GAP_TAPER` (70) piksler
+   før selve hullet, i stedet for å stoppe brått.
+2. **"Ikke gjør det for mørkt heller. Det skal gå veldig sakte
+   gradvis mørkere per bane. Spilleren skal nesten ikke merke at det
+   blir mørkere og mørkere."** Forrige mørke-steg (faktor 0,85 per
+   bane) var for merkbart. Satt ned til 0,98 per bane; bane 5 blir da
+   knapt merkbart mørkere enn bane 3/4-baseline (98 %), bane 6 enda
+   litt til (96 %), i stedet for de forrige 85 %/72 %.
+3. **"Pass på at posisjonen til marken ikke starter inne i taket."**
+   Sjekket tallmessig og fant at dette faktisk var en reell feil:
+   marken sitt startpunkt (verdenskoordinat 0,0) treffer lokal rad
+   ~25,5 i flis 1, altså helt øverst i bildet, nøyaktig der det
+   hengende taket begynner (fra rad 0 og minst ~235 nedover). Taket
+   dekket dermed markens startpunkt fullstendig. Lagt til
+   `apply_ceiling_spawn_clearance()`: for flis 1 spesifikt trekkes
+   taket helt vekk (nær null) de første 500 pikslene, med jevn
+   overgang til normal tak-dybde etterpå, godt forbi markens faktiske
+   startkolonne (~170). Tematisk stemmer det også fint: helt
+   innerst/øverst ved inngangen er det åpent, selve hule-taket starter
+   litt lenger inn. Regnet ut klaringen etterpå: bane 5 har nå 125
+   verdensenheter luft mellom tak og startpunkt, bane 6 157, begge
+   trygt positive.
+
+Ingen av de tre endringene rørte avstanden fra markens startpunkt til
+bakken (fortsatt 423 for bane 5, 610 for bane 6, sjekket på nytt).
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå.

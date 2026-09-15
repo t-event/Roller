@@ -265,13 +265,23 @@ filene gjør.
 
 **Fargeprogresjon (mørkere jo lenger ut i spillet):** designprinsipp
 fra Mathias, hver bane skal være mørkere enn forrige, som å dra dypere
-ned i en hule. Målt presist fra bane 3/4 sin faktiske kunst (ikke bane
-1, som er opplæringsbanen og en outlier): dyp bakkefarge ~(38,14,1),
-kantfarge ~(63,27,4). Bane 5 sin farge er dette ett "mørke-steg"
-(faktor 0,85 på rød/grønn kanal) mørkere, bane 6 to steg (0,85²).
-Blåkanalen holdes på bunnivå (1) i stedet for å skaleres videre ned,
-den store overgangen skjedde allerede mellom bane 1 og 2 i den ekte
-kunsten. Se `TIL-ORJAN.md` for målingene.
+ned i en hule, men VELDIG gradvis, spilleren skal knapt merke det.
+Målt presist fra bane 3/4 sin faktiske kunst (ikke bane 1, som er
+opplæringsbanen og en outlier): dyp bakkefarge ~(38,14,1), kantfarge
+~(63,27,4). Bane 5 sin farge er dette ett "mørke-steg" (faktor 0,98 på
+rød/grønn kanal, satt ned fra en først altfor merkbar 0,85) mørkere,
+bane 6 to steg (0,98²). Blåkanalen holdes på bunnivå (1) i stedet for
+å skaleres videre ned, den store overgangen skjedde allerede mellom
+bane 1 og 2 i den ekte kunsten. Se `TIL-ORJAN.md` for målingene.
+
+**Luftlommene og taket, presisert:** luftlommene skal kun ligge inni
+hver flis (aldri ved flis-skjøtene, det var allerede riktig), og deres
+kanter skal være avrundet, ikke rette utstansinger (`apply_gap_taper()`
+i generator-scriptet). Det hengende taket måtte i tillegg trekkes vekk
+helt i starten av flis 1, markens faktiske startpunkt (verdenskoordinat
+0,0) treffer lokal rad ~25 i bildet, rett der taket ellers ville
+startet, så uten dette sto marken visuelt inni fjellet ved spawn
+(`apply_ceiling_spawn_clearance()`). Se `TIL-ORJAN.md` for tallene.
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
