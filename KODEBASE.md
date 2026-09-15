@@ -239,18 +239,29 @@ filene gjør.
   pikslene på flis 1 sin venstrekant og flis 4 sin høyrekant, resten
   urørt). Se `TIL-ORJAN.md` for alle detaljene, inkludert
   generator-scriptet (ligger i en økt-scratchpad, ikke i selve
-  repoet). **Bane 6 har IKKE fått noen av disse to siste fiksene ennå**
-  (samme gamle bakgrunnsoppsett, ingen avrundet kant), siden de ble
-  bedt om spesifikt for bane 5.
+  repoet). Siste runde, samme dag: bakken var én ubrutt skråning,
+  Mathias ba om at den skal se ut som en faktisk hule med ganger og
+  rom, slik bane 1-4 sin håndtegnede kunst har (flere separate
+  bakkestykker med luft mellom, ikke én sammenhengende flate). Lagt
+  til `gap_ranges()` (to luftlommer per flis, holdt unna
+  kant-avrundingen og markens faktiske startpunkt) og
+  `ceiling_curve()` (et hengende, rent visuelt hule-tak nær toppen av
+  bildet, ingen kollisjon). Samme prinsipp som hullet mellom flis 2/3,
+  bare i mindre skala og inni hver flis. **Bane 6 fikk samme
+  hule-behandling samtidig** (se under), bakgrunnsfiksen og
+  kant-avrundingen over gjelder fortsatt bare bane 5.
 - `level6.lua` — **egen, prosedyregenerert bane, 2026-09-15.** Bygget
   rett med den ferdig fiksede generatoren fra bane 5 (riktig
   visningsskala, 40 kollisjons-linjestykker per flis, jevn
-  "value noise"-kurve), bare med andre tilfeldighetsfrø så terrenget
-  ser annerledes ut enn bane 5, og uten hullet (vanlig diagonal
+  "value noise"-kurve, luftlommer og hengende tak for hule-følelsen),
+  bare med andre tilfeldighetsfrø så terrenget ser annerledes ut enn
+  bane 5, og uten hullet mellom flis 2/3 (vanlig diagonal
   flis-cascade, ingen ekstra avstand mellom flisene, samme som bane
   1-4). Ny `lib/shapedefs6.lua`, byttet ut fra den delte, feile
   `lib/shapedefs.lua`. `del1`-formen (marken) kopiert uendret fra
-  `lib/shapedefs4.lua`, identisk med bane 5 sin.
+  `lib/shapedefs4.lua`, identisk med bane 5 sin. Har IKKE fått
+  bane 5 sin bakgrunnsfiks eller kant-avrunding ennå (de ble bedt om
+  spesifikt for bane 5).
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig

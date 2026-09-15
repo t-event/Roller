@@ -1625,3 +1625,55 @@ faktisk nettleser ennå. Bane 6 fikk IKKE samme avrunding eller
 bakgrunnsfiks ennå, den bruker fortsatt sitt eget (uavrundede, men
 korrekte fra byggingen) oppsett, siden dette ble bedt om spesifikt for
 bane 5.
+
+## 2026-09-15, bane 5/6: bakken skal se ut som en faktisk hule, ikke en ramp
+
+Sendte Mathias referansebilder av bane 5 (flisene satt sammen i
+faktisk relativ posisjon, med markens startpunkt merket). Han ba om at
+banen skal ha "ganger med åpenrom og lignende", som bane 1-4 sin
+håndtegnede kunst har, i stedet for tomrommene i selve
+verdensplasseringen. Spurte om han mente kosmetikk på referansebildet
+mitt eller selve banekunsten, han bekreftet: selve bane 5/6 sin
+bakke-kunst.
+
+Sammenlignet med referansearket over alle ni baner: bane 1-4 sin
+kunst er aldri én sammenhengende skråning, den har flere separate
+bakkestykker med luft mellom (f.eks. bane 2 sin første flis har to
+adskilte kiler), og en mer organisk hule-silhuett enn en ren trekant.
+Terreng-scriptet for bane 5/6 laget derimot én ubrutt kurve fra
+venstre til høyre kant.
+
+Bygget om terreng-scriptet med to nye ingredienser, begge fra samme
+kurve-system som før (fortsatt eksakt samsvar mellom bilde og
+kollisjonsform per konstruksjon):
+
+- **Hull i bakken**: hver flis får nå to luftlommer (fravær av bakke,
+  `gap_ranges()`) i stedet for én sammenhengende bakke, samme prinsipp
+  som hullet mellom flis 2 og 3 fra før, bare i mindre skala og inni
+  hver enkelt flis. Hullenes plassering er tilfeldig per flis (egen
+  seed), men holdt unna kant-avrundingen og, for flis 1, unna markens
+  faktiske startpunkt (kolonne ~170), sjekket tallmessig etterpå at
+  avstanden fra spawn til bakke fortsatt er uendret (423 for bane 5,
+  610 for bane 6).
+- **Hengende tak** (`ceiling_curve()`): en egen, separat silhuett nær
+  toppen av bildet, med noen dypere "drypestein"-humper. Rent
+  visuelt, ingen kollisjon på taket, for ikke å legge til en ny type
+  hindring ingen ba om. Gjør at luftrommene leses som gangrom i en
+  hule i stedet for åpen himmel.
+
+Kollisjonsformene hopper nå over segmenter som havner inni et hull
+(ingen fixture der, samme som det eksisterende hullet mellom flis 2/3
+allerede gjorde), resten uendret (40 linjestykker per flis, jevn
+kurve).
+
+Samme behandling på begge banene, med banenes egne (allerede
+etablerte) frø-forskyvninger, så bane 5 og 6 fortsatt ser forskjellige
+ut. Regenererte `level5/1-4.png`, `level6/1-4.png`,
+`lib/shapedefs5.lua` og `lib/shapedefs6.lua`. Filstørrelsene økte noe
+(fra ~1,5 til ~1,7 MB per flis) pga. mer kant-detalj fra hullene og
+taket, fortsatt en rimelig størrelse.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå. Sendte oppdaterte referansebilder (samme
+flis-i-relativ-posisjon-metode som før) til Mathias for
+tilbakemelding før dette regnes som ferdig.
