@@ -1253,3 +1253,44 @@ kunst om noen leverer det).
 Luac-sjekket `level5.lua`. Ikke testet i faktisk nettleser — det
 er akkurat fallet-gjennom-hullet jeg mest av alt skulle ønske noen
 kunne bekrefte fungerer, siden jeg ikke kan spille selv.
+
+## 2026-09-15, bane 5 fikk sin egen (prosedyregenererte) grafikk
+
+Mathias bekreftet at nedoverbakken og hullet fungerte, og ba meg bygge
+videre med den prosedyregenererte bakken i stedet for å fortsette å
+låne bane 4 sine bilder.
+
+Skrev om terreng-scriptet fra forrige runde til å produsere ferdige
+filer direkte: `level5/1.png`-`4.png` (samme kontinuerlige, humpete
+konturlinje som i forhåndsbildet, samme fargepalett hentet fra bane 4)
+og `lib/shapedefs5.lua`. Det siste er det egentlig interessante: siden
+jeg tegnet selve terrengkurven i Python, kunne jeg regne
+kollisjonsformen direkte ut fra de nøyaktig samme koordinatene i
+stedet for å spore dem i etterkant. Hver av de fire flisene deles i 6
+trapeser (to punkter fra selve terrengkurven + bunnen av bildet),
+som alltid er konvekse per konstruksjon (rett bunnkant, to parallelle
+sider, én skrå topp-kant) — ingen konveks-dekomponering nødvendig, og
+ingen usikkerhet rundt om formen faktisk stemmer med bildet, siden de
+kommer fra samme tall. `del1` (selve marken sin kollisjonsform)
+kopiert uendret inn fra `lib/shapedefs4.lua`, siden marken er lik i
+alle baner.
+
+Første forsøk på bildefilene ble 10 MB per flis (ren støy per piksel
+komprimerer nesten ikke i PNG). Byttet til en nedskalert, oppskalert
+"flekk"-tekstur i stedet for piksel-for-piksel-støy, som ser nesten
+like tekstur-rik ut men komprimerer mye bedre — endte på 0.4-0.6 MB
+per flis. Vurderte også å paletisere filene (som de andre `levelN/`-
+bildene), men fikk ikke gjennomsiktighets-tabellen til å bli riktig
+skrevet av Pillow innenfor rimelig tid og lot det være, RGBA med ekte
+alfakanal fungerer like fint i Solar2D, bare noe større filer.
+
+`scenes/level5.lua` peker nå på sine egne filer og
+`lib.shapedefs5` i stedet for de midlertidige `level4`-referansene og
+`lib.shapedefs4` fra forrige runde. Hullet mellom flis 2 og 3 står
+urørt, ingen nye ønsker om plassering kom fram.
+
+Luac-sjekket `scenes/level5.lua` og `lib/shapedefs5.lua`. Fortsatt
+ikke testet i faktisk nettleser — spesielt viktig å få bekreftet nå:
+at kollisjonen mot den NYE bakken faktisk stemmer visuelt (den er
+riktig utregnet, men "riktig utregnet" er ikke det samme som "sett
+med egne øyne i spillet").
