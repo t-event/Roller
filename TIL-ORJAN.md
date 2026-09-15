@@ -1570,3 +1570,58 @@ byttet fra `lib.shapedefs` (den delte, feile) til `lib.shapedefs6`.
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå. Bane 7-9 står igjen med samme jobb, ikke gjort
 ennå, ingen konkret grunn til å prioritere én av dem over de andre.
+
+## 2026-09-15, bane 5: feil parallax-bakgrunn, og hardt kutt ved start/slutt
+
+Mathias testet videre og meldte to ting: parallax-bakgrunnen på bane 5
+fungerer ikke som den skal, og ba om samme gradient som bane 4. Så
+også et ønske om å runde av starten og slutten på banen i stedet for
+et hardt kutt.
+
+**Bakgrunnen:** `scenes/level5.lua` sin bakgrunnsoppsett var en KOPI av
+en gammel, ikke lenger brukt versjon: brukte `background/dirt1.png` og
+`background/back_cave.png` (uten "1"-prefiks) i stedet for
+`1dirt1.png`/`1back_cave.png`/`1back_cave1.png`/`1back_cave2.png` som
+bane 1-4 faktisk bruker. Sammenlignet kildebildenes egne
+pikseldimensjoner: `back_cave.png` er 2000×6000 piksler, men ble vist
+med `display.newImageRect(..., 2000, 3000)`, altså klemt sammen til
+HALV høyde, en tydelig forvrengning. `1back_cave.png` (bane 1-4 sin
+versjon) er derimot 1000×3000 og vises riktig strukket til 2000×6000.
+I tillegg hadde bane 5 bare 12 bakgrunnsflis-kopier per lag
+(`background1`-`background12`, samme for "a"/"b"-lagene), mens bane 4
+bruker 20 per lag, altså gikk bane 5 tom for bakgrunn på slutten av
+banen siden kameraet rekker lenger enn 12 fliser dekker (bane 5 sin
+bane er endog litt lengre enn bane 4 sin, pga. det bevisste hullet).
+
+Fikset ved å bytte ut HELE bakgrunns-oppsettet i `scenes/level5.lua`
+(fra `local background = display.newImageRect(...)` til siste
+`camera:add`-kall) med en eksakt kopi av det samme oppsettet fra
+`scenes/level4.lua`: riktig bildefiler, riktig visningsstørrelse, 20
+fliser per lag i stedet for 12. `justerside`/`justeroppned`
+(forskyvningen mellom hver flis) var allerede identiske konstanter i
+begge filene fra før, urørt.
+
+**Hardt kutt ved start/slutt:** hver flis sin bakke fylles solid helt
+ned til bunnen av bildet. Usynlig ved skjøtene mellom fliser (neste
+flis dekker det), men synlig som en rett, loddrett klippevegg helt i
+starten av flis 1 og helt i slutten av flis 4, siden det ikke er noe
+der til å skjule den. Lagt til en `apply_edge_taper()`-funksjon i
+terreng-scriptet: blander kurven jevnt ned mot bunnen av bildet
+(bakken "spisser seg ut" til nesten ingenting) over de ytterste 90
+pikslene på disse to kantene, resten av banen urørt. 90 piksler er
+bevisst kort: verdenskoordinat x=0 (der marken faktisk starter) treffer
+lokal kolonne ca 170 i flis 1, så avrundingen måtte holde seg godt
+under det, ellers ville den også spist av avstanden til bakken ved
+selve startpunktet (sjekket tallmessig, første forsøk på 260 piksler
+gjorde nettopp det, økte gapet fra 423 til over 1500 enheter, satt ned
+til 90 for å unngå akkurat det).
+
+Regenererte `level5/1.png` og `level5/4.png` (de to ytterkantene, 2 og
+3 uendret siden avrundingen ikke rører dem) og `lib/shapedefs5.lua` fra
+den oppdaterte kurven.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå. Bane 6 fikk IKKE samme avrunding eller
+bakgrunnsfiks ennå, den bruker fortsatt sitt eget (uavrundede, men
+korrekte fra byggingen) oppsett, siden dette ble bedt om spesifikt for
+bane 5.

@@ -228,9 +228,20 @@ filene gjør.
   (bare 6 rette linjestykker per flis, økt til 40), og selve terrenget
   var for kantete (den gamle boks-filtrerte støyen ga alltid en
   sagtakket rest uansett glattingsbredde, byttet til jevn
-  "value noise" mellom en håndfull kontrollpunkter). Se `TIL-ORJAN.md`
-  for alle detaljene, inkludert generator-scriptet (ligger i en
-  økt-scratchpad, ikke i selve repoet).
+  "value noise" mellom en håndfull kontrollpunkter). Enda en runde,
+  samme dag: parallax-bakgrunnen brukte en gammel, ubrukt bildesett
+  (`background/dirt1.png`/`back_cave.png`, uten "1"-prefiks) i feil
+  størrelse (klemt til halv høyde) og for få fliser (12 mot bane 4 sine
+  20, gikk tom for bakgrunn før banen var over). Hele
+  bakgrunns-oppsettet byttet ut med en eksakt kopi av bane 4 sitt.
+  Terrenget fikk i tillegg en avrundet, ikke hardt avkuttet, start og
+  slutt (`apply_edge_taper()` i generator-scriptet, kun de ytterste 90
+  pikslene på flis 1 sin venstrekant og flis 4 sin høyrekant, resten
+  urørt). Se `TIL-ORJAN.md` for alle detaljene, inkludert
+  generator-scriptet (ligger i en økt-scratchpad, ikke i selve
+  repoet). **Bane 6 har IKKE fått noen av disse to siste fiksene ennå**
+  (samme gamle bakgrunnsoppsett, ingen avrundet kant), siden de ble
+  bedt om spesifikt for bane 5.
 - `level6.lua` — **egen, prosedyregenerert bane, 2026-09-15.** Bygget
   rett med den ferdig fiksede generatoren fra bane 5 (riktig
   visningsskala, 40 kollisjons-linjestykker per flis, jevn

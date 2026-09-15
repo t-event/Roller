@@ -199,7 +199,7 @@ timer.performWithDelay(3000, hent, 1)
 
 
 
-    local background = display.newImageRect( "background/dirt1.png", 1920*20, 1080*5 )
+    local background = display.newImageRect( "background/1dirt1.png", 1920*40, 1080*5 )
     background.anchorX = 0.5
     background.anchorY = 0.5
     background.x = bredde-bredde-bredde
@@ -208,7 +208,7 @@ timer.performWithDelay(3000, hent, 1)
     background.alpha = 1
 
 
-    local background1 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background1 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background1.anchorX = 1
     background1.anchorY = 0.5
     background1.x = bredde-bredde
@@ -216,7 +216,7 @@ timer.performWithDelay(3000, hent, 1)
     background1.rotation = 31.48 
     background1.alpha = 1
 
-    local background2 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background2 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background2.anchorX = 1
     background2.anchorY = 0.5
     background2.x = background1.x+ justerside  
@@ -224,7 +224,7 @@ timer.performWithDelay(3000, hent, 1)
     background2:rotate( background1.rotation )
     background2.alpha = 1
 
-    local background3 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background3 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background3.anchorX = 1
     background3.anchorY = 0.5
     background3.x = background2.x+ justerside
@@ -232,7 +232,7 @@ timer.performWithDelay(3000, hent, 1)
     background3:rotate( background1.rotation )
     background3.alpha = 1
 
-    local background4 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background4 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background4.anchorX = 1
     background4.anchorY = 0.5
     background4.x = background3.x+ justerside
@@ -240,7 +240,7 @@ timer.performWithDelay(3000, hent, 1)
     background4:rotate( background1.rotation )
     background4.alpha = 1
 
-    local background5 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background5 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background5.anchorX = 1
     background5.anchorY = 0.5
     background5.x = background4.x+ justerside
@@ -248,7 +248,7 @@ timer.performWithDelay(3000, hent, 1)
     background5:rotate( background1.rotation )
     background5.alpha = 1
 
-    local background6 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background6 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background6.anchorX = 1
     background6.anchorY = 0.5
     background6.x = background5.x+ justerside
@@ -256,7 +256,7 @@ timer.performWithDelay(3000, hent, 1)
     background6:rotate( background1.rotation )
     background6.alpha = 1
 
-    local background7 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background7 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background7.anchorX = 1
     background7.anchorY = 0.5
     background7.x = background6.x+ justerside
@@ -264,7 +264,7 @@ timer.performWithDelay(3000, hent, 1)
     background7:rotate( background1.rotation )
     background7.alpha = 1
 
-    local background8 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background8 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background8.anchorX = 1
     background8.anchorY = 0.5
     background8.x = background7.x+ justerside
@@ -272,7 +272,7 @@ timer.performWithDelay(3000, hent, 1)
     background8:rotate( background1.rotation )
     background8.alpha = 1
 
-    local background9 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background9 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background9.anchorX = 1
     background9.anchorY = 0.5
     background9.x = background8.x+ justerside
@@ -280,7 +280,7 @@ timer.performWithDelay(3000, hent, 1)
     background9:rotate( background1.rotation )
     background9.alpha = 1
 
-    local background10 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background10 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background10.anchorX = 1
     background10.anchorY = 0.5
     background10.x = background9.x+ justerside
@@ -289,7 +289,7 @@ timer.performWithDelay(3000, hent, 1)
     background10.alpha = 1
 
 
-    local background11 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background11 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background11.anchorX = 1
     background11.anchorY = 0.5
     background11.x = background10.x+ justerside
@@ -297,7 +297,7 @@ timer.performWithDelay(3000, hent, 1)
     background11:rotate( background1.rotation )
     background11.alpha = 1
 
-    local background12 = display.newImageRect( "background/back_cave.png", 2000, 3000 )
+    local background12 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
     background12.anchorX = 1
     background12.anchorY = 0.5
     background12.x = background11.x+ justerside
@@ -305,9 +305,72 @@ timer.performWithDelay(3000, hent, 1)
     background12:rotate( background1.rotation )
     background12.alpha = 1
 
+    local background13 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background13.anchorX = 1
+    background13.anchorY = 0.5
+    background13.x = background12.x+ justerside
+    background13.y = background12.y+   justeroppned
+    background13:rotate( background1.rotation )
+    background13.alpha = 1
+
+    local background14 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background14.anchorX = 1
+    background14.anchorY = 0.5
+    background14.x = background13.x+ justerside
+    background14.y = background13.y+   justeroppned
+    background14:rotate( background1.rotation )
+    background14.alpha = 1
+
+    local background15 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background15.anchorX = 1
+    background15.anchorY = 0.5
+    background15.x = background14.x+ justerside
+    background15.y = background14.y+   justeroppned
+    background15:rotate( background1.rotation )
+    background15.alpha = 1
+
+    local background16 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background16.anchorX = 1
+    background16.anchorY = 0.5
+    background16.x = background15.x+ justerside
+    background16.y = background15.y+   justeroppned
+    background16:rotate( background1.rotation )
+    background16.alpha = 1
+
+    local background17 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background17.anchorX = 1
+    background17.anchorY = 0.5
+    background17.x = background16.x+ justerside
+    background17.y = background16.y+   justeroppned
+    background17:rotate( background1.rotation )
+    background17.alpha = 1
+
+    local background18 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background18.anchorX = 1
+    background18.anchorY = 0.5
+    background18.x = background17.x+ justerside
+    background18.y = background17.y+   justeroppned
+    background18:rotate( background1.rotation )
+    background18.alpha = 1
+
+    local background19 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background19.anchorX = 1
+    background19.anchorY = 0.5
+    background19.x = background18.x+ justerside
+    background19.y = background18.y+   justeroppned
+    background19:rotate( background1.rotation )
+    background19.alpha = 1
+
+    local background20 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
+    background20.anchorX = 1
+    background20.anchorY = 0.5
+    background20.x = background19.x+ justerside
+    background20.y = background19.y+   justeroppned
+    background20:rotate( background1.rotation )
+    background20.alpha = 1
    ------
 
-    local background1a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background1a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background1a.anchorX = 1
     background1a.anchorY = 0.5
     background1a.x = bredde-bredde
@@ -315,7 +378,7 @@ timer.performWithDelay(3000, hent, 1)
     background1a.rotation = 31.48 
     background1a.alpha = 1
 
-    local background2a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background2a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background2a.anchorX = 1
     background2a.anchorY = 0.5
     background2a.x = background1a.x+ justerside  
@@ -323,7 +386,7 @@ timer.performWithDelay(3000, hent, 1)
     background2a:rotate( background1.rotation )
     background2a.alpha = 1
 
-    local background3a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background3a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background3a.anchorX = 1
     background3a.anchorY = 0.5
     background3a.x = background2a.x+ justerside
@@ -331,7 +394,7 @@ timer.performWithDelay(3000, hent, 1)
     background3a:rotate( background1.rotation )
     background3a.alpha = 1
 
-    local background4a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background4a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background4a.anchorX = 1
     background4a.anchorY = 0.5
     background4a.x = background3a.x+ justerside
@@ -339,7 +402,7 @@ timer.performWithDelay(3000, hent, 1)
     background4a:rotate( background1.rotation )
     background4a.alpha = 1
 
-    local background5a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background5a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background5a.anchorX = 1
     background5a.anchorY = 0.5
     background5a.x = background4a.x+ justerside
@@ -347,7 +410,7 @@ timer.performWithDelay(3000, hent, 1)
     background5a:rotate( background1.rotation )
     background5a.alpha = 1
 
-    local background6a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background6a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background6a.anchorX = 1
     background6a.anchorY = 0.5
     background6a.x = background5a.x+ justerside
@@ -355,7 +418,7 @@ timer.performWithDelay(3000, hent, 1)
     background6a:rotate( background1.rotation )
     background6a.alpha = 1
 
-    local background7a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background7a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background7a.anchorX = 1
     background7a.anchorY = 0.5
     background7a.x = background6a.x+ justerside
@@ -363,7 +426,7 @@ timer.performWithDelay(3000, hent, 1)
     background7a:rotate( background1.rotation )
     background7a.alpha = 1
 
-    local background8a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background8a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background8a.anchorX = 1
     background8a.anchorY = 0.5
     background8a.x = background7a.x+ justerside
@@ -371,7 +434,7 @@ timer.performWithDelay(3000, hent, 1)
     background8a:rotate( background1.rotation )
     background8a.alpha = 1
 
-    local background9a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background9a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background9a.anchorX = 1
     background9a.anchorY = 0.5
     background9a.x = background8a.x+ justerside
@@ -379,7 +442,7 @@ timer.performWithDelay(3000, hent, 1)
     background9a:rotate( background1.rotation )
     background9a.alpha = 1
 
-    local background10a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background10a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background10a.anchorX = 1
     background10a.anchorY = 0.5
     background10a.x = background9a.x+ justerside
@@ -388,7 +451,7 @@ timer.performWithDelay(3000, hent, 1)
     background10a.alpha = 1
 
 
-    local background11a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background11a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background11a.anchorX = 1
     background11a.anchorY = 0.5
     background11a.x = background10a.x+ justerside
@@ -396,7 +459,7 @@ timer.performWithDelay(3000, hent, 1)
     background11a:rotate( background1.rotation )
     background11a.alpha = 1
 
-    local background12a = display.newImageRect( "background/back_cave1.png", 2000, 3000 )
+    local background12a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
     background12a.anchorX = 1
     background12a.anchorY = 0.5
     background12a.x = background11a.x+ justerside
@@ -404,9 +467,73 @@ timer.performWithDelay(3000, hent, 1)
     background12a:rotate( background1.rotation )
     background12a.alpha = 1
 
+    local background13a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background13a.anchorX = 1
+    background13a.anchorY = 0.5
+    background13a.x = background12a.x+ justerside
+    background13a.y = background12a.y+   justeroppned
+    background13a:rotate( background1.rotation )
+    background13a.alpha = 1
+
+    local background14a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background14a.anchorX = 1
+    background14a.anchorY = 0.5
+    background14a.x = background13a.x+ justerside
+    background14a.y = background13a.y+   justeroppned
+    background14a:rotate( background1.rotation )
+    background14a.alpha = 1
+
+    local background15a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background15a.anchorX = 1
+    background15a.anchorY = 0.5
+    background15a.x = background14a.x+ justerside
+    background15a.y = background14a.y+   justeroppned
+    background15a:rotate( background1.rotation )
+    background15a.alpha = 1
+
+    local background16a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background16a.anchorX = 1
+    background16a.anchorY = 0.5
+    background16a.x = background15a.x+ justerside
+    background16a.y = background15a.y+   justeroppned
+    background16a:rotate( background1.rotation )
+    background16a.alpha = 1
+
+    local background17a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background17a.anchorX = 1
+    background17a.anchorY = 0.5
+    background17a.x = background16a.x+ justerside
+    background17a.y = background16a.y+   justeroppned
+    background17a:rotate( background1.rotation )
+    background17a.alpha = 1
+
+    local background18a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background18a.anchorX = 1
+    background18a.anchorY = 0.5
+    background18a.x = background17a.x+ justerside
+    background18a.y = background17a.y+   justeroppned
+    background18a:rotate( background1.rotation )
+    background18a.alpha = 1
+
+    local background19a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background19a.anchorX = 1
+    background19a.anchorY = 0.5
+    background19a.x = background18a.x+ justerside
+    background19a.y = background18a.y+   justeroppned
+    background19a:rotate( background1.rotation )
+    background19a.alpha = 1
+
+    local background20a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
+    background20a.anchorX = 1
+    background20a.anchorY = 0.5
+    background20a.x = background19a.x+ justerside
+    background20a.y = background19a.y+   justeroppned
+    background20a:rotate( background1.rotation )
+    background20a.alpha = 1
+
     -------
 
-    local background1b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background1b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background1b.anchorX = 1
     background1b.anchorY = 0.5
     background1b.x = bredde-bredde
@@ -414,7 +541,7 @@ timer.performWithDelay(3000, hent, 1)
     background1b.rotation = 31.48 
     background1b.alpha = 1
 
-    local background2b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background2b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background2b.anchorX = 1
     background2b.anchorY = 0.5
     background2b.x = background1b.x+ justerside  
@@ -422,7 +549,7 @@ timer.performWithDelay(3000, hent, 1)
     background2b:rotate( background1.rotation )
     background2b.alpha = 1
 
-    local background3b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background3b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background3b.anchorX = 1
     background3b.anchorY = 0.5
     background3b.x = background2b.x+ justerside
@@ -430,7 +557,7 @@ timer.performWithDelay(3000, hent, 1)
     background3b:rotate( background1.rotation )
     background3b.alpha = 1
 
-    local background4b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background4b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background4b.anchorX = 1
     background4b.anchorY = 0.5
     background4b.x = background3b.x+ justerside
@@ -438,7 +565,7 @@ timer.performWithDelay(3000, hent, 1)
     background4b:rotate( background1.rotation )
     background4b.alpha = 1
 
-    local background5b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background5b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background5b.anchorX = 1
     background5b.anchorY = 0.5
     background5b.x = background4b.x+ justerside
@@ -446,7 +573,7 @@ timer.performWithDelay(3000, hent, 1)
     background5b:rotate( background1.rotation )
     background5b.alpha = 1
 
-    local background6b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background6b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background6b.anchorX = 1
     background6b.anchorY = 0.5
     background6b.x = background5b.x+ justerside
@@ -454,7 +581,7 @@ timer.performWithDelay(3000, hent, 1)
     background6b:rotate( background1.rotation )
     background6b.alpha = 1
 
-    local background7b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background7b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background7b.anchorX = 1
     background7b.anchorY = 0.5
     background7b.x = background6b.x+ justerside
@@ -462,7 +589,7 @@ timer.performWithDelay(3000, hent, 1)
     background7b:rotate( background1.rotation )
     background7b.alpha = 1
 
-    local background8b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background8b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background8b.anchorX = 1
     background8b.anchorY = 0.5
     background8b.x = background7b.x+ justerside
@@ -470,7 +597,7 @@ timer.performWithDelay(3000, hent, 1)
     background8b:rotate( background1.rotation )
     background8b.alpha = 1
 
-    local background9b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background9b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background9b.anchorX = 1
     background9b.anchorY = 0.5
     background9b.x = background8b.x+ justerside
@@ -478,7 +605,7 @@ timer.performWithDelay(3000, hent, 1)
     background9b:rotate( background1.rotation )
     background9b.alpha = 1
 
-    local background10b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background10b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background10b.anchorX = 1
     background10b.anchorY = 0.5
     background10b.x = background9b.x+ justerside
@@ -487,7 +614,7 @@ timer.performWithDelay(3000, hent, 1)
     background10b.alpha = 1
 
 
-    local background11b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background11b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background11b.anchorX = 1
     background11b.anchorY = 0.5
     background11b.x = background10b.x+ justerside
@@ -495,7 +622,7 @@ timer.performWithDelay(3000, hent, 1)
     background11b:rotate( background1.rotation )
     background11b.alpha = 1
 
-    local background12b = display.newImageRect( "background/back_cave2.png", 2000, 3000 )
+    local background12b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
     background12b.anchorX = 1
     background12b.anchorY = 0.5
     background12b.x = background11b.x+ justerside
@@ -503,6 +630,69 @@ timer.performWithDelay(3000, hent, 1)
     background12b:rotate( background1.rotation )
     background12b.alpha = 1
 
+    local background13b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background13b.anchorX = 1
+    background13b.anchorY = 0.5
+    background13b.x = background12b.x+ justerside
+    background13b.y = background12b.y+   justeroppned
+    background13b:rotate( background1.rotation )
+    background13b.alpha = 1
+
+    local background14b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background14b.anchorX = 1
+    background14b.anchorY = 0.5
+    background14b.x = background13b.x+ justerside
+    background14b.y = background13b.y+   justeroppned
+    background14b:rotate( background1.rotation )
+    background14b.alpha = 1
+
+    local background15b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background15b.anchorX = 1
+    background15b.anchorY = 0.5
+    background15b.x = background14b.x+ justerside
+    background15b.y = background14b.y+   justeroppned
+    background15b:rotate( background1.rotation )
+    background15b.alpha = 1
+
+    local background16b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background16b.anchorX = 1
+    background16b.anchorY = 0.5
+    background16b.x = background15b.x+ justerside
+    background16b.y = background15b.y+   justeroppned
+    background16b:rotate( background1.rotation )
+    background16b.alpha = 1
+
+    local background17b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background17b.anchorX = 1
+    background17b.anchorY = 0.5
+    background17b.x = background16b.x+ justerside
+    background17b.y = background16b.y+   justeroppned
+    background17b:rotate( background1.rotation )
+    background17b.alpha = 1
+
+    local background18b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background18b.anchorX = 1
+    background18b.anchorY = 0.5
+    background18b.x = background17b.x+ justerside
+    background18b.y = background17b.y+   justeroppned
+    background18b:rotate( background1.rotation )
+    background18b.alpha = 1
+
+    local background19b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background19b.anchorX = 1
+    background19b.anchorY = 0.5
+    background19b.x = background18b.x+ justerside
+    background19b.y = background18b.y+   justeroppned
+    background19b:rotate( background1.rotation )
+    background19b.alpha = 1
+
+    local background20b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
+    background20b.anchorX = 1
+    background20b.anchorY = 0.5
+    background20b.x = background19b.x+ justerside
+    background20b.y = background19b.y+   justeroppned
+    background20b:rotate( background1.rotation )
+    background20b.alpha = 1
 
 
 
@@ -1541,6 +1731,14 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10b,5,false)
     camera:add (background11b,5,false)
     camera:add (background12b,5,false)
+    camera:add (background13b,3,false)
+    camera:add (background14b,3,false)
+    camera:add (background15b,3,false)
+    camera:add (background16b,3,false)
+    camera:add (background17b,3,false)
+    camera:add (background18b,3,false)
+    camera:add (background19b,3,false)
+    camera:add (background20b,3,false)
     ----------------------------------
     camera:add (background1a,4,false)
     camera:add (background2a,4,false)
@@ -1554,6 +1752,14 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10a,4,false)
     camera:add (background11a,4,false)
     camera:add (background12a,4,false)
+    camera:add (background13a,3,false)
+    camera:add (background14a,3,false)
+    camera:add (background15a,3,false)
+    camera:add (background16a,3,false)
+    camera:add (background17a,3,false)
+    camera:add (background18a,3,false)
+    camera:add (background19a,3,false)
+    camera:add (background20a,3,false)
     ----------------------------------
     
     camera:add (background1,3,false)
@@ -1568,6 +1774,14 @@ Runtime:addEventListener("collision", knekk)
     camera:add (background10,3,false)
     camera:add (background11,3,false)
     camera:add (background12,3,false)
+    camera:add (background13,3,false)
+    camera:add (background14,3,false)
+    camera:add (background15,3,false)
+    camera:add (background16,3,false)
+    camera:add (background17,3,false)
+    camera:add (background18,3,false)
+    camera:add (background19,3,false)
+    camera:add (background20,3,false)
     -----------------------------------
     camera:add (firkant1,1,false)
     camera:add (firkant2,1,false)
