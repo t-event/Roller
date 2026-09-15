@@ -1589,6 +1589,8 @@ Runtime:addEventListener("collision", knekk)
     grp:insert(camera)
     camera:toBack()
 camera:layer(2).parallaxRatio=0
+-- Rettet 2026-09-15: se level1.lua for forklaring.
+camera:layer(2):toFront()
 local sqCenterX, sqCenterY = reff:localToContent( 0, 0 )
 
 

@@ -156,7 +156,12 @@ if not ok then
 end
   pausemenu.alpha=0
 --composer.gotoScene( "scenes.level1" ,{effect = "zoomOutInRotate" , time = 400})
-physics.start( )
+-- Rettet 2026-09-15: physics.start() her satte fysikken til banen vi
+-- forlater i gang igjen midt i fade-overgangen til gotoretry/adoffer,
+-- så marken falt videre synlig i et sekund eller to selv om retry
+-- allerede var trykket ("Marken går videre i ett sekund eller to etter
+-- man har klikket retry"). Banen vi går TIL starter selv fysikken sin
+-- egen physics.start() i sin scene:create, så denne trengs ikke her.
 --Runtime:addEventListener( "touch", trykk_knapp)
 --Runtime:addEventListener( "tap", trykk_knapp)
 --knapp1.alpha = 1
@@ -173,23 +178,31 @@ pausemenu.alpha=0
 -- banens egen scene:hide når composer.removeScene() under tvinger den
 -- gjennom.
 timer.cancel(eventTimer)
-local ok, err = pcall( composer.gotoScene, "scenes.gotomenu", {effect = "fade" , time = 1} )
+print("Current Score1: ", liv.returnScore())
+print("Current Score2: ", liv.returnScore())
+liv.endreliv( 1 )
+print("Current Score3: ", liv.returnScore())
+print("Current Score4: ", liv.returnScore())
+print("Current Score5: ", liv.returnScore())
+liv.lagreliv()
+-- Rettet 2026-09-15: denne knappen gikk før alltid til "scenes.gotomenu"
+-- uansett liv igjen, liv-sjekken fantes bare i retry-knappen resume()
+-- over. Uten den havnet man med 0 liv i hovedmenyen uten at
+-- reklame-for-liv-skjermen (scenes/adoffer.lua) noen gang ble vist.
+local target = "scenes.gotomenu"
+if liv.erTom() then
+	target = "scenes.adoffer"
+end
+local ok, err = pcall( composer.gotoScene, target, {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
-	print( "CRASH going to gotomenu: " .. msg )
+	print( "CRASH going to " .. tostring(target) .. " (main menu): " .. msg )
 	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
 	bg:setFillColor( 0, 0, 0, 0.85 )
 	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
 	t:setFillColor( 1, 0.3, 0.3 )
 end
-physics.start( )
-print("Current Score1: ", liv.returnScore())
-print("Current Score2: ", liv.returnScore())
-liv.endreliv( 1 )
-print("Current Score3: ", liv.returnScore())    
-print("Current Score4: ", liv.returnScore())
-print("Current Score5: ", liv.returnScore())
-liv.lagreliv()
+-- Rettet 2026-09-15: samme feil som i resume() over, se forklaring der.
 end
 pausemenumainmenu:addEventListener ("touch", resume1)
 
@@ -217,23 +230,29 @@ pausemenu.alpha=0
 -- banens egen scene:hide når composer.removeScene() under tvinger den
 -- gjennom.
 timer.cancel(eventTimer)
-local ok, err = pcall( composer.gotoScene, "scenes.gotochooselevel", {effect = "fade" , time = 1} )
+print("Current Score1: ", liv.returnScore())
+print("Current Score2: ", liv.returnScore())
+liv.endreliv( 1 )
+print("Current Score3: ", liv.returnScore())
+print("Current Score4: ", liv.returnScore())
+print("Current Score5: ", liv.returnScore())
+liv.lagreliv()
+-- Rettet 2026-09-15: samme feil som i resume1 over, denne knappen gikk
+-- alltid til "scenes.gotochooselevel" uansett liv igjen.
+local target = "scenes.gotochooselevel"
+if liv.erTom() then
+	target = "scenes.adoffer"
+end
+local ok, err = pcall( composer.gotoScene, target, {effect = "fade" , time = 1} )
 if not ok then
 	local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
-	print( "CRASH going to gotochooselevel: " .. msg )
+	print( "CRASH going to " .. tostring(target) .. " (levels): " .. msg )
 	local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
 	bg:setFillColor( 0, 0, 0, 0.85 )
 	local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
 	t:setFillColor( 1, 0.3, 0.3 )
 end
-physics.start( )
-print("Current Score1: ", liv.returnScore())
-print("Current Score2: ", liv.returnScore())
-liv.endreliv( 1 )
-print("Current Score3: ", liv.returnScore())    
-print("Current Score4: ", liv.returnScore())
-print("Current Score5: ", liv.returnScore())
-liv.lagreliv()
+-- Rettet 2026-09-15: samme feil som i resume() over, se forklaring der.
 end
 pausemenulevels:addEventListener ("touch", resume3)
 

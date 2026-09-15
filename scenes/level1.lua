@@ -2175,6 +2175,13 @@ checkpoint("level1:cp_2004_after_collision_del9_block")
     grp:insert(camera)
     camera:toBack()
 camera:layer(2).parallaxRatio=0
+-- Rettet 2026-09-15: lag 1 (banen/marken) ble satt inn i "view" sist av
+-- perspective.lua sin egen konstruktør og lå derfor alltid øverst,
+-- foran lag 2 der pauseknappen bor. parallaxRatio=0 over holder knappen
+-- fast på skjermen, men styrte ikke rekkefølgen den tegnes i. toFront()
+-- flytter kun lag 2 til fronten av kamera-gruppa, uten å endre hvilket
+-- lag knappen faktisk tilhører (og dermed ikke rulle-oppførselen).
+camera:layer(2):toFront()
 local sqCenterX, sqCenterY = reff:localToContent( 0, 0 )
 
 

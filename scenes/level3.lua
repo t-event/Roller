@@ -2201,6 +2201,11 @@ end
     grp:insert(camera)
     camera:toBack()
 camera:layer(2).parallaxRatio=0
+-- Rettet 2026-09-15: se level1.lua for forklaring. Pauseknappen legges
+-- ikke i kamera-lag 2 i denne banen (se kommentert camera:add(knapp1..)
+-- over), men linjen skader ikke og gjør oppførselen lik på tvers av
+-- alle banene om den samme mekanismen tas i bruk her senere.
+camera:layer(2):toFront()
 local sqCenterX, sqCenterY = reff:localToContent( 0, 0 )
 
 

@@ -1853,3 +1853,74 @@ seg, flis 2-4 upåvirket) og begge banenes `lib/shapedefs5/6.lua`.
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Bekreftet visuelt
 med et nærbilde av spawn-punktet mot de nye kollisjonsformene før
 commit denne gangen, ikke bare et tall jeg selv kunne regne feil på.
+
+## 2026-09-15, fire feil Mathias meldte etter mer testing i nettleser
+
+Fem punkter i samme melding handlet ikke om bane 5/6 sin kunst i det
+hele tatt, men om spillogikk som gjelder alle banene. Fikset alle fire
+her, de resterende (tak, hull-kanter, "dynamisk hule", fargegradering)
+er egen logg under.
+
+**"Nå starter vi med 0 liv igjen om man trykker på levels eller main
+menu når man er fri for liv. Reklame menyen kommer bare om man klikker
+på restart."** Sant. `resume()` (retry-knappen) i både
+`pausemenu1.lua` og `dodmenu1.lua` sjekket riktig `liv.erTom()` og
+sendte spilleren til `scenes.adoffer` (reklame-for-liv) i stedet for
+vanlig mål når livet var tomt. `resume1()` (hovedmeny-knappen) og
+`resume3()` (baner-knappen) i BEGGE filene gjorde det samme
+livstrekket (`liv.endreliv(1)`), men manglet denne sjekken helt, og
+gikk alltid rett til `scenes.gotomenu`/`scenes.gotochooselevel` uansett
+liv igjen. Lagt til samme `if liv.erTom() then target = "scenes.adoffer"
+end`-mønster i alle fire funksjonene. Måtte også snu rekkefølgen i
+`resume1`/`resume3`: de kalte før `composer.gotoScene()` FØR
+`liv.endreliv(1)`, så man kunne ikke vite om livet ble tomt før man
+allerede hadde bestemt målet. Nå trekkes livet og lagres først, så
+regnes målet ut fra riktig oppdatert status.
+
+**"Marken går videre i ett sekund eller to etter man har klikket retry,
+ligger banen da i bakgrunnen å går?"** Ja, nøyaktig det. Alle fire
+knappene i `pausemenu1.lua` (retry, hovedmeny, baner, i tillegg fantes
+den ikke på quit) og alle tre i `dodmenu1.lua` (retry, hovedmeny,
+baner) kalte `physics.start()` rett etter de startet
+`composer.gotoScene()` til et helt annet mål. Fysikken til banen vi
+FORLOT ble dermed satt i gang igjen midt i fade-overgangen (500ms, pluss
+tiden det tar før banens egen `scene:hide` faktisk rekker å rive den
+ned), og marken falt/beveget seg synlig videre helt til det skjedde.
+`physics.start()` skal bare kjøres når man faktisk BLIR i samme bane,
+det vil si `resume4()` i `pausemenu1.lua` ("fortsett spillet"-knappen,
+den eneste av de syv knappene totalt som ikke navigerer bort). Fjernet
+kallet fra de seks andre. Banen man navigerer TIL starter uansett sin
+egen fysikk i sin egen `scene:create`, så ingenting ble borte av å
+fjerne dette.
+
+Mistenker at dette samme feilen forklarer **"Det virker som om at
+retry menyen ligger i bakgrunnen noen ganger"** også: når marken/banen
+fortsatte å bevege seg etter at retry-menyen begynte å tones bort,
+kunne det trigge en NY kollisjon (dødsfelle eller neste-bane) mens den
+forrige menyen fortsatt var i ferd med å forsvinne, og skape en andre
+overlay midt i samme overgang. Kan ikke bekrefte dette i en nettleser
+herfra (ingen nettverkstilgang til selve spillet fra denne økten), så
+si fra om det fortsatt skjer etter denne fiksen, så graves det videre.
+
+**"Pauseknappen kommer bak banen, vil at den skal syntes hele tiden når
+man spiller en bane."** Fant den egentlige årsaken i kamera-biblioteket
+(`lib/perspective.lua`): kameraet har 8 "lag" (grupper), og lag 1 er
+alltid det fremste (tegnes sist av konstruktøren, altså øverst).
+Pauseknappen legges i lag 2 i banene 1, 5, 6, 7, 8, 9
+(`camera:add(knapp1,2,false)`), mens selve banen/marken/gulvet ligger i
+lag 1. Lag 2 lå dermed alltid BAK lag 1, uansett rekkefølge på
+`camera:add`-kallene. `camera:layer(2).parallaxRatio=0` (som alt lå i
+alle ni banefilene) gjør riktignok at lag 2 aldri ruller med kameraet,
+så knappen sto stille, men det løste ikke at den lå bak. Lagt til
+`camera:layer(2):toFront()` rett etter i alle ni `levelN.lua`-filene:
+flytter kun HELE lag 2 fremst i kamera-gruppa, uten å endre hvilket lag
+knappen faktisk tilhører (rulle-oppførselen er dermed uendret). I
+banene 2, 3 og 4 er ikke pauseknappen lagt i kameraet i det hele tatt
+(en tidligere, ufullstendig fiks, ser det ut som), linjen er lagt til
+der også for konsistens, men gjør ingenting siden knappen ikke er i lag
+2 der.
+
+Luac-sjekket alle 11 endrede filer (`pausemenu1.lua`, `dodmenu1.lua`,
+`level1.lua`-`level9.lua`), kjørte fullt syntakssøk over repoet. Kan
+ikke teste i faktisk nettleser herfra, så si fra om noe av dette ikke
+stemmer etter neste bygg.

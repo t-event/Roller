@@ -162,14 +162,25 @@ filene gjør.
 
 ### Pause-/dødsmeny
 - `pausemenu1.lua` — **i bruk, av ALLE ni baner**. Eneste pausemeny som
-  faktisk vises.
+  faktisk vises. To feil fra samme runde rettet 2026-09-15 (se
+  `TIL-ORJAN.md`): (1) `resume1()` ("main menu") og `resume3()`
+  ("levels") manglet `liv.erTom()`-sjekken som `resume()` ("retry")
+  alt hadde, så de trakk liv og gikk rett til målet uansett, uten å
+  vise `scenes.adoffer` når livet ble tomt. (2) `resume()`, `resume1()`
+  og `resume3()` kalte alle `physics.start()` rett etter de startet
+  navigering bort fra banen, noe som satte fysikken til banen man
+  FORLOT i gang igjen midt i fade-overgangen (marken falt synlig videre
+  i et sekund eller to). Kun `resume4()` ("fortsett spillet", den
+  eneste knappen som blir i samme bane) skal kalle `physics.start()`.
 - `pausemenu2.lua` til `pausemenu9.lua` — **100 % død kode**. Bekreftet:
   ingen fil i hele repoet refererer til `"pausemenu2"` gjennom `"pausemenu9"`
   i det hele tatt.
 - `dodmenu1.lua` — **i bruk, av ALLE ni baner**. Samme mønster som
   pausemenu1. Fikk pcall-sikkerhetsnettet på alle tre knappene
   (retry/main menu/levels) 2026-09-10, samme dekning som
-  pausemenu1.lua nå.
+  pausemenu1.lua nå. Samme to feil og samme fiks som pausemenu1.lua
+  over, 2026-09-15 (har ingen `resume4`/"fortsett"-knapp i det hele
+  tatt, så her ble `physics.start()` fjernet fra alle tre knappene).
 - `dodmenu2.lua` til `dodmenu9.lua` — **100 % død kode**, samme bekreftelse
   som pausemenu2-9.
 
@@ -331,7 +342,16 @@ kolonne-for-kolonne-sjekkede klaringen.
 
 ### Delte spillobjekter
 - `perspective.lua` — kamerasystem (parallakse, lag), tredjepartsbibliotek
-  ("Perspective" av Caleb P), urørt.
+  ("Perspective" av Caleb P), urørt. Lag 1 av 8 er alltid fremst (tegnes
+  sist av `Perspective.createView()`, siden løkka går `numLayers` ned
+  til 1 og `view:insert()` legger til bakerst i lista). Pauseknappen
+  (`knapp1`) legges i lag 2 med `parallaxRatio = 0` (så den ikke ruller
+  med kameraet) i alle ni `levelN.lua`, men lag 2 lå likevel BAK lag 1
+  der banen/marken/gulvet ligger, altså bak selve banen. Rettet
+  2026-09-15 ved å legge til `camera:layer(2):toFront()` rett etter i
+  alle ni banefiler (flytter kun rekkefølgen lag 2 tegnes i, endrer
+  ikke hvilket lag noe tilhører eller rulle-oppførselen). Se
+  `TIL-ORJAN.md`.
 - `shapedefs.lua` — auto-generert av PhysicsEditor, kollisjonsformer. Se
   "Kjente feil".
 - `liv.lua` — "liv" = spillerens liv/poengsum, lagres til fil
