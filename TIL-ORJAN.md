@@ -2684,3 +2684,57 @@ endrer ingen konklusjon, siden begge de vannrette retningene målte 92 og
 93 prosent, men tabellen i `KODEBASE.md` sa "opp" og "ned" der den
 egentlig bare kunne skille vannrett fra loddrett. Den er rettet til å si
 det den faktisk viser.
+
+## 2026-09-15, spawn point var feil på bane 5 og 6
+
+Mathias: "Spawn point er feil på bane 5 og 6."
+
+Riktig, og verifiseringen min burde fanget det. Den gjorde ikke det
+fordi den stilte feil spørsmål.
+
+Marken står i `del1 = (0,0)`, og `firkant1` er sentrert i (3500, 2300)
+med 7680 x 4702 enheter mot et bilde på 3840 x 2351 piksler. Marken
+starter altså ved bildepunkt (116-170, 26) i flis 1, i alle ni banene.
+
+Målte hvor langt det er ned til bakken derfra:
+
+| bane | første stein | fall |
+|---|---|---|
+| 2 | 111 px | 171 enheter |
+| 3 | 118 px | 185 |
+| 4 | 210 px | 369 |
+| 7, 8, 9 | 153 px | 255 |
+| **5 (min)** | **875 px** | **1699** |
+| **6 (min)** | **930 px** | **1809** |
+
+Banene mine åpnet altså med at marken stupte nesten en hel flishøyde før
+den traff noe, mens de ekte banene starter med marken praktisk talt
+oppå bakken.
+
+Sammenlignet bakkeprofilen i flis 1, og mønsteret er tydelig: de ekte
+banene starter høyt, på 167-251 piksler, og faller jevnt utover flisa.
+Bane 4 går 251 → 650 → 1036 → 1320 → 1680. Mine startet på 925 og 938,
+altså midt på flisa, og hadde ikke den innledende høyden i det hele
+tatt.
+
+Flis 1 i begge baner er bygget om: bakken starter nå høyt og faller
+utover, som i de ekte. Takskåret er flyttet til høyre, der bakken har
+falt nok til at det er plass over den. Fallet fra spawn er nå 355
+enheter i bane 5 og 373 i bane 6, mot 171-369 i de ekte.
+
+To runder: første forsøk landet på 489 og 721, fordi konturstøyen legger
+til 90 og 186 piksler oppå tallet jeg setter. Kompenserte for det målte
+avviket i stedet for å gjette på nytt.
+
+### Hvorfor sjekken ikke fanget det
+
+Spawn-sjekken min spurte bare om det var *fritt* under marken, ikke hvor
+langt ned det var. 1699 enheter fritt fall besto den testen med glans.
+Den måler nå fallhøyden og sammenligner med de ekte banene sitt spenn,
+så en gjentakelse blir fanget.
+
+Verdt å merke seg for øvrig: **bane 1 starter inni stein.** `level1/1.png`
+er en flat plate helt øverst, og marken spawner inne i den. Det er ikke
+noe jeg har innført, det har vært slik hele tiden, og det er grunnen til
+at den flisa aldri ble brukt da bane 5/6 var satt sammen av ekte fliser.
+Jeg har ikke rørt det, men si fra om du vil at jeg skal se på det.

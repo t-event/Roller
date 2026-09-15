@@ -606,8 +606,23 @@ bekreftet mot bane 3 og 4 sine egne shapedefs:
 og hjørnene må ha positiv signert flate (alle 400 undersøkte fixtures i
 `lib/shapedefs4.lua` har det).
 
-**Målt spillbarhet:** takhøyde 852-1676 enheter, fall mellom fliser
-1722-4523 (mot 673-5244 i bane 1-4), spawn har 893/910 px fritt fall,
+**Spawn.** Marken står i `del1 = (0,0)`, og `firkant1` er sentrert i
+(3500, 2300) med 7680 x 4702 enheter mot et bilde på 3840 x 2351 px.
+Marken starter derfor ved bildepunkt **(116-170, 26)** i flis 1, i alle
+ni banene. Flis 1 må ha bakke rett under der: de ekte banene har den
+111-210 px nede, altså 171-369 enheters fall. Første utgave av bane 5/6
+hadde 1699 og 1809, og banen åpnet med at marken stupte nesten en hel
+flishøyde (meldt av Mathias 2026-09-15). Rettet, nå 355 og 373.
+
+Mønsteret i flis 1 er: bakken starter høyt (167-251 px) og faller jevnt
+utover flisa. Bane 4 går 251 → 650 → 1036 → 1320 → 1680.
+
+**NB:** `level1/1.png` er en flat plate helt øverst, så **bane 1 spawner
+marken inni stein.** Det er en gammel feil, ikke innført av noen av
+endringene i 2026-09-15, men den er verdt å vite om.
+
+**Målt spillbarhet bane 5/6:** takhøyde 852-1676 enheter, fall mellom
+fliser 1722-4523 (mot 673-5244 i bane 1-4), spawn-fall 355/373,
 dødslinje-klaring 600-632, hull i gulvet 186-414 enheter.
 
 Bildene er lagret som palett-PNG med egen gjennomsiktighet per indeks,
