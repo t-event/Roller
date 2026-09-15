@@ -61,6 +61,8 @@ scenes/pausemenu1.lua (delt av alle baner)
   ├─ "retry"      → gotoScene("scenes.gotoretry")   [egen mellomscene, fikset
   │                  2026-09-10 i to omganger, se "Kjente feil" punkt 4]
   │                  └─ (0.8s) removeScene + gotoScene("scenes.level" .. lm.currentLevel)
+  │                  [om liv.erTom(): går i stedet til "scenes.adoffer", se under.
+  │                  Endret 2026-09-15, gikk før rett til "scenes.gotolevel1"]
   ├─ "main menu"  → gotoScene("scenes.gotomenu") → gotoScene("scenes.menu")
   └─ "levels"     → gotoScene("scenes.gotochooselevel") → gotoScene("scenes.chooselevel")
                      └─ lm.init() (lib/ogt_levelmanager.lua) bygger rutenettet
@@ -69,17 +71,21 @@ scenes/pausemenu1.lua (delt av alle baner)
 
 scenes/dodmenu1.lua (delt av alle baner)
   └─ samme struktur som pausemenu1.lua, "retry"/"main menu"/"levels", samme
-     "gotoretry"-omvei. Om liv.erTom() går "retry" til "scenes.gotolevel1"
-     i stedet (start på nytt fra bane 1) — samme splash som brukes for
-     "ingen liv igjen", uavhengig av at appstart nå går via menyen.
+     "gotoretry"-omvei og samme "adoffer"-avstikker når liv.erTom().
+
+scenes/adoffer.lua (ny 2026-09-15, "ingen liv igjen"-skjermen)
+  ├─ "se kort reklame"  → placeholder-nedtelling → liv.addToScore(1) → gotoScene("scenes.gotoretry")
+  ├─ "se lang reklame"  → placeholder-nedtelling → liv.addToScore(3) → gotoScene("scenes.gotoretry")
+  └─ "fortsett uten"    → gotoScene("scenes.gotolevel1")   [samme fallback som før]
 
 scenes/chooselevel.lua / gotochooselevel.lua
   → lm.init() i lib/ogt_levelmanager.lua, som leser lib/ogt_lmdata.lua
 ```
 
 **Viktigst å forstå:** Selve banevalget hopper rett til `levelN`, ikke via
-`gotolevelN`. `gotolevel1.lua`-splashen nås på appstart OG av "retry" når
-spilleren er tom for liv. `gotoretry.lua` er en tilsvarende splash, men for
+`gotolevelN`. `gotolevel1.lua`-splashen nås på appstart, og på "retry" når
+spilleren er tom for liv velger "fortsett uten" på `scenes/adoffer.lua`
+(se over). `gotoretry.lua` er en tilsvarende splash, men for
 "retry på gjeldende bane" (se "Kjente feil" punkt 4 for hvorfor den finnes).
 Disse to er de eneste `gotolevelN`-lignende filene som fortsatt er i bruk
 (`gotolevel2.lua` til `gotolevel9.lua` ligger i `dod-kode/`, se der for
@@ -102,7 +108,8 @@ filene gjør.
 
 ### Splash-skjermer ("gotoX")
 - `gotolevel1.lua` — **i bruk**, appens faktiske startskjerm, og der
-  "retry" går når spilleren er tom for liv (se `lib/liv.lua`).
+  "fortsett uten"-knappen på `scenes/adoffer.lua` går når spilleren er
+  tom for liv og ikke vil se reklame (se `lib/liv.lua`).
 - `gotoretry.lua` — **ny fil, 2026-09-10, i bruk**. Samme mønster som
   `gotolevel1.lua`, men for "retry på gjeldende bane" i stedet for
   "start på nytt fra bane 1". Se "Kjente feil" punkt 4 for hvorfor den
@@ -118,6 +125,13 @@ filene gjør.
   ingenting navigerte dit noensinne.
 - `gotomenu.lua`, `gotochooselevel.lua` — **i bruk**, splash mellom
   pausemeny og hhv. hovedmeny/banevalg.
+- `adoffer.lua` — **ny fil, 2026-09-15, i bruk**. Vises fra
+  `pausemenu1.lua`/`dodmenu1.lua` sin "retry" når `liv.erTom()`, i
+  stedet for at koden gikk rett til `gotolevel1`. Kort reklame gir 1
+  liv, lang reklame gir 3, "fortsett uten" går fortsatt til
+  `gotolevel1` som før. Selve reklamen er en tydelig merket
+  PLACEHOLDER (nedtelling), ikke koblet til noe reklame-SDK ennå. Se
+  `TIL-ORJAN.md` for detaljer.
 
 ### Menyer
 - `menu.lua` — **i bruk**, hovedmeny (bg1-5, "spill"-knapp til `chooselevel`).
@@ -213,11 +227,12 @@ filene gjør.
   ("Perspective" av Caleb P), urørt.
 - `shapedefs.lua` — auto-generert av PhysicsEditor, kollisjonsformer. Se
   "Kjente feil".
-- `liv.lua` — "liv" = spillerens liv/poengsum, lagres via `GGData.lua`.
-  **Trekkes bare fra når du bruker en knapp i pause-/dødsmenyen
-  (retry/main menu/levels), ikke av noe som skjer inni selve
-  spillingen.** Ørjan bekreftet 2026-09-10: liv skal ha reell
-  betydning (ikke ferdig kodet), og skal kunne nå null, da skal
+- `liv.lua` — "liv" = spillerens liv/poengsum, lagres til fil
+  (`system.pathForFile("liv.txt", ...)`, på HTML5 vedvarende
+  nettleser-lagring). **Trekkes bare fra når du bruker en knapp i
+  pause-/dødsmenyen (retry/main menu/levels), ikke av noe som skjer
+  inni selve spillingen.** Ørjan bekreftet 2026-09-10: liv skal ha
+  reell betydning (ikke ferdig kodet), og skal kunne nå null, da skal
   spilleren kunne se en reklame for å få liv tilbake (1 min reklame =
   1 liv, lang reklame = flere), eller heller starte på nytt fra bane 1
   om man ikke vil se reklame. Bugen som hindret telleren fra
@@ -225,12 +240,16 @@ filene gjør.
   liv i stedet for å trekke fra ved siste liv). "Retry" i
   `pausemenu1.lua`/`dodmenu1.lua` sjekker nå `liv.erTom()`: har du
   liv igjen, restartes gjeldende bane; er du tom, går du i stedet til
-  `gotolevel1` (start fra bane 1), som en fallback siden selve
-  reklame-visningen ennå IKKE er bygget (krever et valg av
-  annonse-SDK, ingen faktisk "vil du se reklame?"-dialog finnes ennå).
-  Dødsskjermen (`showOverlay("dodmenu1")`) trigges fortsatt av noe
-  helt separat: en fysikk-kollisjon mellom et "dod"-objekt og
-  spillerens hode (`del9`), uavhengig av live-telleren.
+  `scenes.adoffer` (ny fil, 2026-09-15, se "Splash-skjermer"), som
+  viser reklame-for-liv-skjermen Ørjan beskrev. `liv.addToScore(val)`
+  var en tom stub fram til 2026-09-15, fylt inn til faktisk å legge
+  til liv siden `adoffer.lua` trengte den. Reklamevisningen selv er
+  fortsatt en PLACEHOLDER (nedtelling, ikke et faktisk SDK-kall), men
+  resten av flyten (legg til liv, lagre, gå videre til riktig bane)
+  er ferdig kodet. Dødsskjermen (`showOverlay("dodmenu1")`) trigges
+  fortsatt av noe helt separat: en fysikk-kollisjon mellom et
+  "dod"-objekt og spillerens hode (`del9`), uavhengig av
+  live-telleren.
 - `mark.lua` — bygger spillerkarakterens kroppsdeler (hale/hode),
   fysikk-leddet sammen. **`require`t av `menu.lua` og `level1.lua`,
   men `mark.hent()` blir aldri faktisk kalt noe sted** (begge fanger

@@ -1333,3 +1333,58 @@ Luac-sjekket. Fortsatt ikke sett i faktisk nettleser, men
 avstanden fra markens startpunkt til bakken er nå tallfestet og
 matcher den ekte bane 4-kunsten godt, så jeg er en god del tryggere
 denne gangen enn forrige.
+
+## 2026-09-15, reklame-for-liv-skjerm (placeholder), fordi liv stod fast på 0
+
+Mathias meldte at han "alltid har 0 liv nå". Årsaken er ikke en feil i
+selve lagringen, den fungerer som tenkt: `liv.lastliv()` leser antall
+liv fra fil (`liv.txt` i DocumentsDirectory, på HTML5 vedvarende
+nettleser-lagring) ved hver banestart, `liv.lagreliv()` skriver
+tilbake etter hvert forsøk. Det som manglet var en vei tilbake opp
+igjen. Etter mye testing i dag var de 10 standardlivene brukt opp, og
+uten noen måte å legge til liv på forblir 0 lagret for alltid.
+
+Bygget skjermen Ørjan selv beskrev (se sporsmal.md, spørsmål 1): kort
+reklame gir ett liv, lang reklame gir flere, den som ikke vil se
+reklame kan starte på nytt fra bane 1 som før. Selve reklamen finnes
+ikke ennå (krever et annonse-SDK), så jeg bygget den som en tydelig
+merket PLACEHOLDER, en nedtelling på noen sekunder i stedet for en
+ekte videoannonse.
+
+Konkret:
+
+- `lib/liv.lua`: `liv.addToScore(val)` var en tom stub (kroppen stod
+  kommentert ut), fylte den inn til faktisk å legge til liv
+  (`liv_igjen = liv_igjen + val`). Navnet fantes fra før og pekte
+  allerede mot akkurat dette bruksområdet, ifølge kommentaren ved
+  `liv.erTom()`.
+- Ny fil `scenes/adoffer.lua`: viser "Ingen liv igjen" og tre knapper,
+  kort reklame (+1 liv), lang reklame (+3 liv), fortsett uten (start
+  fra bane 1). `visReklamePlaceholder(sekunder, livBelonning)` teller
+  ned med `timer.performWithDelay`, og legger til liv og lagrer når
+  den er ferdig, før den går videre til `scenes.gotoretry` (samme
+  trygge mellomscene-mønster som resten av retry-flyten bruker, se
+  forklaringen i `pausemenu1.lua`/`dodmenu1.lua` fra tidligere, av
+  samme grunn: å bytte scene direkte herfra mens denne selv ligger som
+  overlay er ikke en støttet rekkefølge i Composer).
+- Fant og rettet to feil underveis i egen gjennomgang av den nye fila,
+  før noe ble commitet: knappegruppa (`knappGruppe`, brukt til å
+  skjule alle tre knappene på én gang når reklamevisningen kommer opp)
+  var laget med `display.newGroup()` men aldri satt inn i
+  `sceneGroup`, som ville latt den henge igjen uryddet av Composer sin
+  scene-opprydning. Og `lagKnapp()` returnerte bare selve
+  knapperektangelet, ikke tekstetiketten, så etikettene ble aldri lagt
+  i `knappGruppe` og ville blitt stående synlige alene når knappene
+  ble skjult. Rettet begge før commit.
+- `scenes/pausemenu1.lua` og `scenes/dodmenu1.lua`: der `liv.erTom()`
+  gikk `target` før rett til `scenes.gotolevel1`, går den nå til
+  `scenes.adoffer` i stedet. Den som ikke vil se reklame kan fortsatt
+  velge "start på nytt fra bane 1" derfra, så den gamle sikkerhetsveien
+  finnes fortsatt, bare ett skritt lenger inn.
+
+Luac-sjekket alle fire filene, og kjørte et fullt syntakssøk over hele
+repoet etterpå. Ikke testet i faktisk nettleser ennå. Ting å sjekke
+ved neste testing: at "ingen liv"-skjermen faktisk dukker opp i stedet
+for å gå til bane 1 direkte, at begge reklameplaceholderne legger til
+riktig antall liv og går videre til riktig bane, og at "fortsett
+uten"-knappen fortsatt fungerer som før.

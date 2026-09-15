@@ -124,10 +124,13 @@ function liv.erTom()
    return liv_igjen <= 0
 end
 
+-- Legger til liv, brukt av reklame-for-liv-skjermen (scenes/adoffer.lua)
+-- når spilleren er tom for liv. Var en tom stub før (kommentert ut),
+-- fylt inn 2026-09-15 siden akkurat dette hooket allerede fantes med
+-- riktig navn og var ment for nettopp dette, ifølge kommentaren ved
+-- liv.erTom() over.
 function liv.addToScore( val )
-   -- liv_igjen = liv_igjen + val 
-    --print("Current score", liv_igjen)
-    
+   liv_igjen = liv_igjen + val
 end
 
 function liv.returnScore()

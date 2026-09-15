@@ -139,10 +139,11 @@ liv.lagreliv()
 -- "ingen liv igjen"-tilfellet.
 local target = "scenes.gotoretry"
 if liv.erTom() then
-	-- Ingen liv igjen. Reklame-for-liv er ikke bygget ennå (krever et
-	-- annonse-SDK), så inntil videre: den som ikke vil/kan se reklame
-	-- starter på nytt fra bane 1 i stedet for gjeldende bane.
-	target = "scenes.gotolevel1"
+	-- Ingen liv igjen. Rettet 2026-09-15: gikk før rett til
+	-- "scenes.gotolevel1", nå viser vi først reklame-for-liv-skjermen
+	-- (scenes/adoffer.lua). Den som ikke vil se reklame kan fortsatt
+	-- velge "start på nytt fra bane 1" derfra.
+	target = "scenes.adoffer"
 end
 local ok, err = pcall( composer.gotoScene, target, {effect = "fade" , time = 500} )
 if not ok then
