@@ -1431,3 +1431,37 @@ faktisk havner på riktig neste bane (ikke bane 1) når man fullfører en
 bane, at det fortsatt fungerer å fullføre siste bane (går til
 banevalget), og at retry på den nye banen restarter riktig bane
 etterpå.
+
+## 2026-09-15, "fortsett uten" på reklame-skjermen ga fortsatt 0 liv
+
+Mathias påpekte at når man er tom for liv og trykker "gå til level 1"
+(altså "fortsett uten" på `scenes/adoffer.lua`), burde man få 10 nye
+liv, siden man starter helt på nytt. Stemte: knappen gikk til
+`scenes.gotolevel1`, men gjorde ingenting med selve livtelleren, så
+man landet på bane 1 med fortsatt 0 liv lagret, altså rett tilbake til
+"ingen liv igjen"-skjermen ved første tap.
+
+`liv.new()` var en tom stub fra før (samme mønster som
+`liv.addToScore()` var før forrige økt). Fylte den inn til å
+nullstille `liv_igjen` til en ny navngitt konstant `STARTLIV = 10`
+(samme verdi som filens opprinnelige standardverdi, nå ett sted i
+stedet for et implisitt tall). "Fortsett uten"-knappen i
+`adoffer.lua` kaller nå `liv.new()` og `liv.lagreliv()` før den går
+til bane 1.
+
+Én ting verdt å vite, siden Mathias sin begrunnelse var "siden alle
+banene blir låst igjen": det stemmer ikke helt ennå. Verken
+`gotolevel1.lua` eller noe annet sted faktisk låser banene igjen når
+man starter på nytt. Det finnes en utkommentert
+`lm.resetLevels(dataFile)` i hver banes egen døds-kollisjonshåndterer
+(aldri aktivert), og `lib/ogt_levelmanager.lua` sin `loadData()` har i
+tillegg en midlertidig debug-linje som tvinger ALLE baner åpne uansett
+lagret status, satt inn for testing (se `KODEBASE.md`). Så selv om jeg
+hadde aktivert `resetLevels()` her, ville den ikke synes før den
+midlertidige linja fjernes. Rørte ikke ved dette nå, bare selve
+livtellingen som var det konkrete som ble spurt om. Si ifra om
+faktisk gjenlåsing av baner også skal på plass, det er en egen, litt
+større endring.
+
+Luac-sjekket begge filene, kjørte fullt syntakssøk over repoet
+etterpå. Ikke testet i faktisk nettleser ennå.

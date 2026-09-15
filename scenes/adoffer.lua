@@ -119,6 +119,10 @@ function scene:create( event )
 		return true
 	end )
 	avKnapp:addEventListener( "tap", function()
+		-- Lagt til 2026-09-15, per Mathias: å starte helt på nytt fra
+		-- bane 1 bør gi fulle liv igjen, ikke fortsatt stå med 0.
+		liv.new()
+		liv.lagreliv()
 		local ok, err = pcall( composer.gotoScene, "scenes.gotolevel1", { effect = "fade", time = 500 } )
 		if not ok then
 			print( "CRASH going to gotolevel1 (adoffer): " .. tostring(err) )

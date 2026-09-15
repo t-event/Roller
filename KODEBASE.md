@@ -78,7 +78,9 @@ scenes/dodmenu1.lua (delt av alle baner)
 scenes/adoffer.lua (ny 2026-09-15, "ingen liv igjen"-skjermen)
   ├─ "se kort reklame"  → placeholder-nedtelling → liv.addToScore(1) → gotoScene("scenes.gotoretry")
   ├─ "se lang reklame"  → placeholder-nedtelling → liv.addToScore(3) → gotoScene("scenes.gotoretry")
-  └─ "fortsett uten"    → gotoScene("scenes.gotolevel1")   [samme fallback som før]
+  └─ "fortsett uten"    → liv.new() (10 liv) + liv.lagreliv() → gotoScene("scenes.gotolevel1")
+                  [full livsrefill lagt til 2026-09-15, gikk før til bane 1
+                  med fortsatt 0 liv]
 
 scenes/gotonextlevel.lua (ny 2026-09-15, "banen er fullført"-splashen)
   └─ (0.8s) removeScene + gotoScene("scenes.level" .. (lm.currentLevel+1))
@@ -144,10 +146,11 @@ filene gjør.
 - `adoffer.lua` — **ny fil, 2026-09-15, i bruk**. Vises fra
   `pausemenu1.lua`/`dodmenu1.lua` sin "retry" når `liv.erTom()`, i
   stedet for at koden gikk rett til `gotolevel1`. Kort reklame gir 1
-  liv, lang reklame gir 3, "fortsett uten" går fortsatt til
-  `gotolevel1` som før. Selve reklamen er en tydelig merket
-  PLACEHOLDER (nedtelling), ikke koblet til noe reklame-SDK ennå. Se
-  `TIL-ORJAN.md` for detaljer.
+  liv, lang reklame gir 3, "fortsett uten" kaller `liv.new()` (fulle
+  10 liv igjen) før den går til `gotolevel1` som før (lagt til
+  2026-09-15, gikk før dit med fortsatt 0 liv). Selve reklamen er en
+  tydelig merket PLACEHOLDER (nedtelling), ikke koblet til noe
+  reklame-SDK ennå. Se `TIL-ORJAN.md` for detaljer.
 
 ### Menyer
 - `menu.lua` — **i bruk**, hovedmeny (bg1-5, "spill"-knapp til `chooselevel`).
@@ -258,11 +261,14 @@ filene gjør.
   liv igjen, restartes gjeldende bane; er du tom, går du i stedet til
   `scenes.adoffer` (ny fil, 2026-09-15, se "Splash-skjermer"), som
   viser reklame-for-liv-skjermen Ørjan beskrev. `liv.addToScore(val)`
-  var en tom stub fram til 2026-09-15, fylt inn til faktisk å legge
-  til liv siden `adoffer.lua` trengte den. Reklamevisningen selv er
-  fortsatt en PLACEHOLDER (nedtelling, ikke et faktisk SDK-kall), men
-  resten av flyten (legg til liv, lagre, gå videre til riktig bane)
-  er ferdig kodet. Dødsskjermen (`showOverlay("dodmenu1")`) trigges
+  og `liv.new()` var begge tomme stubber fram til 2026-09-15, fylt inn
+  til hhv. å legge til liv (reklame-knappene) og nullstille til fulle
+  10 liv igjen (`adoffer.lua` sin "fortsett uten"-knapp, per Mathias:
+  å starte helt på nytt bør gi fulle liv, ikke fortsatt 0). Reklamevisningen
+  selv er fortsatt en PLACEHOLDER (nedtelling, ikke et faktisk
+  SDK-kall), men resten av flyten (legg til/nullstill liv, lagre, gå
+  videre til riktig bane) er ferdig kodet. Dødsskjermen
+  (`showOverlay("dodmenu1")`) trigges
   fortsatt av noe helt separat: en fysikk-kollisjon mellom et
   "dod"-objekt og spillerens hode (`del9`), uavhengig av
   live-telleren.

@@ -7,9 +7,10 @@ local hoyde = display.contentHeight
 
 local liv = {}
 
--- File path to the score file 
+-- File path to the score file
 local score_file_path = system.pathForFile( "liv.txt", system.DocumentsDirectory )
-local liv_igjen = 10
+local STARTLIV = 10
+local liv_igjen = STARTLIV
 
 
 -----------------------------
@@ -91,7 +92,14 @@ end
 -----------------------------
 -- PUBLIC FUNCTIONS
 -----------------------------
+
+-- Nullstiller liv til startverdien (10). Brukt når spilleren velger å
+-- starte helt på nytt fra bane 1 i stedet for å se reklame
+-- (scenes/adoffer.lua sin "fortsett uten"-knapp) etter å ha gått tom.
+-- Var en tom stub før, per Mathias 2026-09-15: å starte på nytt bør gi
+-- fulle liv igjen.
 function liv.new()
+   liv_igjen = STARTLIV
 end
 
 -- *** NOTE ***
@@ -116,10 +124,10 @@ function liv.endreliv( val )
    return true
 end
 
--- Sant når spilleren er tom for liv. Ment å brukes til å vise
--- "se reklame for å få liv tilbake"-skjermen når den er kodet
--- (1 min reklame = 1 liv, lang reklame = f.eks 3 liv, per Ørjan).
--- Selve reklame-integrasjonen er ikke bygget ennå.
+-- Sant når spilleren er tom for liv. Brukes til å vise
+-- "se reklame for å få liv tilbake"-skjermen (scenes/adoffer.lua,
+-- kort reklame = 1 liv, lang reklame = 3, per Ørjan). Reklamen der er
+-- fortsatt en placeholder (ikke koblet til noe ekte SDK ennå).
 function liv.erTom()
    return liv_igjen <= 0
 end
