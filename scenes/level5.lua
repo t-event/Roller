@@ -1093,7 +1093,12 @@ if event.phase == "began" then
 local agro = event.object1
 local hit = event.object2
 if agro.type == "mal2" and hit.type == "del4" then
-    Runtime:removeEventListener(collision1)
+    -- Rettet 2026-09-15: "collision1" var en udefinert global (skulle
+    -- vært selve funksjonsnavnet onCollision1), så dette kallet kastet
+    -- en feil hver gang målet ble nådd og stoppet resten av
+    -- onCollision1 (lm.unlockNextLevel()/goto2() ble aldri kjørt) -
+    -- banen "klikket bare" og gikk aldri videre til neste bane.
+    Runtime:removeEventListener("collision", onCollision1)
     print( "mal2vsdel4" )
     del4.isSensor = false
   
@@ -1839,8 +1844,14 @@ grp.yScale = scaleFactor
  trykk_knapp = function( event )
     if event.phase == "began" then
             local naa = system.getTimer()
-            if ( naa - sisteBegan ) < dobbeltklikkVindu then
-                isLimp = not isLimp
+            -- Rettet 2026-09-15: å bli slapp krevde dobbeltklikk, men å bli
+            -- stram igjen krevde OGSÅ et dobbeltklikk innenfor samme vindu,
+            -- altså to klikk. Ett enkelt klikk er nå nok når marken
+            -- allerede er slapp.
+            if isLimp then
+                isLimp = false
+            elseif ( naa - sisteBegan ) < dobbeltklikkVindu then
+                isLimp = true
                 print( "marken slapp: " .. tostring(isLimp) )
             end
             sisteBegan = naa

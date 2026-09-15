@@ -21,6 +21,11 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local k = require("lib.ogt_lmdata") -- tweak the variables in this file!
+-- Lagt til 2026-09-15, per Mathias: kunne før velge og starte en bane
+-- rett fra banevalget selv med 0 liv igjen, uten at
+-- reklame-for-liv-skjermen (scenes/adoffer.lua) noen gang ble vist -
+-- liv ble bare sjekket i pause-/dødsmenyen. Se selectLevel() under.
+local liv = require("lib.liv")
 
 local sceneMgr = require( "composer" ) -- or use "storyboard"
 
@@ -141,6 +146,27 @@ end
 
 
 local function selectLevel(event)
+	-- Lagt til 2026-09-15: sjekk liv FØR banen i det hele tatt startes,
+	-- se forklaringen ved "local liv = require(...)" øverst i fila.
+	-- liv.lastliv() må kalles her (ikke bare stole på den siste verdien
+	-- fra denne økten): selve banene laster liv fra fil i sin egen
+	-- scene:create, men banevalget kan nås FØR noen bane noensinne er
+	-- åpnet denne økten (rett etter appstart), da har liv-modulen bare
+	-- sin hardkodede standardverdi (10) i minnet ennå, ikke den faktiske
+	-- lagrede verdien.
+	liv.lastliv()
+	if liv.erTom() then
+		local ok, err = pcall( sceneMgr.gotoScene, "scenes.adoffer", {effect=k.sboardEffect, time=k.sboardTime} )
+		if not ok then
+			local msg = "Checkpoint: " .. tostring(_G.LAST_CHECKPOINT) .. "\n" .. tostring(err)
+			print( "CRASH going to adoffer (selectLevel, 0 liv): " .. msg )
+			local bg = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth - 20, display.contentHeight - 20 )
+			bg:setFillColor( 0, 0, 0, 0.85 )
+			local t = display.newText( { text = msg, x = display.contentCenterX, y = display.contentCenterY, width = display.contentWidth - 40, font = native.systemFont, fontSize = 14, align = "left" } )
+			t:setFillColor( 1, 0.3, 0.3 )
+		end
+		return true
+	end
 	-- save the current page so we can come back to that later
 	if k.rememberPage then
 		local levelInfo  = GGData:new( k.dataFile )

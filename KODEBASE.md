@@ -367,6 +367,13 @@ kolonne-for-kolonne-sjekkede klaringen.
   `ogt_lmdata.lua` bekreftet 4 som riktig verdi — det er nøyaktig så
   mange baner som faktisk er ferdige, se `level2.lua`-punktet lenger
   ned og "Kjente feil".
+  `selectLevel()` sjekker nå liv FØR banen startes (2026-09-15, per
+  Mathias): kunne før starte en hvilken som helst ulåst bane direkte
+  fra banevalget selv med 0 liv, uten at reklame-for-liv-skjermen
+  (`scenes/adoffer.lua`) noen gang ble vist — liv ble kun sjekket i
+  pause-/dødsmenyen. Kaller `liv.lastliv()` (må lastes på nytt her,
+  banevalget kan nås før noen bane er åpnet denne økten) og går til
+  `scenes.adoffer` i stedet for valgt bane om `liv.erTom()`.
 
 ### Delte spillobjekter
 - `perspective.lua` — kamerasystem (parallakse, lag), tredjepartsbibliotek
@@ -560,8 +567,15 @@ kolonne-for-kolonne-sjekkede klaringen.
    **Fikset 2026-09-10:** dobbeltklikk oppdages nå selv, ved å måle tid
    mellom to "began"-faser (300 ms vindu), og "ended" lar motorene være
    av når marken er slapp. Samme fiks i `level2.lua`-`level9.lua` også
-   (delte nøyaktig samme buggede kode), ikke bare `level1.lua`. Ikke
-   testet i faktisk nettleser ennå.
+   (delte nøyaktig samme buggede kode), ikke bare `level1.lua`.
+
+   **Fulgt opp 2026-09-15:** samme 300ms-vindu-sjekk gjaldt begge veier,
+   altså dobbeltklikk krevdes også for å gjøre marken stram igjen, ikke
+   bare for å gjøre den slapp. Mathias: skal bare trenge ett klikk for
+   å bli stram igjen. Endret til at ett enkelt klikk umiddelbart gjør
+   marken stram når den allerede er slapp (ingen tidssjekk i det
+   tilfellet), dobbeltklikk kreves fortsatt for å gjøre den slapp i
+   utgangspunktet. Alle ni banefiler.
 7. **Utilsiktede globale variabler, bekreftet mot Solar2D sin egen
    dokumentasjon (2026-09-10).** Solar2D advarer eksplisitt: fjernes
    ikke Runtime-lyttere, fortsetter de å kjøre og lekker minne, siden
@@ -583,6 +597,23 @@ kolonne-for-kolonne-sjekkede klaringen.
    nedenfor), siden lyttere som ikke fjernes hoper seg opp nøyaktig
    slik Solar2D sin dokumentasjon advarer om. Disse virkningsløse
    linjene er også fjernet.
+8. **"Klarer man banen går man ikke videre, det klikker bare" (funnet
+   2026-09-15).** Alvorlig, sannsynligvis like gammel som spillet selv:
+   `onCollision1` (mål-nådd-sjekken) i alle ni `levelN.lua` inneholdt
+   `Runtime:removeEventListener(collision1)` — `collision1` er en
+   udefinert global (skulle vært selve funksjonsnavnet
+   `onCollision1`), så kallet kastet en Lua-feil hver gang målet ble
+   nådd. `main.lua` sin `Runtime:addEventListener("unhandledError",
+   ...)` fanger nettopp denne typen feil og skriver den bare til
+   konsollen (undertrykker Solar2D sin egen synlige feilboks), så
+   spilleren så ingenting skje. `del4.isSensor = false`,
+   `lm.unlockNextLevel()` og `goto2()` (viser "neste bane") stod alle
+   etter denne linja og ble dermed aldri kjørt. **Fikset**: byttet til
+   riktig kall, `Runtime:removeEventListener("collision",
+   onCollision1)`, i alle ni banefiler. Se `TIL-ORJAN.md` for
+   fullstendig forklaring, inkludert hvorfor dette trolig også forklarer
+   observerte "feilmeldinger" ved banefullføring uavhengig av antall
+   liv igjen.
 
 ## Anbefalt ryddeplan
 

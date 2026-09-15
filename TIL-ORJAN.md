@@ -2048,3 +2048,76 @@ forrige runde) for å bekrefte kollisjonsformene faktisk følger den nye
 kunsten. Kan ikke bekrefte i en faktisk nettleser herfra, spesielt ikke
 "taket går helt opp"-punktet, så si fra om noe av dette fortsatt ser
 feil ut etter neste bygg.
+
+## 2026-09-15, fant den egentlige grunnen til at banen aldri gikk videre
+
+Fem nye punkter fra Mathias, alle spillogikk, ingen av dem om bane
+5/6-kunsten.
+
+**"Når man klarer banen går man ikke videre til neste bane. Det
+klikker bare."** Fant den ekte årsaken, og den er alvorlig: i alle ni
+`levelN.lua` sin `onCollision1` (målet-nådd-sjekken) står det
+`Runtime:removeEventListener(collision1)`. `collision1` er en
+udefinert global variabel (skulle vært selve funksjonsnavnet,
+`onCollision1`), ikke en streng+funksjon slik
+`removeEventListener` krever. Dette kalles med feil argumenter og
+kaster en Lua-feil, HVER gang målet nås, midt inni selve
+kollisjons-håndteringen. `main.lua` har en `Runtime:addEventListener
+("unhandledError", ...)` som fanger nettopp denne typen feil og bare
+skriver den til konsollen (`iHandledTheError = true`, undertrykker
+Solar2D sin egen synlige feilboks), så spilleren ser ingenting skje i
+det hele tatt: `lm.unlockNextLevel()` og `goto2()` (som viser
+"neste bane"-skjermen) stod BEGGE etter denne linja i koden, og ble
+dermed aldri kjørt. Banen "klikker bare" fordi selve kollisjonen
+registreres (og `del4.isSensor = false` også aldri når fram), men
+ingenting av det som faktisk skulle skje etterpå gjør det. Rettet til
+`Runtime:removeEventListener("collision", onCollision1)` (riktig
+kall, fjerner selve lytteren) i alle ni banefiler. Dette er ikke noe
+jeg innførte i denne økten, feilen har sannsynligvis ligget der siden
+spillet først ble bygget, siden alle ni banefilene deler nøyaktig
+samme feil.
+
+Mistenker dette samme forklarer **"Om man har 0 liv kan man fortsatt
+starte banen med null liv og da får man feilmeldinger når man klarer
+banen, trykker main menu osv.."** sin "klarer banen"-halvdel direkte
+(samme bug uansett hvor mange liv man har). For selve "0 liv"-delen:
+sjekket `lib/ogt_levelmanager.lua` (banevalg-rutenettet) og fant at
+`selectLevel()` (kjøres når du trykker på en bane-rute) aldri sjekket
+liv i det hele tatt, bare pause-/dødsmenyen gjorde det. Lagt til en
+sjekk helt i starten av `selectLevel()`: kaller `liv.lastliv()`
+(viktig å laste på nytt her, ikke stole på økten sin nåværende
+minne-verdi, siden banevalget kan nås FØR noen bane noensinne er åpnet
+denne økten, da har liv-modulen bare sin hardkodede standardverdi 10 i
+minnet) og går til `scenes.adoffer` (reklame-for-liv-skjermen) i
+stedet for den valgte banen om `liv.erTom()`. Samme mønster som
+retry/main menu/levels-knappene i pause-/dødsmenyen bruker allerede.
+
+**"Man skal ikke miste liv om man klarer en bane."** Sjekket: ingen av
+de ni `goto2()`-funksjonene eller `onCollision1`-handlerne kaller
+`liv.endreliv()` noe sted. Dette var allerede riktig i koden, ingen
+endring nødvendig.
+
+**"Resume knappen skal ikke ta bort liv."** Sjekket: `resume4()` i
+`pausemenu1.lua` (knappen "pausemenuresume", den eneste som faktisk
+fortsetter samme spilløkt) kaller kun `composer.hideOverlay()` og
+`physics.start()`, ingen `liv.endreliv()`. Dette var allerede riktig i
+koden også. Om dette fortsatt oppleves etter neste bygg, si fra
+nøyaktig når/hvordan (hvilken bane, om det var rett etter en annen
+handling), så graves det videre - fant ingen kodesti som forklarer
+det.
+
+**"Når man dobbelklikker for at marken skal bli slapp så skal det bare
+være å klikke en gang istedenfor to ganger for å gjøre den stram
+igjen."** `trykk_knapp` sin `isLimp`-veksling (alle ni banefiler) målte
+tid mellom to "began"-faser og vekslet `isLimp` bare når det andre
+klikket kom innenfor `dobbeltklikkVindu` (300ms) - samme regel uansett
+om marken skulle bli slapp ELLER stram igjen, altså dobbeltklikk begge
+veier. Endret til: étt enkelt klikk gjør marken stram igjen når den
+allerede er slapp (ingen tidssjekk), dobbeltklikk kreves fortsatt for
+å gjøre den slapp i utgangspunktet.
+
+Luac-sjekket alle 11 endrede filer (`levelN.lua` × 9,
+`lib/ogt_levelmanager.lua`), kjørte fullt syntakssøk over repoet. Kan
+ikke bekrefte "resume tar liv"-punktet eller teste noe av dette i en
+faktisk nettleser herfra, så si fra om noe fortsatt ikke stemmer etter
+neste bygg.
