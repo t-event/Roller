@@ -2498,3 +2498,117 @@ og ikke bare regnet.
 `display.contentHeight` er 540 i dette spillet, motsatt av det
 `config.lua` ser ut til å si. Bruk alltid `display.contentWidth` og
 `display.contentHeight`, aldri tallene fra `config.lua` direkte.
+
+## 2026-09-15, bane 5 og 6 tegnet på nytt: looken, ikke flisene
+
+Mathias presiserte det jeg hadde misforstått: "Jeg mente jeg ville ha
+looken, ikke ren kopi. Så du må lage nye baner med samme look. Se på
+hvordan taket fungerer i hula, fargene osv."
+
+Han har rett, og forrige runde var feil løsning på riktig problem. Jeg
+hadde satt sammen bane 5 og 6 av ekte fliser fra bane 2, 3 og 4. Det ga
+riktig utseende, men det er jo de samme steinene om igjen.
+
+Denne gangen målte jeg stilen ut av den ekte kunsten først, og bygget
+den så opp igjen med nye former.
+
+### Hva kunsten faktisk består av
+
+Jeg trodde bakken var malt med en gradering. Det stemmer ikke. Den er
+**to flate farger**:
+
+- kropp `rgb(38,14,1)`, nesten svart brun
+- kantstrek `rgb(72,33,6)`, tydelig lysere
+
+Resten av paletten, 25 til 49 indekser per fil, er bare blandinger
+mellom de to og det gjennomsiktige. Det forklarer hvorfor forsøkene mine
+på en glatt gradering aldri lignet.
+
+Og så det som var selve nøkkelen. Jeg målte hvor kantstreken ligger, per
+kantretning, på tolv ekte fliser:
+
+| kanten vender | andel med kantstrek |
+|---|---|
+| opp | 93 % (74-100) |
+| ned | 92 % (78-100) |
+| loddrett | **18 %** (6-35) |
+
+Kantstreken ligger altså på **vannrette** kanter, ikke rundt hele
+formen. Loddrette sider står nesten nakne. Det var nøyaktig dette jeg
+bommet på i alle de tidligere forsøkene: jeg la lik kantfarge hele veien
+rundt, og da ser steinen ut som en utstanset plate i stedet for noe lys
+faller på ovenfra.
+
+Tykkelsen på streken målte jeg til median 43 piksler, p90 87.
+
+### Hvordan de nye banene er bygget
+
+Alt er satt sammen av én byggekloss: en **steinskive** med en toppkurve
+og en bunnkurve. Den dekker alt som finnes i den ekte kunsten:
+
+- **høyt tårn**: smal skive, stor tykkelse
+- **kile**: toppen stuper mens bunnen står, så massen spisser seg ut i
+  en lang tunge. Dette er den viktigste. Første forsøk lot topp og bunn
+  gå parallelt, og da blir alt flate bånd uten karakter.
+- **takskår**: tynn skive som ligger fritt over bakken
+- **hulemunn**: tjukk skive som spisser seg ut over gulvet
+
+Konturene er en glattet tilfeldig gange, ikke summer av sinuser. Første
+forsøk med sinuser ga tette skvulp langs hele toppen, cirka 150 piksler
+mellom hver bølge. Den ekte kunsten har lange rolige sveip på 500 til
+900 piksler med noen få bevisste knekk, og det er det den nye
+konturfunksjonen lager.
+
+I tillegg: tynne sprekker inne i massene, og den kalde blågrønne
+aksenten langs enkelte kanter, som bane 4 har.
+
+### Målt mot fasit, ikke skjønnsmessig
+
+Jeg kjørte de samme målingene på min egen kunst som på den ekte, og
+justerte til tallene lå innenfor. Ekte spenn i parentes:
+
+| mål | ekte | nye bane 5/6 |
+|---|---|---|
+| kantstrek, dybde median | 39-47 | 35-45 |
+| kantstrek, p90 | 81-91 | 83-101 |
+| andel kantstrek av kropp | 16-38 % | 14-26 % |
+| rim på opp-vendt kant | 74-100 % | 78-100 % |
+| rim på loddrett side | 6-35 % | 4-26 % |
+| dekning av flata | 31-68 % | 34-48 % |
+
+De tre første gikk jeg tre runder på: kantstreken lå først på median 24
+og var altfor tynn.
+
+### Spillbarheten
+
+- **Takhøyde** i hulepartiene: 852 til 1676 enheter. Første utkast hadde
+  to steder på 498 og 522, begge rettet.
+- **Fall mellom fliser**: 1722 til 4523 enheter, mot 673-5244 som
+  allerede finnes i bane 1-4.
+- **Spawn**: marken har 893 (bane 5) og 910 (bane 6) piksler fritt fall
+  under seg, ingen stein i veien.
+- **Dødslinja**: klaring 600 til 632 enheter overalt.
+- **Hull i gulvet**: 186 til 414 enheter, smale nok til å rulle over.
+
+En ting verdt å vite: målingen min var først strengere enn fysikken. Den
+flagget en passasje på 498 enheter som viste seg å være den 1-4 piksler
+tynne spissen på enden av en kile. Kollisjonssporeren lager ingen
+fixture under 14 piksler, så den spissen finnes bare visuelt. Jeg gjorde
+målingen lik fysikken i stedet for å flytte på stein som ikke var i
+veien.
+
+### Kollisjonen
+
+281 og 285 fixtures, altså rundt 70 per flis, mot 67-308 i de ekte
+banene. Hver fixture er et trapes på 70 piksler med hjørnene på skivens
+egen topp- og bunnkurve, så bilde og kollisjon kommer fra nøyaktig de
+samme kurvene. Jeg tegnet dem oppå kunsten og så på resultatet: de
+følger steinen presist, også de tilspissede endene.
+
+Filene er lagret som palett-PNG med egen gjennomsiktighet per indeks,
+samme format som den ekte kunsten. 79 til 97 kB per flis, mot 86-195 kB
+for de ekte. Til sammenligning var den prosedyregenererte kunsten fra i
+går 1,6 MB per flis.
+
+Fortsatt ikke spilt, jeg har ikke nettleser her. Alt over er målt og
+sett, ikke testet i spill.

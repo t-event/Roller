@@ -224,18 +224,26 @@ filene gjør.
   i `lib/shapedefs.lua` (se "Kjente feil"). Ørjans zip dekket bare bane 1-4,
   så disse tre venter fortsatt på tilsvarende retting. Bane 5 og 6 fikk
   hver sin egen prosedyregenererte bane 2026-09-15, se under.
-> **VIKTIG, 2026-09-15, sent på dagen: all prosedyregenerert grafikk for
-> bane 5 og 6 er kastet og erstattet med ekte, håndtegnet kunst fra bane
-> 1-4.** Mathias sammenlignet bildene side om side: "5 og 6 ser ikke like
-> bra ut, vil ha identisk bakke og tak utseende som de første banene da
-> det ser mye bedre ut." Den eneste måten å få *identisk* utseende på er
-> å bruke de samme bildene, ikke å etterligne dem. Hver flis i bane 5/6
-> er nå en kopi av en faktisk flis fra bane 2/3/4, og kollisjonsformen
-> følger med fra samme bane sin `shapedefs`-fil, så bilde og form hører
-> sammen per konstruksjon. Se "Bane 5 og 6 etter byttet" rett under
-> `level6.lua`. **Alt som står om generator-scriptet, luftlommer,
-> hengende tak, `ceiling_curve()`, `apply_gap_taper()` og fargemåling i
-> avsnittene nedenfor er historikk** fra før byttet, beholdt fordi det
+> **VIKTIG, 2026-09-15, siste runde: bane 5 og 6 er tegnet på nytt med
+> NYE former i bane 1-4 sin stil.** Historikken i to steg:
+>
+> 1. Først ble den prosedyregenererte grafikken kastet og erstattet med
+>    kopier av ekte fliser fra bane 2/3/4, etter at Mathias sammenlignet
+>    bildene: "5 og 6 ser ikke like bra ut, vil ha identisk bakke og tak
+>    utseende som de første banene."
+> 2. Så presiserte han hva han egentlig mente: "Jeg mente jeg ville ha
+>    looken, ikke ren kopi. Så du må lage nye baner med samme look."
+>    Kopiene er derfor også borte. Bane 5 og 6 har nå egne former, malt i
+>    en stil som er **målt** ut av den ekte kunsten.
+>
+> Selve stilmodellen står i "Bane 5 og 6: stilmodellen" rett under
+> `level6.lua`, og den er verdt å lese før man rører terreng i dette
+> spillet. Kort: kunsten er to flate farger, ikke en gradering, og
+> kantstreken ligger bare på vannrette kanter.
+>
+> **Alt som står om generator-scriptet, luftlommer, hengende tak,
+> `ceiling_curve()`, `apply_gap_taper()` og fargemåling i avsnittene
+> nedenfor er historikk** fra de tidligere forsøkene, beholdt fordi det
 > forklarer hvorfor ting ble prøvd, men ingenting av det er i bruk nå.
 
 - `level5.lua` — **egen bane, 2026-09-15.** Første
@@ -524,6 +532,70 @@ kolonne-for-kolonne-sjekkede klaringen.
   stedet en gammel `game`-modul (score.txt/high_score, fungerende
   internt). Ufarlig siden begge er 100 % ubrukte, men en felle for
   filnavn-basert gjetting hvis noen vurderer å gjenopplive en av dem.
+
+### Bane 5 og 6: stilmodellen
+
+Målt på tolv ekte fliser (bane 2, 3 og 4) 2026-09-15, og det er denne
+modellen `level5/1-4.png` og `level6/1-4.png` er tegnet etter.
+
+**Kunsten er to flate farger, ikke en gradering.**
+
+| | farge |
+|---|---|
+| kropp | `rgb(38,14,1)` |
+| kantstrek | `rgb(72,33,6)` |
+
+Resten av paletten (25-49 indekser per fil) er blandinger mellom de to
+og det gjennomsiktige. Flere forsøk på en glatt gradering lignet aldri,
+og dette er grunnen.
+
+**Kantstreken ligger bare på vannrette kanter.** Dette er det viktigste
+enkeltpunktet, og det som ble bommet på i alle de tidligere forsøkene:
+
+| kanten vender | andel med kantstrek |
+|---|---|
+| opp | 93 % (spenn 74-100) |
+| ned | 92 % (spenn 78-100) |
+| loddrett | 18 % (spenn 6-35) |
+
+Legger man lik kantfarge rundt hele formen, ser steinen ut som en
+utstanset plate i stedet for noe lys faller på ovenfra. Streken er
+median 43 piksler dyp, p90 87.
+
+**Formene** er alle bygget av én kloss: en skive med en toppkurve og en
+bunnkurve. Høyt tårn er en smal tjukk skive, kile er en der toppen
+stuper mens bunnen står (så massen spisser seg ut i en tunge), takskår
+er en tynn fritt liggende skive, og hulemunn er en tjukk skive som
+spisser seg ut over gulvet. Topp og bunn må IKKE gå parallelt, da blir
+alt flate bånd uten karakter.
+
+**Konturene** er en glattet tilfeldig gange med noen få bevisste knekk,
+ikke summer av sinuser. Sinuser gir tette skvulp (cirka 150 px mellom
+hver bølge); den ekte kunsten har lange sveip på 500-900 px.
+
+Verktøyene som gjorde dette ligger ikke i repoet, de var
+engangs-scripts. Tallene over er det som trengs for å gjøre det om
+igjen.
+
+**Kollisjonen** er 281 (bane 5) og 285 (bane 6) fixtures, rundt 70 per
+flis, mot 67-308 i de ekte banene. Hver fixture er et trapes på 70 px
+med hjørnene på skivens egen topp- og bunnkurve, så bilde og kollisjon
+kommer fra de samme kurvene. Trapeser tynnere enn 14 px slippes, så de
+hårtynne spissene på kilene er rent visuelle. Koordinatavbildning,
+bekreftet mot bane 3 og 4 sine egne shapedefs:
+
+    X = (bildepiksel_x - 1920) * 2
+    Y = (bildepiksel_y - 1175.5) * 2
+
+og hjørnene må ha positiv signert flate (alle 400 undersøkte fixtures i
+`lib/shapedefs4.lua` har det).
+
+**Målt spillbarhet:** takhøyde 852-1676 enheter, fall mellom fliser
+1722-4523 (mot 673-5244 i bane 1-4), spawn har 893/910 px fritt fall,
+dødslinje-klaring 600-632, hull i gulvet 186-414 enheter.
+
+Bildene er lagret som palett-PNG med egen gjennomsiktighet per indeks,
+samme format som den ekte kunsten, 79-97 kB per flis.
 
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
 
