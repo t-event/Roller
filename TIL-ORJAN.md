@@ -1190,3 +1190,66 @@ md5sum, byte-for-byte identiske (unntatt en triviell sti i
 Luac-sjekket `main.lua` og `lib/ogt_lmdata.lua`. Ikke testet i faktisk
 nettleser at hele kjeden main → meny → banevalg faktisk fungerer som
 forventet.
+
+## 2026-09-15, første forsøk på en helt ny bane (bane 5), i to steg
+
+Mathias ba om en genuint ny bane, og tilbød å koble til connectorer om
+jeg trengte det. Jeg har ikke bildegenerering tilgjengelig i denne
+økten (sjekket: verken som eget verktøy eller som noen connector i
+registeret, Canva/Figma krever et eksisterende design å jobbe ut fra,
+ikke "lag et hulegulv i denne stilen"), så egentlig ny kunst må enten
+lages prosedyremessig (kode som tegner formen) eller komme fra en
+ekte kilde (Ørjan/Mathias).
+
+Laget et prosedyre-generert forslag til bane 5 sin bakke (fire fliser,
+jevn/humpete konturlinje trukket fra samme fargepalett som bane 4, med
+kollisjonsform beregnet direkte fra samme kurve jeg tegnet den med, så
+ingen PhysicsEditor-usikkerhet). Sendte et forhåndsbilde til Mathias
+før noe ble lagt inn i spillet.
+
+Mathias svarte med to konkrete krav banen faktisk må oppfylle
+(uavhengig av selve grafikken): den skal være en **nedoverbakke**, og
+det skal finnes **steder man kan falle gjennom og dø**. Ba samtidig om
+å teste selve banedesignet med de gamle bildene først, og lage noe fra
+bunnen når mekanikken faktisk er under kontroll — fornuftig rekkefølge,
+så jeg satte den prosedyregenererte bakken til side for nå (ligger
+fortsatt i scratchpad, ikke committet).
+
+**Funn som gjorde testen enkel**: `level4.lua` (og alle andre baner)
+er allerede bygget som en nedoverbakke, ikke flatt. `firkant1`-
+`firkant4` (banestykkene) plasseres diagonalt — hver flis flyttes
+BÅDE sin egen bredde til høyre OG sin egen høyde ned fra forrige flis
+(`firkant2.x = firkant1.x+firkant2.width`, `firkant2.y =
+firkant1.y+firkant2.height`, osv). Det er derfor spillet allerede
+oppleves som en nedoverbakke i dag, ikke noe jeg trengte å legge til.
+
+Det finnes også allerede en dødssone, `dod`: en 70000 piksler lang,
+usynlig sensor-stripe rotert i samme vinkel (31.48°) som resten av
+banen, plassert langt til venstre og strukket over hele banens lengde.
+Alt som treffer den (`del1`-`del9` i kollisjonssjekken) trigger
+dødsmenyen, akkurat som å falle helt av banen.
+
+**Testet begge kravene i `level5.lua` uten ny grafikk i det hele
+tatt**, ved midlertidig å gjenbruke `level4.lua` sine ferdig
+sammenhørende bilder OG kollisjonsformer (`level4/1-4.png` +
+`lib/shapedefs4.lua`, byttet fra den delte `lib/shapedefs.lua`) i
+stedet for `level5` sine egne (som uansett fortsatt er feil/delte, se
+"Kjente feil"). Selve hull-testen: flyttet `firkant3` et helt ekstra
+halvt flis-mål lenger unna `firkant2` (både i x og y, langs samme
+skråvinkel som resten), i stedet for kant-i-kant som normalt. Siden
+`dod`-sonen allerede dekker hele banens lengde langt under selve
+bakken, skal det som faller i det hullet dø akkurat som å falle av
+banen — ingen ny dødssone-kode trengtes.
+
+Dette er bevisst en MIDLERTIDIG oppsett (merket tydelig i koden med
+dagens dato): `level5.lua` bruker `level4` sine bilder og
+kollisjonsformer bare for å bevise at nedoverbakke- og
+hull-mekanikken fungerer, ikke som permanent innhold. Neste steg,
+når Mathias/Ørjan har bekreftet at hull-fallet faktisk fungerer og
+føles riktig: erstatte `level4`-referansene med egen bane 5-grafikk
+(enten den prosedyregenererte som allerede ligger klar, eller ekte
+kunst om noen leverer det).
+
+Luac-sjekket `level5.lua`. Ikke testet i faktisk nettleser — det
+er akkurat fallet-gjennom-hullet jeg mest av alt skulle ønske noen
+kunne bekrefte fungerer, siden jeg ikke kan spille selv.

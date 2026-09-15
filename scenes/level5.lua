@@ -11,7 +11,11 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
+-- MIDLERTIDIG 2026-09-15: bruker bane 4 sine kollisjonsformer og bilder
+-- (se under) mens selve banedesignet (nedoverbakke + hull man kan falle
+-- gjennom) testes, akkurat som Mathias ba om. Egen bane 5-grafikk med
+-- riktig sporet kollisjon kommer i en senere omgang, se TIL-ORJAN.md.
+local physicsData = (require "lib.shapedefs4").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -766,34 +770,42 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
    
 
                                      
-                                      local     firkant1 = display.newImageRect("level5/1.png", 7680,4702)
+                                      -- MIDLERTIDIG 2026-09-15: level4/N.png i stedet for level5/N.png,
+                                      -- se forklaringen ved physicsData over.
+                                      local     firkant1 = display.newImageRect("level4/1.png", 7680,4702)
                                                 firkant1.x = 3500
                                                 --firkant1.x = 3850
                                                 firkant1.y = 2300
                                                 physics.addBody(firkant1,"static", physicsData:get("1") )
-                                                firkant1.alpha = 1  
-                                                firkant1.myName = "firkant1"                                
-                                                
-                                      local     firkant2 = display.newImageRect("level5/2.png", 7680,4702)
+                                                firkant1.alpha = 1
+                                                firkant1.myName = "firkant1"
+
+                                      local     firkant2 = display.newImageRect("level4/2.png", 7680,4702)
                                                 firkant2.x = firkant1.x+firkant2.width
                                                 firkant2.y = firkant1.y+firkant2.height
                                                 physics.addBody(firkant2,"static", physicsData:get("2") )
-                                                firkant2.myName = "firkant2"   
-                                                
-                                                 
-                                      local     firkant3 = display.newImageRect("level5/3.png", 7680,4702)
-                                                firkant3.x = firkant2.x+firkant3.width
-                                                firkant3.y = firkant2.y+firkant3.height
+                                                firkant2.myName = "firkant2"
+
+
+                                      -- Hull man kan falle gjennom, som Mathias ba om: bane 3 flyttes et
+                                      -- ekstra halvt flis-mål lenger unna bane 2 (både i x og y, langs
+                                      -- samme skrå nedoverbakke som resten), i stedet for å ligge
+                                      -- kant-i-kant. Den brede "dod"-dødssonen lenger ned i fila dekker
+                                      -- allerede hele banens lengde, så det som faller i hullet dør,
+                                      -- akkurat som å falle av selve banen.
+                                      local     firkant3 = display.newImageRect("level4/3.png", 7680,4702)
+                                                firkant3.x = firkant2.x+firkant3.width+firkant3.width/2
+                                                firkant3.y = firkant2.y+firkant3.height+firkant3.height/2
                                                 physics.addBody(firkant3,"static", physicsData:get("3") )
-                                                firkant3.myName = "firkant3"   
-                                                
-                                                
-                                      local     firkant4 = display.newImageRect("level5/4.png", 7680,4702)
+                                                firkant3.myName = "firkant3"
+
+
+                                      local     firkant4 = display.newImageRect("level4/4.png", 7680,4702)
                                                 firkant4.x = firkant3.x+firkant4.width
                                                 firkant4.y = firkant3.y+firkant4.height
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
-                                                firkant4.myName = "firkant4"   
-                                                
+                                                firkant4.myName = "firkant4"
+
                                                 
 
 

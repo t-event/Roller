@@ -167,6 +167,18 @@ filene gjør.
   plassholderbildene og de samme (feil, sporet fra bane 1) kollisjonsformene
   i `lib/shapedefs.lua` (se "Kjente feil"). Ørjans zip dekket bare bane 1-4,
   så disse fem venter fortsatt på tilsvarende retting.
+- `level5.lua` — **midlertidig omgjort til en test-bane 2026-09-15.**
+  Bruker nå `level4` sine bilder OG `lib/shapedefs4.lua` (i stedet for
+  sine egne, fortsatt gale, plassholder-ting) for å bevise to konkrete
+  krav fra Mathias uten å vente på ny grafikk: at banen faktisk er en
+  nedoverbakke (viser seg at det allerede stemmer, se "Faktisk
+  scene-flyt" — banestykkene plasseres diagonalt, ikke flatt), og at
+  man kan falle gjennom et hull i bakken og dø (testet ved å flytte
+  `firkant3` en ekstra halv flis-lengde unna `firkant2`, den brede
+  `dod`-dødssonen dekker allerede hele banens lengde). Merket tydelig
+  i koden som midlertidig. Se `TIL-ORJAN.md` for hele resonnementet.
+  Egen bane 5-grafikk (prosedyregenerert forslag klart, eller ekte
+  kunst) kommer i neste omgang, når hull-mekanikken er bekreftet.
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
