@@ -1294,3 +1294,42 @@ ikke testet i faktisk nettleser — spesielt viktig å få bekreftet nå:
 at kollisjonen mot den NYE bakken faktisk stemmer visuelt (den er
 riktig utregnet, men "riktig utregnet" er ikke det samme som "sett
 med egne øyne i spillet").
+
+## 2026-09-15, marken så ikke banen: kurven min startet for langt nede
+
+Mathias meldte "ser ikke banen på bane 5" og ba meg sjekke markens
+startposisjon. God ledetråd, for det var akkurat der feilen lå.
+
+Marken (`del1`) starter alltid på verdenskoordinat (0,0), i ALLE baner
+(bekreftet identisk i `level4.lua` også, ikke noe jeg selv satte opp).
+Første flis (`firkant1`) står på (3500, 2300) med en kjempestørrelse
+(7680×4702), så (0,0) havner et stykke inn i selve fliseflaten — men
+KUN dersom bakkeflaten faktisk ligger nær toppen av bildet der. Målte
+etterpå hvor bakken faktisk starter i `level4/1.png` sin egen
+bildefil, nøyaktig ved kolonnen som tilsvarer verdenskoordinat x=0:
+rundt 11 % ned i bildet. Min kurve fra forrige runde startet derimot
+på 60 % ned (en jevn, flat kurve rundt midten) — marken falt dermed
+over 1500 piksler gjennom tomt, gjennomsiktig rom før noe bakke i det
+hele tatt kom i syne. Med kameraet fokusert på marken var resultatet
+nettopp "ser ikke banen": skjermen viste bare tomrom lenge før noe
+dukket opp.
+
+Målte samtidig, mens jeg først var inne i `level4` sine bildefiler,
+den faktiske formen på Ørjans ekte kunst: hver flis er IKKE en jevn,
+rullende bakke, men en bratt nedoverbakke i seg selv (fra ~11 % ned
+ved flisens egen venstrekant til ~83 % ned ved høyrekanten), med et
+tydelig steg/hopp i verdenskoordinater fra én flis til neste (målt
+til over 1000 enheter). Skrev om terreng-scriptet fra "én jevn kurve
+over alle fire flisene" til at hver flis får sin EGEN bratte
+nedoverbakke-kurve (samme mønster som målt), i stedet for å anta at
+flisene skulle flyte jevnt sammen ved kantene. Regnet ut på nytt at
+gapet mellom markens startpunkt og ny bakke nå blir ca 777 enheter,
+tett opptil de 627-751 jeg målte i den ekte bane 4-kunsten.
+
+Genererte alle fire flisene og `lib/shapedefs5.lua` på nytt fra den
+nye kurven. Hullet mellom flis 2 og 3 (fra forrige commit) er urørt.
+
+Luac-sjekket. Fortsatt ikke sett i faktisk nettleser, men
+avstanden fra markens startpunkt til bakken er nå tallfestet og
+matcher den ekte bane 4-kunsten godt, så jeg er en god del tryggere
+denne gangen enn forrige.

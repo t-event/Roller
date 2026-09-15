@@ -174,13 +174,19 @@ filene gjør.
   flyttet en ekstra halv flis-lengde unna `firkant2`, fanget opp av
   den eksisterende `dod`-dødssonen). Grafikken (`level5/1-4.png`) er
   ikke håndtegnet som resten av spillet, men generert med et
-  Python-script som tegner en sammenhengende terrengkurve; selve
-  kollisjonsformen i `lib/shapedefs5.lua` er regnet ut direkte fra de
-  samme koordinatene kurven ble tegnet med (ikke sporet i etterkant),
-  så form og bilde stemmer eksakt overens per konstruksjon. `del1`
-  (marken sin egen form) kopiert uendret fra `lib/shapedefs4.lua`. Se
-  `TIL-ORJAN.md` for hele prosessen, inkludert et mellomsteg der bane
-  4 sine bilder ble lånt midlertidig for å teste selve mekanikken
+  Python-script; selve kollisjonsformen i `lib/shapedefs5.lua` er
+  regnet ut direkte fra de samme koordinatene kurven ble tegnet med
+  (ikke sporet i etterkant), så form og bilde stemmer eksakt overens
+  per konstruksjon. `del1` (marken sin egen form) kopiert uendret fra
+  `lib/shapedefs4.lua`. Hver flis har sin EGEN bratte
+  nedoverbakke-kurve (fra ~12 % ned ved venstrekant til ~83 % ned ved
+  høyrekant, målt fra bane 4 sin ekte kunst), ikke én jevn kurve over
+  alle fire flisene som i det aller første forsøket — den jevne
+  varianten plasserte bakken altfor langt fra der marken faktisk
+  starter (verdenskoordinat 0,0), så marken falt gjennom tomt rom uten
+  at noen bakke kom i syne. Se `TIL-ORJAN.md` for hele prosessen,
+  inkludert et mellomsteg der bane 4 sine bilder ble lånt midlertidig
+  for å teste selve mekanikken
   isolert fra grafikken.
 
 ### Banevalg-systemet
