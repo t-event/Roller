@@ -297,6 +297,19 @@ til tak-kurven. Antall fixtures per flis gikk fra ~40 til over 130.
 Se `TIL-ORJAN.md` for detaljene og hvordan feilen ble oppdaget
 (et referansebilde med kollisjonsformene tegnet oppå kunsten).
 
+**Tak-klaringen ved spawn, rettet på nytt:** forrige forsøk på
+`apply_ceiling_spawn_clearance()` hadde riktig idé men et fortegn
+baklengs i egen verifikasjon (regnet "tak-verdi minus markens rad" og
+kalte positivt trygt, riktig sjekk er omvendt siden taket er solid
+FRA toppen av bildet OG NED), så marken spawnet fortsatt 125 enheter
+inni fjellet i praksis, til tross for en rapportert "trygg klaring".
+Skrevet om til en flat, trygg sone (`SPAWN_CLEAR_FLAT`, tak presset
+mot null) som dekker markens HELE kroppsbredde ved spawn (alle ni
+kroppsdelene deler samme rad, kolonner ca 60-170), etterfulgt av en
+lengre glidende overgang (`SPAWN_CLEAR_RAMP`) tilbake til normal
+tak-dybde. Se `TIL-ORJAN.md` for hele regnefeilen og den nye,
+kolonne-for-kolonne-sjekkede klaringen.
+
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig
   "level select grid"-bibliotek (paginert rutenett, lås/opplåsing,

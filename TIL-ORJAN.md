@@ -1804,3 +1804,52 @@ for begge banene på nytt for å bekrefte fiksen visuelt før commit.
 
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå.
+
+## 2026-09-15, bane 5: marken spawnet faktisk inni taket, egen tabbe
+
+Mathias testet i faktisk nettleser og meldte: "Marken spawner inne i
+taket på level 5". Overrasket, siden jeg hadde regnet ut og rapportert
+en "trygt positiv klaring" (125 enheter) for akkurat dette forrige
+runde. Gikk gjennom utregningen på nytt og fant feilen: den var min
+egen, i selve KONTROLLEN, ikke i spillkoden jeg allerede hadde skrevet.
+
+`apply_ceiling_spawn_clearance()` sin logikk var riktig, men
+verifikasjons-regnestykket mitt hadde fortegnet baklengs.
+Taket er solid fra rad 0 og NED TIL tak-kurven sin verdi, så jo
+STØRRE tak-verdien er, jo lenger NED strekker steinen seg (nærmere
+markens startpunkt, ikke lenger unna). Jeg regnet
+"tak-verdi minus markens rad" og kalte et POSITIVT tall trygt, det
+motsatte av riktig: riktig sjekk er "markens rad minus tak-verdi",
+positivt betyr marken sitter rad-messig UNDER (altså tallmessig
+lenger ned enn) der taket slutter, i åpent rom. Med feil fortegn så
+"125 enheter klaring" egentlig ut som en god verdi, den var faktisk
+125 enheter INNI fjellet.
+
+Rettet både utregningen og selve avstanden: `apply_ceiling_spawn_clearance()`
+skrevet om fra én enkelt letting-kurve til en FLAT trygg sone
+(`SPAWN_CLEAR_FLAT = 300` piksler, taket presset helt ned mot null)
+etterfulgt av en lengre, separat glidende overgang tilbake til normal
+tak-dybde (`SPAWN_CLEAR_RAMP = 600` piksler til). Grunnen til at forrige
+forsøk (300+ i praksis for smalt, se forrige logg) likevel traff feil:
+selv om verdien VAR liten ved kolonne 0, rakk den å stige forbi markens
+egen rad (25,5) lenge før kolonne 170 der marken faktisk spawner, fordi
+letting-kurven brukte den fulle 500-piksler bredden til å nå helt fram
+til den naturlige tak-dybden (~235+). Den flate sonen holder nå taket
+nede over HELE markens kroppsbredde ved spawn (regnet ut at alle ni
+kroppsdelene, som alle deler samme rad, dekker lokale kolonner ca
+60-170), ikke bare ved én enkelt kolonne.
+
+Sjekket på nytt, denne gangen med riktig fortegn, over hele det
+kritiske kolonneområdet (0-250), ikke bare ved markens egen
+spawn-kolonne: klaringen er nå jevnt +37 enheter over hele den flate
+sonen for både bane 5 og 6. Avstanden fra spawn til bakken uendret
+(423/610).
+
+Samme feil (og samme fiks) gjaldt bane 6 sitt script også, siden det
+er en kopi av bane 5 sitt med egne frø. Regenererte kun `level5/1.png`
+og `level6/1.png` (bare flis 1 sin tak-sone nær spawn faktisk endret
+seg, flis 2-4 upåvirket) og begge banenes `lib/shapedefs5/6.lua`.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Bekreftet visuelt
+med et nærbilde av spawn-punktet mot de nye kollisjonsformene før
+commit denne gangen, ikke bare et tall jeg selv kunne regne feil på.
