@@ -554,13 +554,29 @@ enkeltpunktet, og det som ble bommet på i alle de tidligere forsøkene:
 
 | kanten vender | andel med kantstrek |
 |---|---|
-| opp | 93 % (spenn 74-100) |
-| ned | 92 % (spenn 78-100) |
+| vannrett (topp og bunn) | 92-93 % (spenn 74-100) |
 | loddrett | 18 % (spenn 6-35) |
 
 Legger man lik kantfarge rundt hele formen, ser steinen ut som en
 utstanset plate i stedet for noe lys faller på ovenfra. Streken er
 median 43 piksler dyp, p90 87.
+
+**Det blå er IS, ikke bare en farge.** Fixturene under den har
+`friction = 0.05` i stedet for `3`. Målt i `lib/shapedefs4.lua`: 125 av
+519 fixtures har 0.05, ingen av de andre banene har en eneste, og
+is-fixturene inneholder 6,7-12,6 % blå piksler mot 0,1-1,2 % i
+stein-fixturene. `level4/1` har ingen blå farge og ingen is-fixtures.
+
+Isen ligger på **gulvflaten man ruller på**, som et tynt lag 6-20 px
+under overflaten (94,6 % og 98,4 % av de blå pikslene i `level4/2` og
+`level4/3` ligger på nederste bit i kolonnen). `level4/4` er 45/55 fordi
+halve isen der ligger på hulemunnens overheng. Is på en stein man ikke
+kan komme på gjør ingenting, så legg den aldri på takskår.
+
+Visuelt er isen et **skarpt** cyan band, `rgb(44,106,130)` på det
+sterkeste, med hard innerkant. Toner man den mykt ut leser den som en
+flekk i steinen i stedet for et eget materiale. Bane 5 og 6 har 65 og 62
+is-fixtures, 0,44-1,46 % av kroppen blå, dybde median 14-16 px.
 
 **Formene** er alle bygget av én kloss: en skive med en toppkurve og en
 bunnkurve. Høyt tårn er en smal tjukk skive, kile er en der toppen

@@ -2529,8 +2529,7 @@ kantretning, på tolv ekte fliser:
 
 | kanten vender | andel med kantstrek |
 |---|---|
-| opp | 93 % (74-100) |
-| ned | 92 % (78-100) |
+| vannrett (topp og bunn) | 92-93 % (74-100) |
 | loddrett | **18 %** (6-35) |
 
 Kantstreken ligger altså på **vannrette** kanter, ikke rundt hele
@@ -2612,3 +2611,76 @@ går 1,6 MB per flis.
 
 Fortsatt ikke spilt, jeg har ikke nettleser her. Alt over er målt og
 sett, ikke testet i spill.
+
+## 2026-09-15, det blå er is, og det hadde jeg ikke skjønt
+
+Mathias: "Husk at det blå skal representere is. Og har annen friksjon
+enn resten av banen, akkurat slik som de andre banene som har is."
+
+Jeg hadde behandlet den blå fargen som ren dekorasjon. Den har en
+gameplay-funksjon, og jeg fant den igjen i koden med en gang jeg lette
+etter den.
+
+### Hvordan is er representert
+
+`lib/shapedefs4.lua` har **125 av 519 fixtures med `friction = 0.05`**,
+mens all annen stein har `3`. Ingen av de andre banene har en eneste
+0.05. Bane 4 er nettopp den banen som har blå farge, så det var en
+sterk indikasjon. Jeg bekreftet den ved å måle hvor de fixturene ligger:
+
+| flis | is-fixtures | blå piksler i is-boksene | i stein-boksene |
+|---|---|---|---|
+| level4/1 | 0 | ingen blå farge i bildet | 0,0 % |
+| level4/2 | 35 | 8,6 % | 0,1 % |
+| level4/3 | 40 | 6,7 % | 0,9 % |
+| level4/4 | 50 | 12,6 % | 1,2 % |
+
+Altså 10 til 60 ganger så konsentrert i is-fixturene, og flisa uten blå
+farge har ingen. Det er isen.
+
+Jeg målte også **hvor** isen ligger, og det var det viktigste for meg:
+94,6 % (level4/2) og 98,4 % (level4/3) av de blå pikslene ligger på den
+nederste biten i kolonnen, altså på **gulvflaten man ruller på**, som et
+tynt lag 6 til 20 piksler under overflaten. Det er logisk nok: is man
+ikke kan komme på ville ikke gjort noe.
+
+`level4/4` er 45/55, fordi den flisa har hulemunnen og halve isen ligger
+på overhenget.
+
+### Hva jeg hadde gjort feil
+
+Jeg hadde lagt den blå fargen på **oversiden av takskårene**, altså på
+steiner som henger i taket, der marken aldri kommer. Pent, men
+meningsløst, og direkte misvisende nå som jeg vet at blått betyr is.
+
+Isen er flyttet til gulvblokkene. Fordelingen er nå 100 % på gulvet i
+seks av åtte fliser, og 45/54 i de to flisene som har hulemunn, akkurat
+samme mønster som bane 4. Is-rekkevidden stopper alltid før blokkens
+høyre ende, så kanten mot et hull aldri er isete.
+
+Fixturene under isen har `friction = 0.05`, 65 i bane 5 og 62 i bane 6,
+altså 16 til 37 prosent av fixturene per flis mot 0 til 41 prosent i
+bane 4.
+
+### Og så måtte den se ut som is
+
+Første forsøk tonet isen ut mykt over 36 piksler. Da jeg la den ved
+siden av den ekte i full oppløsning, så min ut som en blåfarget flekk
+inne i steinen, mens den ekte er et tydelig cyan band med hard
+innerkant, som leser som et eget materiale.
+
+Endret til et skarpt band: full styrke fra overflaten og ned, med bare
+5 piksler mykt omslag i innerkanten, og lysere farge `rgb(44,106,130)`,
+som er den målte toppen i `level4/4`.
+
+Etter det: 0,44 til 1,46 prosent av kroppen er blå, mot 0,43 / 1,50 /
+1,90 i bane 4. Dybde median 14 til 16 piksler, mot 6 til 20.
+
+### Én rettelse i det jeg skrev i går
+
+Fortegnet mitt for kantretning var omvendt. Jeg kontrollerte det mot en
+syntetisk maske: positiv y-gradient betyr at kanten vender opp. Det
+endrer ingen konklusjon, siden begge de vannrette retningene målte 92 og
+93 prosent, men tabellen i `KODEBASE.md` sa "opp" og "ned" der den
+egentlig bare kunne skille vannrett fra loddrett. Den er rettet til å si
+det den faktisk viser.
