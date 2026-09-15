@@ -219,8 +219,12 @@ filene gjør.
   starter (verdenskoordinat 0,0), så marken falt gjennom tomt rom uten
   at noen bakke kom i syne. Se `TIL-ORJAN.md` for hele prosessen,
   inkludert et mellomsteg der bane 4 sine bilder ble lånt midlertidig
-  for å teste selve mekanikken
-  isolert fra grafikken.
+  for å teste selve mekanikken isolert fra grafikken, og en
+  skaleringsfeil (kollisjonsformene var regnet ut i kildebildets
+  pikselstørrelse, 3840×2351, i stedet for den faktiske viste
+  størrelsen 7680×4702 som `display.newImageRect` strekker til, rettet
+  2026-09-15 ved å doble alle "1"-"4"-koordinatene i
+  `lib/shapedefs5.lua`).
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig

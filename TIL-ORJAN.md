@@ -1465,3 +1465,40 @@ større endring.
 
 Luac-sjekket begge filene, kjørte fullt syntakssøk over repoet
 etterpå. Ikke testet i faktisk nettleser ennå.
+
+## 2026-09-15, bane 5: banen vises, men kollisjonen virket ikke
+
+Mathias bekreftet: banen vises nå riktig etter forrige fiks, men
+kollisjonen fungerer ikke. Fant feilen ved å sammenligne
+`lib/shapedefs5.lua` sine tall direkte mot `lib/shapedefs4.lua` (ekte,
+PhysicsEditor-sporet, bekreftet fungerende) sine.
+
+`firkant1`-`firkant4` lages med `display.newImageRect("level5/N.png",
+7680, 4702)`, altså strekkes kildebildet (3840×2351 piksler) opp til
+DOBBEL størrelse på skjermen. Kollisjonsform-koordinater i Solar2D
+angis i objektets EGET, faktiske (viste) koordinatsystem, ikke
+kildebildets pikselstørrelse. Terreng-scriptet mitt bygde derimot
+formene direkte fra kildebildets piksel-koordinater (±1920/±1175,
+halve 3840×2351), uten å gange opp til den faktiske visningsstørrelsen
+(som skulle vært ±3840/±2351). Sjekket `lib/shapedefs4.lua` sine
+faktiske tall for å bekrefte: de ligger i området ±3700/±2300, altså
+den DOBLE, riktige skalaen jeg selv skulle brukt.
+
+Dette ble faktisk vurdert allerede i den første bane 5-økten (se
+loggen lenger opp, "kurven min startet for langt nede"), og den gangen
+konkludert med at skaleringen stemte. Det var feil, trolig fordi jeg
+den gangen sammenlignet mot feil referansepunkt. Beklager at det tok
+en runde til å finne.
+
+Fikset ved å doble alle tallene i de fire bakke-fixturene ("1"-"4") i
+`lib/shapedefs5.lua`, en ren skalering (samme kurveform, samme
+relative posisjon, bare uttrykt i riktig koordinatsystem). Rørte ikke
+`del1` (markens egen form, kopiert fra `shapedefs4.lua` fra før, var
+allerede riktig skalert). Vurderte å heller sette
+`scaleFactor = 2.0` i `level5.lua` i stedet for å endre selve fila,
+men lot være: den samme `scaleFactor`-variabelen brukes til å skalere
+ALLE former filen returnerer, `del1` inkludert, så det ville doblet
+markens egen kollisjonsform ved en feiltagelse også.
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå.
