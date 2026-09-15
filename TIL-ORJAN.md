@@ -2214,3 +2214,80 @@ Luac-sjekket alle ni banefiler på nytt, kjørte `luacheck` på nytt for å
 bekrefte at both `onCollision`- og `eventTimer`-varslene er borte,
 kjørte fullt syntakssøk over hele repoet. Kan ikke bekrefte i en
 faktisk nettleser herfra.
+
+## 2026-09-15, man kunne falle ut av verdenen uten å dø
+
+**"Marken kunne falle ut av banen på bane 2 uten at det kom opp at den
+døde. Gjør slik at man dør om man faller ut av verdenen."** Fant
+årsaken, og den gjelder alle ni banene, ikke bare bane 2: dødssonen er
+ETT enkelt rektangel (`dod`, 70000x50 piksler, rotert 31,48 grader),
+lagt som én lang diagonal linje under banen. Den er lang, men ikke
+uendelig. Regnet ut nøyaktig hvor den slutter:
+
+- dødssonen tar slutt ved x = 28409
+- siste flis slutter ved x = 30380
+- selve målet (`mal2`) står ved x = 31000
+
+Altså er de siste ~2600 enhetene av hver eneste bane helt uten dødssone,
+og det er nøyaktig den strekningen du er på når du holder på å fullføre
+banen. Faller marken av bakken der, treffer den aldri noe, og fortsetter
+bare å falle i det uendelige mens kameraet følger etter. Ingen dødsmeny,
+ingen vei videre, må pause og gå ut manuelt.
+
+Lagt inn et sikkerhetsnett som ikke er avhengig av `dod` i det hele tatt,
+og som ikke kan ta slutt: en `enterFrame`-sjekk som for hver x finner
+flisa marken er over, og utløser vanlig død (samme `goto()` som
+dødssonen bruker) hvis marken har falt under UNDERKANTEN av den flisa,
+eller er kommet en hel flisbredde utenfor første/siste flis i bredden.
+Underkanten av selve bildet ligger alltid under all bakke som er tegnet
+i det, så sjekken kan ikke slå til der spilleren egentlig står trygt.
+
+Første forsøk brukte i stedet én felles skrå linje under alle flisene
+(samme vinkel som `dod`, bare uendelig lang), som var enklere. Målte den
+mot den ekte bakke-kunsten før commit, og den holdt ikke: på slutten av
+bane 1 og bane 3 lå linja 160-170 enheter OVER bakken, altså midt i der
+spilleren faktisk går, som ville gitt død uten grunn. Grunnen er at en
+rett linje gjennom flis-sentrene skjærer opp i flisene i venstre halvdel
+av hver flis. Kastet det og gikk over til per-flis-grensen over.
+Verifiserte den nye mot alle 36 bakke-bildene (ni baner x fire fliser),
+målt kolonne for kolonne i selve PNG-ene: minste klaring mellom bakken
+og dødsgrensa er 864 enheter, og den er positiv overalt.
+
+## 2026-09-15, livtelleren viste ett liv for mye, og fikk egen retry-knapp
+
+**"Når man er på sitt siste liv bør det stå 0. Folk tror de enda har ett
+ekstra forsøk når det står 1 igjen, men om de dør så må de se reklame."**
+Stemmer: telleren viste den rå verdien i `liv.txt`, mens livet først
+trekkes fra når du faktisk bruker retry/hovedmeny/baner. Står det 1, er
+det forsøket du spiller det siste, og dør du kommer reklame-skjermen.
+Visningen trekker nå fra det forsøket som pågår (`liv_igjen - 1`, aldri
+under 0), så 0 betyr "dette er siste forsøk". Selve telleren og
+regnestykket bak er uendret, bare visningen.
+
+Endret samtidig ordlyden på reklame-skjermen (`scenes/adoffer.lua`) fra
+"liv" til "forsøk": med den nye visningen ville "+1 liv" sett ut som om
+ingenting skjedde, siden telleren står på 0 både før og under det
+ekstra forsøket. "+1 forsøk" stemmer nøyaktig. Si fra om du heller vil
+ha "liv" der, det er bare to tekststrenger.
+
+**"Om man klikker på livene sine bør det være en knapp for å retry, så
+slipper man å pause også trykke retry."** Lagt inn: trykker du på
+livteller/markikonet øverst, spretter det opp en retry-knapp rett under,
+og trykker du den igjen forsvinner den. To trykk totalt er med vilje, så
+man ikke starter banen på nytt ved et uhell med ett bomtrykk øverst på
+skjermen. Selve retryen gjør nøyaktig det samme som retry-knappen i
+pausemenyen: avbryter ventende transitions og den forsinkede
+knekk-timeren, stopper fysikken så marken ikke fortsetter under
+overgangen, trekker livet, og går via mellomscenen `gotoretry` (eller
+reklame-skjermen om forsøkene er brukt opp).
+
+Alt dette ligger i `lib/liv.lua`, altså ett sted for alle ni banene.
+Ryddet samtidig opp i to ting der: `livText`/`livbilde` var utilsiktede
+globaler (ingenting utenfor fila har noen gang rørt dem), og telleren
+ble tegnet to ganger oppå seg selv fordi hver banefil kaller
+`liv.hent()` både med en gang og igjen etter tre sekunder. Den gamle
+fjernes nå først.
+
+Luac-sjekket alle endrede filer, kjørte `luacheck` på `lib/liv.lua`
+(null varsler nå) og fullt syntakssøk over repoet. Kan ikke teste i
+faktisk nettleser herfra.

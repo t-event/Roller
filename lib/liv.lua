@@ -7,6 +7,16 @@ local hoyde = display.contentHeight
 
 local liv = {}
 
+-- Lagt til 2026-09-15: livtelleren har nå en egen retry-knapp (se
+-- liv.hent lenger ned), og den trenger både composer og physics for å
+-- gjøre nøyaktig det samme som retry-knappen i pausemenyen gjør.
+local composer = require( "composer" )
+local physics = require( "physics" )
+
+-- Selve livteller-objektene. Var utilsiktede globaler før (2026-09-15),
+-- ingenting utenfor denne fila har noen gang rørt dem.
+local livText, livbilde, livretry
+
 -- File path to the score file
 local score_file_path = system.pathForFile( "liv.txt", system.DocumentsDirectory )
 local STARTLIV = 10
@@ -70,8 +80,31 @@ end
 
 
 -------------------------------------------------------------------------
+-- Hvor mange forsøk du har igjen ETTER det du holder på med nå.
+-- Endret 2026-09-15, Mathias: "Når man er på sitt siste liv bør det stå
+-- 0. Er misvisende på måten det står nå. Folk tror de enda har ett
+-- ekstra forsøk når det står 1 igjen men om de dør så må de se reklame."
+-- Telleren i seg selv (liv_igjen) er uendret, det er bare visningen som
+-- trekker fra det forsøket som pågår: står det 0, er dette det siste,
+-- og dør du nå kommer reklame-for-liv-skjermen.
+local function livIgjenEtterDette()
+   local igjen = liv_igjen - 1
+   if igjen < 0 then
+      igjen = 0
+   end
+   return igjen
+end
+
 function liv.hent( event )
-livText = display.newText(liv_igjen, bredde-200 ,hoyde-hoyde+45 ,nil ,30)
+-- Rydder bort forrige teller først. Banefilene kaller denne to ganger
+-- (én gang med en gang, én gang tre sekunder ut i banen), så uten dette
+-- lå det hele tiden to tellere rett oppå hverandre.
+display.remove( livText )
+display.remove( livbilde )
+display.remove( livretry )
+livText, livbilde, livretry = nil, nil, nil
+
+livText = display.newText(livIgjenEtterDette(), bredde-200 ,hoyde-hoyde+45 ,nil ,30)
 grp:insert( livText )
 
 livbilde = display.newImageRect( "mark.png",121,141 )
@@ -81,7 +114,56 @@ livbilde.height = 141/2
 livbilde.width = 121/2
 grp:insert(livbilde)
 
+-- Retry-knapp rett under livene, skjult til man trykker på dem.
+-- Lagt til 2026-09-15, Mathias: "Om man klikker på livene sine bør det
+-- være en knapp for å retry, så slipper man å pause også trykke retry".
+-- To trykk totalt (livene, så knappen) er med vilje: da kan man ikke
+-- starte banen på nytt ved et uhell med ett bomtrykk øverst på skjermen.
+livretry = display.newImageRect( "pausemenuretry.png", 109, 45 )
+livretry.x = livText.x
+livretry.y = livText.y + 70
+livretry.isVisible = false
+grp:insert( livretry )
 
+local function visRetryKnapp( event )
+   if event.phase == "began" then
+      livretry.isVisible = not livretry.isVisible
+   end
+   return true
+end
+livText:addEventListener( "touch", visRetryKnapp )
+livbilde:addEventListener( "touch", visRetryKnapp )
+
+local function gjorRetry( event )
+   if event.phase ~= "began" then
+      return true
+   end
+   livretry.isVisible = false
+   -- Nøyaktig samme rekkefølge som retry-knappen i pausemenu1.lua, se
+   -- forklaringene der: avbryt ventende transitions og den forsinkede
+   -- knekk-timeren først (ellers kan de fyre av mot en bane som er revet
+   -- ned), stopp fysikken så marken ikke fortsetter å bevege seg under
+   -- overgangen, trekk livet, og gå via mellomscenen "gotoretry" (eller
+   -- reklame-for-liv-skjermen om livene er brukt opp).
+   transition.cancel()
+   if _G.eventTimer ~= nil then
+      timer.cancel( _G.eventTimer )
+      _G.eventTimer = nil
+   end
+   physics.pause()
+   liv.endreliv( 1 )
+   liv.lagreliv()
+   local target = "scenes.gotoretry"
+   if liv.erTom() then
+      target = "scenes.adoffer"
+   end
+   local ok, err = pcall( composer.gotoScene, target, {effect = "fade" , time = 500} )
+   if not ok then
+      print( "CRASH going to " .. tostring(target) .. " (retry fra livene): " .. tostring(err) )
+   end
+   return true
+end
+livretry:addEventListener( "touch", gjorRetry )
 end
 -------------------------------------------------------------------------
 

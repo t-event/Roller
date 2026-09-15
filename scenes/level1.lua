@@ -45,6 +45,11 @@ local trykk_knapp
 -- Forhåndsdeklarert her av samme grunn som trykk_knapp: begge stedene
 -- refererer nå samme fil-scopede local.
 local onCollision, onCollision1
+-- Lagt til 2026-09-15: forhåndsdeklarert av samme grunn som de over,
+-- slik at både goto() og scene:hide kan fjerne enterFrame-lytteren
+-- igjen. Se der den settes opp (nederst i scene:create) for hvorfor
+-- den finnes.
+local sjekkUtenforBanen
 
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -74,6 +79,10 @@ local onCollision, onCollision1
         physics.pause( )
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
+        -- Slår av utenfor-banen-sjekken her også, ellers kan den rekke å
+        -- kalle goto() en gang til rett etter at dod-sonen allerede har
+        -- gjort det (marken er som regel utenfor banen i begge tilfeller).
+        Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
         composer.showOverlay( "scenes.dodmenu1",{isModal = true,effect = "fade",time = 1500,})
         end
 
@@ -2209,6 +2218,56 @@ camera:layer(2).parallaxRatio=0
 -- flytter kun lag 2 til fronten av kamera-gruppa, uten å endre hvilket
 -- lag knappen faktisk tilhører (og dermed ikke rulle-oppførselen).
 camera:layer(2):toFront()
+
+-- Lagt til 2026-09-15 (Mathias: "Marken kunne falle ut av banen på bane
+-- 2 uten at det kom opp at den døde. Gjør slik at man dør om man faller
+-- ut av verdenen."). Dødssonen har hele tiden vært ETT enkelt rektangel
+-- ("dod" øverst i fila, 70000x50 rotert 31,48 grader) lagt som en
+-- diagonal linje under banen. Den er lang, men ikke uendelig: regnet ut
+-- at den slutter rundt x = 28400, mens siste flis slutter rundt
+-- x = 30400 og selve målet (mal2) står på x = 31000. Faller marken av
+-- bakken på den aller siste strekningen, altså akkurat der man er når
+-- man holder på å fullføre banen, treffer den aldri dødssonen, og faller
+-- bare videre i det uendelige uten at dødsmenyen dukker opp.
+--
+-- Dette er et sikkerhetsnett som ikke er avhengig av "dod" i det hele
+-- tatt, og som ikke tar slutt: for hver x finner vi flisa marken er over
+-- og dør om den har falt under UNDERKANTEN av den flisa. Underkanten av
+-- selve bildet er alltid under all bakke som er tegnet i det, så dette
+-- kan ikke gi dødsfall der spilleren egentlig står trygt (et forsøk med
+-- én felles skrå linje under alle flisene ble forkastet: målt mot den
+-- ekte bakke-kunsten lå den 160 enheter OVER bakken på slutten av bane 1
+-- og 3, altså midt i der spilleren faktisk går).
+local flisene = { firkant1, firkant2, firkant3, firkant4 }
+local FALL_UNDER_FLIS = 600
+
+local function bunnlinjeVed( x )
+    local flis = flisene[1]
+    for i = 2, #flisene do
+        if x >= flisene[i].x - flisene[i].width / 2 then
+            flis = flisene[i]
+        end
+    end
+    return flis.y + flis.height / 2 + FALL_UNDER_FLIS
+end
+
+local baneVenstre = firkant1.x - firkant1.width
+local baneHoyre = firkant4.x + firkant4.width
+local harFaltUtAvBanen = false
+
+sjekkUtenforBanen = function()
+    if harFaltUtAvBanen then return end
+    if punkt == nil or punkt.x == nil then return end
+    if punkt.y > bunnlinjeVed( punkt.x )
+        or punkt.x < baneVenstre
+        or punkt.x > baneHoyre then
+        harFaltUtAvBanen = true
+        Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
+        print( "marken falt ut av banen" )
+        goto()
+    end
+end
+Runtime:addEventListener( "enterFrame", sjekkUtenforBanen )
 local sqCenterX, sqCenterY = reff:localToContent( 0, 0 )
 
 
@@ -2381,6 +2440,7 @@ Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
 
 
+Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
 composer.removeScene ("scenes.pausemenu1")
 
        composer.removeScene ("scenes.level1")

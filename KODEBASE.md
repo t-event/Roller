@@ -415,6 +415,25 @@ kolonne-for-kolonne-sjekkede klaringen.
   fortsatt av noe helt separat: en fysikk-kollisjon mellom et
   "dod"-objekt og spillerens hode (`del9`), uavhengig av
   live-telleren.
+
+  **Visningen (`liv.hent()`) endret 2026-09-15**, per Mathias: tallet
+  viser nå hvor mange forsøk du har igjen ETTER det du holder på med
+  (`liv_igjen - 1`, aldri under 0), ikke den rå telleren. Står det 0 er
+  dette siste forsøk, og dør du kommer reklame-skjermen. Før viste den
+  "1" på siste forsøk, som fikk folk til å tro de hadde ett forsøk i
+  bakhånd. Selve telleren og alt regnestykket rundt er uendret, kun
+  visningen. `scenes/adoffer.lua` sier derfor "forsøk" og ikke "liv"
+  på knappene sine, ellers ville "+1 liv" sett ut som om ingenting
+  skjedde (telleren står på 0 både før og under det ekstra forsøket).
+  Samme funksjon fikk samtidig en **retry-knapp**: trykk på
+  livteller/markikonet, så spretter det opp en retry-knapp rett under
+  (trykk igjen for å skjule den). Den gjør nøyaktig det samme som
+  retry-knappen i pausemenyen, inkludert `liv.erTom()`-sjekken og
+  omveien om `scenes.gotoretry`. Ligger her, altså ett sted for alle ni
+  banene. `livText`/`livbilde` var utilsiktede globaler og er nå lokale,
+  og den gamle telleren fjernes før en ny tegnes (banefilene kaller
+  `liv.hent()` både med en gang og igjen etter tre sekunder, så det lå
+  hele tiden to oppå hverandre).
 - `mark.lua` — bygger spillerkarakterens kroppsdeler (hale/hode),
   fysikk-leddet sammen. **`require`t av `menu.lua` og `level1.lua`,
   men `mark.hent()` blir aldri faktisk kalt noe sted** (begge fanger
@@ -645,6 +664,27 @@ kolonne-for-kolonne-sjekkede klaringen.
    `TIL-ORJAN.md` for hvilke andre `luacheck`-funn som ble sjekket og
    vurdert ufarlige (`scaleFactor`, `rot`, `reff`, `angel`, `punktsant`,
    `stovteller1-9`, `last`).
+10. **Dødssonen tok slutt før banen gjorde (funnet 2026-09-15).**
+    `dod`-objektet, som er det eneste som utløser dødsmenyen når man
+    faller, er ETT rektangel på 70000x50 rotert 31,48 grader, altså én
+    lang, men endelig, diagonal linje under banen. Regnet ut at den
+    slutter ved x = 28409, mens siste flis slutter ved x = 30380 og
+    målet (`mal2`) står ved x = 31000: de siste ~2600 enhetene av hver
+    bane, nøyaktig der man er når man holder på å fullføre, hadde ingen
+    dødssone i det hele tatt. Falt man av bakken der, falt marken videre
+    i det uendelige uten at dødsmenyen kom (meldt av Mathias for bane 2,
+    men gjelder alle ni). **Fikset** med en `enterFrame`-sjekk i alle ni
+    banefiler: finner flisa marken er over og utløser vanlig død
+    (`goto()`) om den har falt under underkanten av den flisa, eller er
+    kommet en flisbredde utenfor første/siste flis. `dod` er urørt, den
+    tar fortsatt de vanlige tilfellene raskere. Et første forsøk med én
+    felles skrå linje under alle flisene ble målt mot den ekte
+    bakke-kunsten og forkastet: den lå 160-170 enheter OVER bakken på
+    slutten av bane 1 og 3 (en rett linje gjennom flis-sentrene skjærer
+    opp i flisene i venstre halvdel av hver flis), altså død uten grunn.
+    Per-flis-grensen er verifisert kolonne for kolonne mot alle 36
+    bakke-bildene: minste klaring til bakken er 864 enheter, positiv
+    overalt.
 
 ## Anbefalt ryddeplan
 

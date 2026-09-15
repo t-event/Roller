@@ -42,7 +42,13 @@ function scene:create( event )
 	bg:setFillColor( 0, 0, 0, 0.88 )
 	sceneGroup:insert( bg )
 
-	local overskrift = display.newText( { text = "Ingen liv igjen", x = centerX, y = centerY - 260, font = native.systemFontBold, fontSize = 48 } )
+	-- Ordlyd endret 2026-09-15 fra "liv" til "forsøk", så den henger sammen
+	-- med livtelleren i banene: den viser nå hvor mange forsøk du har igjen
+	-- ETTER det du holder på med (se lib/liv.lua), altså 0 på siste forsøk.
+	-- Med den visningen ville "+1 liv" her sett ut som om ingenting skjedde
+	-- (telleren står på 0 både før og under det ekstra forsøket), mens
+	-- "+1 forsøk" stemmer nøyaktig: du får ett forsøk til.
+	local overskrift = display.newText( { text = "Ingen forsøk igjen", x = centerX, y = centerY - 260, font = native.systemFontBold, fontSize = 48 } )
 	overskrift:setFillColor( 1, 1, 1 )
 	sceneGroup:insert( overskrift )
 
@@ -56,8 +62,8 @@ function scene:create( event )
 		return knapp, label
 	end
 
-	local kortKnapp, kortLabel = lagKnapp( centerY - 90, "Se kort reklame (+" .. KORT_REKLAME_LIV .. " liv)", { 0.16, 0.5, 0.2 } )
-	local langKnapp, langLabel = lagKnapp( centerY + 50, "Se lang reklame (+" .. LANG_REKLAME_LIV .. " liv)", { 0.16, 0.4, 0.6 } )
+	local kortKnapp, kortLabel = lagKnapp( centerY - 90, "Se kort reklame (+" .. KORT_REKLAME_LIV .. " forsøk)", { 0.16, 0.5, 0.2 } )
+	local langKnapp, langLabel = lagKnapp( centerY + 50, "Se lang reklame (+" .. LANG_REKLAME_LIV .. " forsøk)", { 0.16, 0.4, 0.6 } )
 	local avKnapp, avLabel     = lagKnapp( centerY + 190, "Fortsett uten (start fra bane 1)", { 0.4, 0.16, 0.16 } )
 
 	local reklameGruppe = display.newGroup()
