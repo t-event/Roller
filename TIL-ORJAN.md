@@ -2363,3 +2363,70 @@ flis ville gitt rundt 1660, så 790 skal være mulig, men marken er en
 leddet mark og ikke en kloss, så jeg vet ikke hva den faktisk holder.
 Er hullet uoverkommelig, fjerner jeg det med én linje i `level5.lua`
 (`firkant3` settes da opp som i alle de andre banene).
+
+## 2026-09-15, kjøp av forsøk på reklameskjermen, og en bug det avdekket
+
+Mathias: "Legg til på reklameskjermen at man kan kjøpe liv om man ikke
+vil se reklame. Legg til diverse pakker, selvfølgelig placeholder for
+disse også inntil videre".
+
+`scenes/adoffer.lua` har nå tre veier videre i stedet for to:
+
+1. **Se reklame.** Kort (+1 forsøk) eller lang (+3), som før.
+2. **Kjøpe forsøk.** Tre pakker: 10 forsøk / 15 kr, 25 / 29 kr,
+   100 / 79 kr.
+3. **Fortsett uten**, altså start på nytt fra bane 1 med fulle liv.
+
+Prisene og antallene er tall jeg har funnet på for å ha noe å vise,
+ikke noe som er avklart med noen butikk. Si fra hva de skal være, det er
+tre linjer i en tabell øverst i fila.
+
+Kjøpene er placeholder på samme måte som reklamen allerede var. Trykker
+du på en pakke får du en bekreft/avbryt-boks som sier rett ut at det
+ikke er koblet noen betaling til spillet, og at du får forsøkene gratis
+om du bekrefter. Det er med vilje: bedre at en tester ser tydelig at
+ingenting er ekte, enn at boksen later som den tar betalt.
+
+Selve flyten bak er ferdig kodet og skal kunne stå urørt den dagen
+ekte kjøp kobles på. Både reklame og kjøp ender i den samme funksjonen
+(`giForsokOgFortsett`), som legger til forsøk, lagrer, og går tilbake i
+banen via mellomscenen `gotoretry`. Det som skal byttes ut er bare
+`visKjopPlaceholder()`, som skal bli et `store.purchase( pakke.id )` med
+`giForsokOgFortsett()` i svar-lytteren. Pakke-ID-ene (`forsok_10` osv.)
+er skrevet slik at de kan brukes direkte som produkt-ID i Google Play /
+App Store, så resten av koden slipper å endres.
+
+### Buggen det avdekket
+
+Da jeg fulgte kjøpsflyten helt ut fant jeg noe som allerede var galt,
+også for reklame-knappene som har ligget der siden i går.
+
+`gotoretry` starter banen `lm.currentLevel`. Den settes av hver
+`levelN.lua` når banen åpnes. Men liv-sjekken jeg la inn i banevalget
+tidligere i dag (`selectLevel()` i `lib/ogt_levelmanager.lua`)
+returnerte til reklameskjermen FØR linja som setter `k.currentLevel` til
+banen du trykket på. Resultatet:
+
+- Trykker du bane 4 med 0 liv, ser reklame eller kjøper, havner du i den
+  banen du spilte SIST, ikke bane 4.
+- Verre rett etter appstart, der `k.currentLevel` fortsatt står på
+  startverdien 0 (`ogt_lmdata.lua`): da blir målet `scenes.level0`, som
+  ikke finnes. Det gir den røde feilboksen.
+
+Fikset ved å flytte de to linjene som husker valgt bane opp FØR
+liv-sjekken. Nå havner du i banen du trykket på.
+
+### Sjekket før push
+
+- `luac -p` på hele repoet, og `luacheck` på de to endrede filene.
+  `adoffer.lua` er ren. Advarslene i `ogt_levelmanager.lua` er de samme
+  gamle globalene (`last`, `endX`, `endY`, swipe-tellerne) som lå der
+  fra før, ikke noe jeg har innført.
+- Regnet ut hvor alle ni elementene på skjermen havner, siden skjermen
+  nå har mye mer innhold enn før. Alt ligger innenfor 0-960, og
+  klaringen mellom naboer er 6-40 piksler. To overskrifter lå 0,6
+  piksler inni knappen under seg i første utkast, de er flyttet opp.
+
+Som ellers denne økten: jeg har ikke nettleser her, så dette er regnet
+og lest, ikke spilt. Skjermen er verdt et raskt blikk i test, særlig at
+kjøpsboksen ikke ligger oppå noe.

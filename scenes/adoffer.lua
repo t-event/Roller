@@ -21,18 +21,46 @@ local centerY = display.contentCenterY
 -- reklame gir flere, og den som ikke vil se reklame kan fortsatt starte
 -- på nytt fra bane 1 som før.
 --
--- Selve reklamen er en PLACEHOLDER: et par sekunders nedtelling med
--- tekst i stedet for en ekte video-annonse, siden det ikke finnes noe
--- reklame-SDK koblet til spillet ennå. Bytt ut visningen av
--- "reklame_placeholder" under med et ekte SDK-kall når det er på plass,
--- resten av flyten (legg til liv, lagre, gå til riktig bane) skal
--- kunne stå urørt.
+-- Utvidet 2026-09-15 (Mathias: "Legg til på reklameskjermen at man kan
+-- kjøpe liv om man ikke vil se reklame. Legg til diverse pakker"), så
+-- skjermen nå har tre veier videre: se reklame, kjøpe forsøk, eller
+-- starte på nytt fra bane 1.
+--
+-- ALT SOM KOSTER ELLER GIR NOE ER PLACEHOLDER:
+--
+--   * Reklamen er en nedtelling med tekst, ikke en ekte video-annonse.
+--     Bytt ut visReklamePlaceholder() med et ekte SDK-kall når et
+--     reklame-SDK er på plass.
+--   * Kjøpene er en bekreft/avbryt-boks som tydelig sier at ingen
+--     betaling skjer. Bytt ut visKjopPlaceholder() med et ekte
+--     kjøp (i Solar2D: "store"-biblioteket mot Google Play / App Store)
+--     når produktene er opprettet der.
+--
+-- I begge tilfellene er resten av flyten ferdig kodet og skal kunne stå
+-- urørt: legg til forsøk (liv.addToScore), lagre (liv.lagreliv), og gå
+-- videre til banen via mellomscenen "gotoretry".
+--
+-- Prisene under er også placeholder-tall, ikke noe som er avklart med
+-- noen butikk ennå.
 -- -----------------------------------------------------------------------------------
 
 local KORT_REKLAME_SEKUNDER = 3
 local KORT_REKLAME_LIV = 1
 local LANG_REKLAME_SEKUNDER = 6
 local LANG_REKLAME_LIV = 3
+
+-- Kjøpspakkene. "id" er ment å matche produkt-ID-en i butikken den
+-- dagen ekte kjøp kobles på, så resten av koden slipper å endres.
+local PAKKER = {
+	{ id = "forsok_10",  forsok = 10,  pris = "15 kr", farge = { 0.45, 0.30, 0.62 } },
+	{ id = "forsok_25",  forsok = 25,  pris = "29 kr", farge = { 0.38, 0.26, 0.58 } },
+	{ id = "forsok_100", forsok = 100, pris = "79 kr", farge = { 0.60, 0.44, 0.12 } },
+}
+
+-- Layout. Innholdsflaten er 540 x 960, så alt må få plass innenfor det.
+local KNAPP_BREDDE = 520
+local KNAPP_HOYDE = 90
+local KNAPP_AVSTAND = 100
 
 function scene:create( event )
 	local sceneGroup = self.view
@@ -42,78 +70,126 @@ function scene:create( event )
 	bg:setFillColor( 0, 0, 0, 0.88 )
 	sceneGroup:insert( bg )
 
+	local knappGruppe = display.newGroup()
+	sceneGroup:insert( knappGruppe )
+
+	local overlayGruppe = display.newGroup()
+	sceneGroup:insert( overlayGruppe )
+
+	local function lagTekst( y, tekst, storrelse, gruppe )
+		local t = display.newText( { text = tekst, x = centerX, y = y, font = native.systemFontBold, fontSize = storrelse, width = KNAPP_BREDDE, align = "center" } )
+		t:setFillColor( 1, 1, 1 )
+		gruppe:insert( t )
+		return t
+	end
+
+	local function lagKnapp( y, tekst, farge )
+		local knapp = display.newRoundedRect( centerX, y, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
+		knapp:setFillColor( farge[1], farge[2], farge[3] )
+		knappGruppe:insert( knapp )
+		local label = display.newText( { text = tekst, x = centerX, y = y, font = native.systemFontBold, fontSize = 28, width = KNAPP_BREDDE - 40, align = "center" } )
+		label:setFillColor( 1, 1, 1 )
+		knappGruppe:insert( label )
+		return knapp
+	end
+
 	-- Ordlyd endret 2026-09-15 fra "liv" til "forsøk", så den henger sammen
 	-- med livtelleren i banene: den viser nå hvor mange forsøk du har igjen
 	-- ETTER det du holder på med (se lib/liv.lua), altså 0 på siste forsøk.
 	-- Med den visningen ville "+1 liv" her sett ut som om ingenting skjedde
 	-- (telleren står på 0 både før og under det ekstra forsøket), mens
 	-- "+1 forsøk" stemmer nøyaktig: du får ett forsøk til.
-	local overskrift = display.newText( { text = "Ingen forsøk igjen", x = centerX, y = centerY - 260, font = native.systemFontBold, fontSize = 48 } )
-	overskrift:setFillColor( 1, 1, 1 )
-	sceneGroup:insert( overskrift )
+	lagTekst( 140, "Ingen forsøk igjen", 46, knappGruppe )
 
-	local function lagKnapp( y, tekst, farge )
-		local knapp = display.newRoundedRect( centerX, y, 520, 110, 16 )
-		knapp:setFillColor( farge[1], farge[2], farge[3] )
-		sceneGroup:insert( knapp )
-		local label = display.newText( { text = tekst, x = centerX, y = y, font = native.systemFontBold, fontSize = 30, width = 480, align = "center" } )
-		label:setFillColor( 1, 1, 1 )
-		sceneGroup:insert( label )
-		return knapp, label
+	lagTekst( 196, "Se reklame", 26, knappGruppe )
+	local kortKnapp = lagKnapp( 265, "Kort reklame (+" .. KORT_REKLAME_LIV .. " forsøk)", { 0.16, 0.5, 0.2 } )
+	local langKnapp = lagKnapp( 265 + KNAPP_AVSTAND, "Lang reklame (+" .. LANG_REKLAME_LIV .. " forsøk)", { 0.16, 0.4, 0.6 } )
+
+	lagTekst( 432, "Eller kjøp forsøk, uten reklame", 26, knappGruppe )
+	local pakkeKnapper = {}
+	for i, pakke in ipairs( PAKKER ) do
+		local y = 500 + (i - 1) * KNAPP_AVSTAND
+		pakkeKnapper[i] = lagKnapp( y, pakke.forsok .. " forsøk  -  " .. pakke.pris, pakke.farge )
 	end
 
-	local kortKnapp, kortLabel = lagKnapp( centerY - 90, "Se kort reklame (+" .. KORT_REKLAME_LIV .. " forsøk)", { 0.16, 0.5, 0.2 } )
-	local langKnapp, langLabel = lagKnapp( centerY + 50, "Se lang reklame (+" .. LANG_REKLAME_LIV .. " forsøk)", { 0.16, 0.4, 0.6 } )
-	local avKnapp, avLabel     = lagKnapp( centerY + 190, "Fortsett uten (start fra bane 1)", { 0.4, 0.16, 0.16 } )
+	local avKnapp = lagKnapp( 830, "Fortsett uten (start fra bane 1)", { 0.4, 0.16, 0.16 } )
 
-	local reklameGruppe = display.newGroup()
-	sceneGroup:insert( reklameGruppe )
-	reklameGruppe.isVisible = false
+	-- Felles for de to placeholder-boksene under: tømmer overlay-gruppa og
+	-- legger en ugjennomsiktig flate over hele skjermen, så man ikke kan
+	-- trykke på knappene bak mens noe pågår.
+	local function nyttOverlay()
+		knappGruppe.isVisible = false
+		for i = overlayGruppe.numChildren, 1, -1 do
+			display.remove( overlayGruppe[i] )
+		end
+		local flate = display.newRect( centerX, centerY, bredde, hoyde )
+		flate:setFillColor( 0, 0, 0, 1 )
+		overlayGruppe:insert( flate )
+	end
 
-	local knappGruppe = display.newGroup()
-	sceneGroup:insert( knappGruppe )
-	knappGruppe:insert( overskrift )
-	knappGruppe:insert( kortKnapp )
-	knappGruppe:insert( kortLabel )
-	knappGruppe:insert( langKnapp )
-	knappGruppe:insert( langLabel )
-	knappGruppe:insert( avKnapp )
-	knappGruppe:insert( avLabel )
+	local function lukkOverlay()
+		for i = overlayGruppe.numChildren, 1, -1 do
+			display.remove( overlayGruppe[i] )
+		end
+		knappGruppe.isVisible = true
+	end
+
+	-- Gir spilleren forsøkene og sender hen tilbake i banen. Felles
+	-- sluttpunkt for både reklame og kjøp.
+	local function giForsokOgFortsett( antall )
+		liv.addToScore( antall )
+		liv.lagreliv()
+		local ok, err = pcall( composer.gotoScene, "scenes.gotoretry", { effect = "fade", time = 500 } )
+		if not ok then
+			print( "CRASH going to gotoretry (adoffer): " .. tostring(err) )
+		end
+	end
 
 	-- PLACEHOLDER for ekte reklame-SDK, se forklaring øverst i fila.
-	local function visReklamePlaceholder( sekunder, livBelonning )
-		knappGruppe.isVisible = false
-		reklameGruppe:removeSelf()
-		reklameGruppe = display.newGroup()
-		sceneGroup:insert( reklameGruppe )
-
-		local reklameBg = display.newRect( centerX, centerY, bredde, hoyde )
-		reklameBg:setFillColor( 0, 0, 0, 1 )
-		reklameGruppe:insert( reklameBg )
-
-		local reklameTekst = display.newText( { text = "REKLAME (placeholder)", x = centerX, y = centerY - 40, font = native.systemFontBold, fontSize = 34 } )
-		reklameTekst:setFillColor( 1, 1, 1 )
-		reklameGruppe:insert( reklameTekst )
-
-		local nedtelling = display.newText( { text = tostring(sekunder), x = centerX, y = centerY + 40, font = native.systemFontBold, fontSize = 60 } )
-		nedtelling:setFillColor( 1, 1, 1 )
-		reklameGruppe:insert( nedtelling )
+	local function visReklamePlaceholder( sekunder, forsokBelonning )
+		nyttOverlay()
+		lagTekst( centerY - 40, "REKLAME (placeholder)", 34, overlayGruppe )
+		local nedtelling = lagTekst( centerY + 40, tostring(sekunder), 60, overlayGruppe )
 
 		local igjen = sekunder
 		local function tikk()
 			igjen = igjen - 1
 			if igjen <= 0 then
-				liv.addToScore( livBelonning )
-				liv.lagreliv()
-				local ok, err = pcall( composer.gotoScene, "scenes.gotoretry", { effect = "fade", time = 500 } )
-				if not ok then
-					print( "CRASH going to gotoretry (adoffer): " .. tostring(err) )
-				end
+				giForsokOgFortsett( forsokBelonning )
 			else
 				nedtelling.text = tostring(igjen)
 			end
 		end
 		timer.performWithDelay( 1000, tikk, sekunder )
+	end
+
+	-- PLACEHOLDER for ekte kjøp, se forklaring øverst i fila. Her skal
+	-- store.purchase( pakke.id ) inn den dagen produktene finnes i
+	-- Google Play / App Store, med giForsokOgFortsett() i svar-lytteren.
+	local function visKjopPlaceholder( pakke )
+		nyttOverlay()
+		lagTekst( centerY - 210, "KJØP (placeholder)", 34, overlayGruppe )
+		lagTekst( centerY - 140, pakke.forsok .. " forsøk for " .. pakke.pris, 40, overlayGruppe )
+		lagTekst( centerY - 60, "Ingen betaling er koblet til spillet ennå.\nTrykker du bekreft får du forsøkene gratis.", 24, overlayGruppe )
+
+		local bekreft = display.newRoundedRect( centerX, centerY + 60, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
+		bekreft:setFillColor( 0.16, 0.5, 0.2 )
+		overlayGruppe:insert( bekreft )
+		lagTekst( centerY + 60, "Bekreft", 30, overlayGruppe )
+
+		local avbryt = display.newRoundedRect( centerX, centerY + 170, KNAPP_BREDDE, KNAPP_HOYDE, 16 )
+		avbryt:setFillColor( 0.35, 0.35, 0.38 )
+		overlayGruppe:insert( avbryt )
+		lagTekst( centerY + 170, "Avbryt", 30, overlayGruppe )
+
+		bekreft:addEventListener( "tap", function()
+			giForsokOgFortsett( pakke.forsok )
+			return true
+		end )
+		avbryt:addEventListener( "tap", function()
+			lukkOverlay()
+			return true
+		end )
 	end
 
 	kortKnapp:addEventListener( "tap", function()
@@ -124,6 +200,12 @@ function scene:create( event )
 		visReklamePlaceholder( LANG_REKLAME_SEKUNDER, LANG_REKLAME_LIV )
 		return true
 	end )
+	for i, pakke in ipairs( PAKKER ) do
+		pakkeKnapper[i]:addEventListener( "tap", function()
+			visKjopPlaceholder( pakke )
+			return true
+		end )
+	end
 	avKnapp:addEventListener( "tap", function()
 		-- Lagt til 2026-09-15, per Mathias: å starte helt på nytt fra
 		-- bane 1 bør gi fulle liv igjen, ikke fortsatt stå med 0.

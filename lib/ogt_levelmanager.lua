@@ -154,6 +154,17 @@ local function selectLevel(event)
 	-- åpnet denne økten (rett etter appstart), da har liv-modulen bare
 	-- sin hardkodede standardverdi (10) i minnet ennå, ikke den faktiske
 	-- lagrede verdien.
+	-- Hvilken bane spilleren faktisk valgte må settes FØR liv-sjekken
+	-- under. Rettet 2026-09-15: reklame-/kjøpsskjermen sender spilleren
+	-- videre via "gotoretry", som starter k.currentLevel. Siden denne
+	-- sjekken returnerte før tilordningen lenger nede, sto k.currentLevel
+	-- fortsatt på forrige spilte bane, eller på startverdien 0 (se
+	-- ogt_lmdata.lua) om ingen bane var spilt siden appstart. Da endte
+	-- kjøpet i "scenes.level0", som ikke finnes. Nå havner spilleren i
+	-- banen hen trykket på.
+	k.currentLevel = event.target.levelNum
+	k.displayText = event.target.displayText
+
 	liv.lastliv()
 	if liv.erTom() then
 		local ok, err = pcall( sceneMgr.gotoScene, "scenes.adoffer", {effect=k.sboardEffect, time=k.sboardTime} )
@@ -174,8 +185,6 @@ local function selectLevel(event)
 		levelInfo:save()
 	end
 	playAudio(selectSound)
-	k.currentLevel = event.target.levelNum
-	k.displayText = event.target.displayText
 	local newScene = k.playScene or k.sequentialScene .. tostring(k.currentLevel)
 	if k.sceneNames and k.sceneNames[levelNum] then
 		newScene = k.sceneNames[levelNum]

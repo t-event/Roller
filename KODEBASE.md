@@ -150,7 +150,16 @@ filene gjør.
   10 liv igjen) før den går til `gotolevel1` som før (lagt til
   2026-09-15, gikk før dit med fortsatt 0 liv). Selve reklamen er en
   tydelig merket PLACEHOLDER (nedtelling), ikke koblet til noe
-  reklame-SDK ennå. Se `TIL-ORJAN.md` for detaljer.
+  reklame-SDK ennå. **Utvidet 2026-09-15** med kjøp av forsøk, etter
+  ønske fra Mathias: tre pakker (10 forsøk / 15 kr, 25 / 29 kr,
+  100 / 79 kr) i tabellen `PAKKER` øverst i fila. Kjøpene er også
+  PLACEHOLDER, en bekreft/avbryt-boks som sier rett ut at ingen betaling
+  er koblet til spillet og at forsøkene er gratis. Både reklame og kjøp
+  ender i `giForsokOgFortsett()`, som legger til forsøk
+  (`liv.addToScore`), lagrer og går til `gotoretry`, så bare
+  `visKjopPlaceholder()` skal byttes ut med et ekte `store.purchase(
+  pakke.id )` den dagen produktene finnes. Priser og antall er tall uten
+  dekning i noen butikk. Se `TIL-ORJAN.md` for detaljer.
 
 ### Menyer
 - `menu.lua` — **i bruk**, hovedmeny (bg1-5, "spill"-knapp til `chooselevel`).
@@ -734,6 +743,21 @@ kolonne-for-kolonne-sjekkede klaringen.
     Per-flis-grensen er verifisert kolonne for kolonne mot alle 36
     bakke-bildene: minste klaring til bakken er 864 enheter, positiv
     overalt.
+
+11. **Reklame-/kjøpsskjermen sendte spilleren til feil bane, eller til
+    en bane som ikke finnes (funnet 2026-09-15).** `scenes/adoffer.lua`
+    sender spilleren tilbake i banen via `scenes.gotoretry`, som starter
+    `lm.currentLevel`. Den settes av hver `levelN.lua` når banen åpnes.
+    Men liv-sjekken som ble lagt inn i `selectLevel()`
+    (`lib/ogt_levelmanager.lua`) tidligere samme dag returnerte til
+    `scenes.adoffer` FØR linja `k.currentLevel = event.target.levelNum`.
+    Valgte man bane 4 med 0 liv og så reklame eller kjøpte forsøk, havnet
+    man derfor i den banen man spilte sist. Rett etter appstart, der
+    `k.currentLevel` fortsatt står på startverdien 0 (`ogt_lmdata.lua`),
+    ble målet `scenes.level0`, som ikke finnes, og man fikk den røde
+    feilboksen fra `pcall`-innpakningen. **Fikset** ved å flytte
+    `k.currentLevel`/`k.displayText` opp FØR liv-sjekken, så valget
+    huskes uansett hvilken vei `selectLevel()` går ut.
 
 ## Anbefalt ryddeplan
 
