@@ -222,9 +222,14 @@ filene gjør.
   for å teste selve mekanikken isolert fra grafikken, og en
   skaleringsfeil (kollisjonsformene var regnet ut i kildebildets
   pikselstørrelse, 3840×2351, i stedet for den faktiske viste
-  størrelsen 7680×4702 som `display.newImageRect` strekker til, rettet
-  2026-09-15 ved å doble alle "1"-"4"-koordinatene i
-  `lib/shapedefs5.lua`).
+  størrelsen 7680×4702 som `display.newImageRect` strekker til). To
+  runder til, samme dag: kollisjonen fulgte fortsatt kurven dårlig
+  (bare 6 rette linjestykker per flis, økt til 40), og selve terrenget
+  var for kantete (den gamle boks-filtrerte støyen ga alltid en
+  sagtakket rest uansett glattingsbredde, byttet til jevn
+  "value noise" mellom en håndfull kontrollpunkter). Se `TIL-ORJAN.md`
+  for alle detaljene, inkludert generator-scriptet (ligger i en
+  økt-scratchpad, ikke i selve repoet).
 
 ### Banevalg-systemet
 - `ogt_levelmanager.lua` / `ogt_lmdata.lua` — **i bruk**, tredjeparts-aktig

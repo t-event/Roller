@@ -1502,3 +1502,44 @@ markens egen kollisjonsform ved en feiltagelse også.
 
 Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
 faktisk nettleser ennå.
+
+## 2026-09-15, bane 5: kollisjonen traff fortsatt dårlig, og for kantete
+
+Mathias testet igjen etter skala-fiksen: kollisjonen traff banen
+bedre, men fortsatt ikke bra, og banen så litt for kantete ut. To
+separate, men beslektede, feil i terreng-scriptet
+(`make_level5_terrain.py` i scratchpad, ikke en del av selve
+repoet):
+
+- **Kollisjonen traff dårlig:** hver flis brukte bare 6 rette
+  linjestykker til å tilnærme en 3840 piksler bred kurve. Mellom
+  samplingspunktene kunne den faktiske kurven svinge unna den rette
+  linja med ganske mye, som synlige hull (kollisjon under bakken man
+  ser) eller motsatt (usynlig vegg over bakken). Økt til 40
+  linjestykker per flis, langt tettere langs kurven.
+- **For kantete:** den gamle støy-modellen genererte tilfeldige verdier
+  per piksel/blokk og glattet dem med et glidende gjennomsnitt
+  (boks-filter). Uansett hvor bredt vinduet ble satt, satt det igjen
+  en synlig sagtakket, hakkete rest, fordi et boks-filter aldri gjør
+  ekte tilfeldig støy helt jevn. Skrev om til "value noise":
+  interpolerer jevnt (cosinus-interpolasjon) mellom bare en håndfull
+  tilfeldige kontrollpunkter (6 store bakker + 24 finere for litt
+  tekstur) i stedet for å glatte støy i etterkant. Jevnt ved
+  konstruksjon, uansett zoom-nivå.
+
+Begge rettelsene ligger i samme kurve-funksjon som både kunsten og
+kollisjonsformen regnes ut fra, så de forblir eksakt like etter
+endringen, akkurat som før. La i tillegg selve skala-dobling (fra
+forrige fiks) inn i scriptet direkte denne gangen, i stedet for en
+etterhånds-runde på selve Lua-fila, så neste regenerering ikke kan
+miste den ved et uhell.
+
+Sjekket at avstanden fra markens startpunkt til bakken (samme
+beregning som forrige runde) fortsatt er fornuftig: ca 423 enheter nå
+(litt kortere enn de 627-751 fra ekte bane 4-kunst pga. den nye
+tilfeldige kurven, men fortsatt et reelt, positivt fall, ikke i
+nærheten av det gamle 1500+-hullet). Filstørrelsene er uendret
+(~1,5 MB per flis).
+
+Luac-sjekket, kjørte fullt syntakssøk over repoet. Ikke testet i
+faktisk nettleser ennå.
