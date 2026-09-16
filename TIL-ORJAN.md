@@ -2788,7 +2788,68 @@ Etter endringen: 187-262 fixtures per flis mot 67-308 i de ekte, ingen
 ugyldige polygoner, presisjon 99,8-100 %, dekning 91,2-97,8 %,
 gulvavvik under 13 piksler overalt.
 
-Jeg er ærlig på at dette er en forbedring jeg kan begrunne, ikke en
-feilretting jeg har bevist. Ser du fortsatt noe galt, trenger jeg å vite
-hva: går marken gjennom bakken, stopper den i løse lufta, henger den
-fast, eller skjelver den når den ruller?
+Jeg var ærlig på at dette var en forbedring jeg kunne begrunne, ikke en
+feilretting jeg hadde bevist, og spurte hva han faktisk så.
+
+### Svaret, og den virkelige feilen
+
+Mathias: "Bane 5, på første hopp er det ikke hitbox på bakken før
+hoppet."
+
+Det var nok til å finne den. Jeg skrev en sjekk som går kolonne for
+kolonne og spør: finnes det tegnet gulv her uten en hitbox på
+gulvflaten? Svaret:
+
+```
+bane5/1: x 801-898 (98 px), x 1052-1149 (98 px), x 2662-2759 (98 px)
+bane5/2: x 1601-1679, x 1882-1979 (98 px), x 2842-2939 (98 px)
+...
+```
+
+Første gap i bane 5 ligger mellom x 900 og 1050. Feltet **x 801-898** er
+altså de siste 98 pikslene av bakken rett før hoppet, uten kollisjon.
+Marken rullet utfor kanten før den så bakken. Nøyaktig det han beskrev.
+
+Og mønsteret gjentok seg i hver eneste blokk i begge baner: det første
+og det siste intervallet manglet alltid.
+
+Årsaken sto i min egen sporer:
+
+```python
+if (b0 - t0) < MIN_TYKK or (b1 - t1) < MIN_TYKK:
+    continue
+```
+
+Den testet tykkelsen i intervallets **to endepunkter**, og droppet hele
+det 100 piksler breie intervallet hvis bare det ene var for tynt. Hver
+blokk tynner ut mot null i endene på grunn av hjørneavrundingen, så det
+første og siste intervallet røk alltid. 98 piksler bakke, i hver ende av
+hver blokk, i åtte fliser.
+
+Testen gjøres nå **per kolonne**: jeg finner sammenhengende spenn der
+steinen er tjukk nok, og flislegger hvert spenn for seg, så kollisjonen
+når helt ut dit steinen faktisk slutter.
+
+Etter fiksen:
+
+| | før | etter | ekte bane 2/3/4 |
+|---|---|---|---|
+| dekning av steinen | 91,2-97,8 % | **95,9-99,1 %** | 80,6-99,8 % |
+| gulv uten hitbox | 98 px per blokkende | ingen | |
+| gulvavvik, maks | 12,6 px | 5,4 px | 102-1542 px |
+| ugyldige polygoner | 0 | 0 av 2043 | 0 |
+
+De to stedene sjekken fortsatt flagger (bane 5 flis 2 og 4) er ikke
+manglende kollisjon: der er steinen 555 til 1250 piksler tjukk. Det er
+en liten bule i konturen der kollisjonskorden kutter 15 piksler under
+den tegnede flata, og sjekken flagger alt over 12. De ekte banene ligger
+100 til 500 piksler under, så dette er godt innenfor.
+
+### Lærdommen
+
+Jeg lette etter feilen i tre runder med målinger som alle sa "dette er
+like bra som de ekte banene", fordi jeg målte **gjennomsnitt og
+median**. Hullene var 98 piksler av gangen i en flis på 3840, altså rundt
+2,5 prosent, og forsvant i snittet. Det som fant feilen var å spørre
+"hvor er det IKKE dekning", ikke "hvor god er dekningen i snitt". Den
+sjekken ligger nå i verktøykassa.
