@@ -3063,3 +3063,93 @@ Dette er tredje gang på rad at konturstøyen har ødelagt noe som var
 riktig tegnet: først oppoverbakke ved spawn, så umulige hopp, nå en
 grop midt i banen. Hver gang var den tegnede formen riktig og støyen
 sterkere enn den. Jeg burde sett mønsteret etter den første.
+
+## 2026-09-16, fem ting fra testrunden
+
+Mathias etter å ha spilt: hitboxene var fikset, men banen ble for slapp,
+kantene ikke rundet av, isen firkantet og friksjonen traff litt ved
+siden av, bakgrunnen rotet på bane 6, og noe bugget da bane 5 ble
+fullført.
+
+### 1. Bane 5 ble for slapp
+
+Målte helningen på gulvet over 100 px vinduer og sammenlignet:
+
+| | median | p10 | p75 | p90 |
+|---|---|---|---|---|
+| ekte bane 2-4 | 23,3° | 3,4° | 30,1° | 42,9° |
+| mine | 16,2° | 5,1° | 21,8° | 24,7° |
+
+Mine var både slakere og jevnere. Motbakke-grensen jeg la inn dagen før
+hadde flatet ut terrenget.
+
+Mathias foreslo selv løsningen: "Kansje d sku ha vært søtte begrensing på
+kor slakk bakkan kan vær. At den føll en viss vinkel. At starten på
+bakken start på et kordinat og enden stopp på et kordinat."
+
+Gulvet bygges nå slik, i stedet for en linje med støy oppå. Det er
+**fallraten** som moduleres: hvert steg nedover er minst `tan(5°)`, og
+summen av stegene er nøyaktig høydeforskjellen. Da er start, slutt og
+minstevinkel garantert samtidig, og variasjonen blir terrasser og bratte
+fall i stedet for jevne skråninger.
+
+To feil på veien:
+
+- Første modulasjon var `exp(v·s)`, altså lognormal. Summen låses til
+  høydefallet, og da havner medianen på `1/exp(s²/2)` av snittet: jo mer
+  variasjon, jo slakere ble det meste. Målt: spredning 0,85 → 1,3 → 1,8
+  ga median 11,3 → 8,0 → 5,1 grader, stikk motsatt av hensikten. Byttet
+  til en modulasjon med median 1.
+- Blokkene var for lange i forhold til fallet. Bygget om på en mal der
+  bakken går inn på cirka 40 og ut på cirka 2100 av flisens 2351 piksler,
+  altså hele høydebudsjettet.
+
+Resultat: median 20,8°, p75 30,1 (eksakt som de ekte), p90 35,8, og
+minimum 4,6° som betyr at bakken aldri flater ut.
+
+### 2. Kantene
+
+Avrundingen på blokkendene var 18 piksler. Satt til 46.
+
+### 3. Isen bommet på hvor det var glatt
+
+Friksjonen ble satt ut fra hvilket t-intervall skiva hadde for isen,
+mens malingen tonet ut i endene. Da lå det glatte partier utenfor den
+synlige isen, akkurat som Mathias beskrev.
+
+Nå leses den ferdig malte flisa, og klossene deles **på selve
+iskanten**. Bommen er 0 piksler på alle åtte fliser, mot opptil 539 før.
+Is-endene er også mykere malt, så båndet ikke slutter i et rett kutt.
+
+### 4. Bakgrunnen på bane 6
+
+Målte: bakgrunnen dekket til x = 19755 og y = 12622, mens banen går til
+x = 30380 og y = 18757. Siste tredjedel av bane 6 hadde altså ingen
+hulebakgrunn i det hele tatt.
+
+To grunner. Flisene ble vist på 2000x3000 selv om bildene er 2000x6000,
+altså klemt til halv høyde, og hver kjede hadde 12 fliser mot 20 i bane
+2 og 5. Dirt-laget bakerst var også halvparten så bredt.
+
+Rettet begge deler. Bane 6 dekker nå til x = 33395 og y = 22474, samme
+som bane 2 og 5.
+
+### 5. Bugen ved fullført bane
+
+`goto2()`, som kjøres når målet nås, fjernet ikke "falt ut av
+banen"-lytteren jeg la inn 15. september. Og siden `goto2` bruker
+`showOverlay()` og ikke `gotoScene()`, kjøres **`scene:hide` aldri** på
+banen. Lytteren ble altså stående og gå etter at målet var nådd, og
+kunne utløse dødsmenyen midt i fullført-overgangen.
+
+Rettet i alle ni banefiler. Verdt å merke seg for senere: alt som ryddes
+i `scene:hide` må også ryddes i `goto2`, nettopp fordi den bruker
+overlay.
+
+### Alt målt på nytt
+
+Hoppene krever 189 til 212 enheter per sekund, alle landinger lavere enn
+avsatsen. Spawn-fall 257 og 323 (ekte 171-369). Ingen motbakker i det
+hele tatt. Takhøyde 950-1510 enheter. Hitbox-presisjon 99,9 prosent,
+dekning 96,2-97,9. 0 ugyldige polygoner av 2096. Stilmålene ligger
+fortsatt innenfor de ekte banenes spenn.

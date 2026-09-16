@@ -111,6 +111,12 @@ local sjekkUtenforBanen
         local function goto2( event )
         --grp:remove(camera)
         physics.pause( )
+        -- Lagt til 2026-09-16: maa fjernes her ogsaa. goto2 bruker
+        -- showOverlay(), saa scene:hide kjorer aldri paa denne banen, og
+        -- uten dette blir "falt ut av banen"-sjekken staaende og gaa
+        -- etter at maalet er naadd. Den kunne da utlose doden midt i
+        -- fullfort-overgangen.
+        Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
         --Runtime:removeEventListener( "touch", trykk_knapp)
