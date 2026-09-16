@@ -3232,3 +3232,89 @@ mye som bane 5 sin, fordi den bruker `back_cave*.png` på 2000x6000 der
 bane 5 bruker `1back_cave*.png` på 1000x3000 og viser dem i samme
 størrelse. Bytter vi bane 6 til de små, faller den fra 306 til rundt
 174 MB uten at noe ser annerledes ut. Ikke gjort, si fra.
+
+## 2026-09-16, det kantete, og hva Corona faktisk gjør
+
+Mathias etter testrunden: minnefiksen hjalp ikke, og "verka mye meir
+kantat alt. Avrund ikke brett nåkka såm helst."
+
+### Først en oppklaring
+
+Corona skalerer ikke ned oppløsningen automatisk på trege telefoner.
+`imageSuffix` i `config.lua` velger *høyere* oppløsning på skarpe
+skjermer (`@2x`), ikke lavere på trege. Det finnes ingen automatisk
+ytelsesjustering, så den hjelpen er ikke der.
+
+### Det kantete var to ting, og bare den ene var konturen
+
+Målte hvor mye helningen endrer seg per 60 piksler, som er et tall på
+kantethet:
+
+| | median | p95 | maks |
+|---|---|---|---|
+| ekte bane 2-4 | 5,2° | 32,7° | 133,2° |
+| mine | 1,4° | 5,0° | 9,9° |
+
+Konturen min var altså allerede **glattere** enn den ekte. Så det du så
+kom ikke derfra.
+
+Men den hadde likevel en reell feil: gulvgeneratoren klemte stegene hardt
+mot minstevinkelen (`steg[under] = min_steg`). Det ga flate strekk på
+nøyaktig minstevinkelen som møtte bratte strekk, og hvert møte ble en
+knekk. Minstevinkelen er nå bygget inn i selve formelen i stedet:
+
+```
+f = lav + (1 - lav) * s,   s glatt og positiv med middel 1
+```
+
+Da ligger f alltid over `lav` uten at noe klemmes, og middelverdien er
+eksakt 1, så summen av stegene treffer høydeforskjellen på øret.
+
+Byttet samtidig fra `exp()` til `tanh()` i modulasjonen. `exp()` er
+lognormal, og når summen er låst havner medianen på `1/exp(s²/2)` av
+snittet, altså under. Medianhelningen hadde falt fra 20,8 til 17,2
+grader av den grunn. Med `tanh` er både median og middel 1, og
+medianen er tilbake på 20,8.
+
+**Det du faktisk så var blokkformene.** Malen jeg innførte laget tre
+nesten like trapeser per flis: rett topp, rett bunn, rette loddrette
+sider. Den ekte kunsten har underkanter som buler og smalner, og blokker
+som ender i lange tunger.
+
+Rettet: 20 blokker har nå egen kurvet underkant i stedet for en rett
+linje, siste blokk i hver flis ender i en lang tunge, og avrundingen på
+blokkendene er økt fra 46 til 120 piksler.
+
+Tungene gjorde først noen gap for breie (opptil 569 piksler, som krevde
+413 enheter/s). Kortet inn tilspissingen på blokkene som vender mot et
+hopp, og lot den lange tungen stå på blokken som går ut av flisa.
+
+Alle fjorten hopp krever nå 202-243 enheter per sekund, mot 92-275 i de
+ekte banene. Hitbox-dekningen gikk samtidig opp til 97,7-99,6 prosent.
+
+### Ytelsen
+
+Jeg fant og fikset en reell lekkasje i går (bane 5-9 rev aldri ned seg
+selv), men den løste det altså ikke. Jeg kan ikke måle bildefrekvens
+herfra, så videre gjetting hjelper lite. To ting jeg kan tallfeste:
+
+**Teksturminne.** Hvert terrengbilde er 3840x2351, altså 34,4 MB som
+RGBA på skjermkortet, og fire per bane gir 138 MB. Halverer vi
+oppløsningen blir det 8,6 MB hver, altså 34 MB per bane. Bildene vises
+2,8 ganger forstørret på telefon uansett, og kunsten er flate farger med
+myk kant, så det er lite detalj å miste. Ikke gjort.
+
+**Fast tidssteg.** `physics.start()` uten `physics.setTimeStep()` gir
+fast tidssteg låst til 60 bilder i sekundet. Klarer ikke nettleseren 60,
+går fysikken tilsvarende saktere i klokketid. Det er selve mekanismen
+bak slow motion. `physics.setTimeStep(0)` fjerner den, men endrer
+hvordan spillet føles. Ikke gjort.
+
+### Om rammer
+
+Mathias: "Akkurat no e d jo greit at den får lek seg fritt, men når vi
+kommer tell nåkka eg e fornøyd me så trur eg d må sættes ramme."
+
+Notert. Når vi lander på noe som sitter, er det bare å si fra, så låser
+jeg tallene og skriver dem ned som faste grenser i stedet for
+justerbare.
