@@ -2738,3 +2738,57 @@ er en flat plate helt øverst, og marken spawner inne i den. Det er ikke
 noe jeg har innført, det har vært slik hele tiden, og det er grunnen til
 at den flisa aldri ble brukt da bane 5/6 var satt sammen av ekte fliser.
 Jeg har ikke rørt det, men si fra om du vil at jeg skal se på det.
+
+## 2026-09-16, hitboxene i bane 5 og 6
+
+Mathias: "Fiks hitboxene på level 5 og 6."
+
+**Jeg fant ikke feilen du så.** Alt jeg klarte å måle sier at
+kollisjonsformene traff kunsten like godt som i de ekte banene, eller
+bedre. Jeg har likevel endret oppbyggingen på ett punkt der de avvek
+tydelig fra bane 1-4, og det står under. Men jeg vil gjerne vite hva du
+faktisk opplevde, for symptomet peker på helt ulike fikser.
+
+### Det jeg sjekket, og som var i orden
+
+| måling | ekte bane 2/3/4 | bane 5/6 før endringen |
+|---|---|---|
+| andel av hitbox-flata som er stein | 99,3-100 % | 99,9 % |
+| andel av steinen som er dekket | 80,6-99,8 % | 94,4-98,7 % |
+| ugyldige polygoner (konveksitet, flate, hjørneavstand) | 0 | 0 |
+| avvik på gulvflata, andel over 10 px | 41-91 % | 0 % |
+| markens egen form (`del1`) | | byte-identisk i alle seks filene |
+| kollisjon på hengende takbiter | 97-99 % | 97-99 % |
+
+Gulvavviket er verdt å merke seg: de ekte banene har kollisjonsflater som
+ligger 100-500 piksler under den tegnede bakken mange steder, fordi
+formene er store trekanter som skjærer rett over buede partier. Mine lå
+på under én piksel. Marken er bare 17 enheter høy, så her er mine
+strammere enn originalen, ikke løsere.
+
+Jeg sjekket også at `level6.lua` kobler `physicsData:get("1")` til
+`firkant1` og så videre, at flisene plasseres likt som i de andre
+banene, og at formfilene har de navnene banefilene ber om. Alt stemte.
+
+### Det jeg endret
+
+Ett tall skilte seg klart ut. Fixturene mine var median **140 enheter
+breie og 1380-1714 høye**, altså forhold rundt 1:10, fordi hvert trapes
+spente hele steinens tykkelse fra topp til bunn. De ekte er kompakte:
+288-376 x 218-293.
+
+Box2D regner dårligere på svært langstrakte polygoner, og de 1400
+enheter høye skjøtene mellom dem er akkurat den typen kant en rullende
+kropp kan hekte seg på. Klossene deles nå både bortover og nedover, 200
+x 320 enheter, og bare den øverste skiva er is, siden isen er et lag på
+overflata. Det siste stemmer også med bane 4, der 98-100 % av
+is-fixturene ligger i selve overflata.
+
+Etter endringen: 187-262 fixtures per flis mot 67-308 i de ekte, ingen
+ugyldige polygoner, presisjon 99,8-100 %, dekning 91,2-97,8 %,
+gulvavvik under 13 piksler overalt.
+
+Jeg er ærlig på at dette er en forbedring jeg kan begrunne, ikke en
+feilretting jeg har bevist. Ser du fortsatt noe galt, trenger jeg å vite
+hva: går marken gjennom bakken, stopper den i løse lufta, henger den
+fast, eller skjelver den når den ruller?

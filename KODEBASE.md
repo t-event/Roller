@@ -593,12 +593,26 @@ Verktøyene som gjorde dette ligger ikke i repoet, de var
 engangs-scripts. Tallene over er det som trengs for å gjøre det om
 igjen.
 
-**Kollisjonen** er 281 (bane 5) og 285 (bane 6) fixtures, rundt 70 per
-flis, mot 67-308 i de ekte banene. Hver fixture er et trapes på 70 px
-med hjørnene på skivens egen topp- og bunnkurve, så bilde og kollisjon
-kommer fra de samme kurvene. Trapeser tynnere enn 14 px slippes, så de
-hårtynne spissene på kilene er rent visuelle. Koordinatavbildning,
-bekreftet mot bane 3 og 4 sine egne shapedefs:
+**Kollisjonen** er 878 (bane 5) og 1018 (bane 6) fixtures, 187-262 per
+flis, mot 67-308 i de ekte banene. Hver fixture er et trapes på 100 px
+bortover og høyst 160 px nedover, med hjørnene på skivens egen topp- og
+bunnkurve, så bilde og kollisjon kommer fra de samme kurvene. Trapeser
+tynnere enn 14 px slippes, så de hårtynne spissene på kilene er rent
+visuelle.
+
+Oppdelingen **nedover** er viktig og ble lagt til 2026-09-16. Første
+utgave laget ett trapes per kolonne som spente hele steinens tykkelse,
+og de ble median 140 enheter breie og 1380-1714 høye, altså forhold
+rundt 1:10. De ekte er kompakte: 288-376 x 218-293. Box2D regner
+dårligere på så langstrakte polygoner, og de 1400 enheter høye skjøtene
+er den typen kant en rullende kropp kan hekte seg på. Hold fixturene
+omtrent like høye som de er breie.
+
+Bare den **øverste** skiva i et is-område får `friction = 0.05`. Isen er
+et lag på overflata, ikke hele steinsøyla, og i bane 4 ligger 98-100 %
+av is-fixturene i selve overflata.
+
+Koordinatavbildning, bekreftet mot bane 3 og 4 sine egne shapedefs:
 
     X = (bildepiksel_x - 1920) * 2
     Y = (bildepiksel_y - 1175.5) * 2
