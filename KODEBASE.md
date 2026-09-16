@@ -622,8 +622,8 @@ og hjørnene må ha positiv signert flate (alle 400 undersøkte fixtures i
 
 **Spawn.** Marken står i `del1 = (0,0)`, og `firkant1` er sentrert i
 (3500, 2300) med 7680 x 4702 enheter mot et bilde på 3840 x 2351 px.
-Marken starter derfor ved bildepunkt **(116-170, 26)** i flis 1, i alle
-ni banene. Flis 1 må ha bakke rett under der: de ekte banene har den
+Marken starter derfor ved bildepunkt **(116-170, 26)** i flis 1 i bane 2
+til 9. Bane 1 har dobbelt så stor flis, se NB under. Flis 1 må ha bakke rett under der: de ekte banene har den
 111-210 px nede, altså 171-369 enheters fall. Første utgave av bane 5/6
 hadde 1699 og 1809, og banen åpnet med at marken stupte nesten en hel
 flishøyde (meldt av Mathias 2026-09-15). Rettet, nå 355 og 373.
@@ -631,9 +631,18 @@ flishøyde (meldt av Mathias 2026-09-15). Rettet, nå 355 og 373.
 Mønsteret i flis 1 er: bakken starter høyt (167-251 px) og faller jevnt
 utover flisa. Bane 4 går 251 → 650 → 1036 → 1320 → 1680.
 
-**NB:** `level1/1.png` er en flat plate helt øverst, så **bane 1 spawner
-marken inni stein.** Det er en gammel feil, ikke innført av noen av
-endringene i 2026-09-15, men den er verdt å vite om.
+**NB om bane 1:** `level1/1.png` er **7680x4702** bildepunkter, mens
+`level2/1.png` til `level6/1.png` er 3840x2351. Alle vises på 7680x4702,
+så omregningen bildepunkt til spillkoordinat er 1:1 i bane 1 og 1:2 i de
+andre. Marken starter derfor ved bildepunkt (232-354, 51) i bane 1.
+
+Flisa er dessuten utendørs og har malt himmel, `rgb(167, 202, 255)`,
+øverst. Den er ugjennomsiktig, så en gjennomsiktighetstest melder
+feilaktig «stein» der. Målt mot kollisjonsformene står marken i fri
+luft: overkanten av bakken ligger på y = 400 under halen, 538 under
+midten og 644 under hodet, altså omtrent 400 enheters fall. Bane 1 er i
+orden. (Tidligere notat om at bane 1 spawner inni stein var feil,
+rettet 2026-09-16.)
 
 **Målt spillbarhet bane 5/6:** takhøyde 852-1676 enheter, fall mellom
 fliser 1722-4523 (mot 673-5244 i bane 1-4), spawn-fall 355/373,

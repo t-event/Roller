@@ -2739,6 +2739,10 @@ noe jeg har innført, det har vært slik hele tiden, og det er grunnen til
 at den flisa aldri ble brukt da bane 5/6 var satt sammen av ekte fliser.
 Jeg har ikke rørt det, men si fra om du vil at jeg skal se på det.
 
+> **Rettelse 2026-09-16: dette stemte ikke.** Se avsnittet «Bane 1
+> spawner ikke inni stein likevel» nederst. Marken starter i malt himmel,
+> og bane 1 er i orden.
+
 ## 2026-09-16, hitboxene i bane 5 og 6
 
 Mathias: "Fiks hitboxene på level 5 og 6."
@@ -3318,3 +3322,50 @@ kommer tell nåkka eg e fornøyd me så trur eg d må sættes ramme."
 Notert. Når vi lander på noe som sitter, er det bare å si fra, så låser
 jeg tallene og skriver dem ned som faste grenser i stedet for
 justerbare.
+
+## 2026-09-16, bane 1 spawner ikke inni stein likevel
+
+Mathias ba meg se på det jeg meldte i går: at bane 1 starter marken inne
+i stein. **Den meldingen var feil, og feilen var min.**
+
+Slik oppdaget jeg den. Jeg testet om flis 1 var «solid» øverst ved å
+lese gjennomsiktigheten i `level1/1.png`. Den er helt ugjennomsiktig fra
+øverste bildepunkt og nedover i hele spawn-området, så testen sa stein.
+
+To ting jeg ikke hadde sjekket:
+
+**Flisa er dobbelt så stor som de andre.** `level1/1.png` er 7680x4702
+bildepunkter, mens `level2/1.png` til `level6/1.png` er 3840x2351. Alle
+vises på 7680x4702. Omregningen mellom bildepunkt og spillkoordinat er
+altså 1:1 i bane 1 og 1:2 i de andre, og jeg hadde brukt 1:2 overalt.
+Det gjorde alle tallene mine for bane 1 feil.
+
+**Bane 1 er utendørs.** Fargen øverst i flisa er `rgb(167, 202, 255)`,
+altså malt himmel, ikke fjell. Derfor er den ugjennomsiktig. De andre
+flisene er huler med gjennomsiktig luft, og der virker
+gjennomsiktighetstesten.
+
+Målte på nytt, denne gangen mot kollisjonsformene i `lib/shapedefs.lua`
+i stedet for bildepunktene. Marken står på spillkoordinat y = 0 og
+strekker seg fra x = -234 til x = 14. Under den ligger en gresskledd
+skråning som faller mot høyre:
+
+| x | overkant stein |
+|---|---|
+| -217 (halen) | y = 400 |
+| -108 (midten) | y = 538 |
+| 0 (hodet) | y = 644 |
+
+Halen treffer altså bakken etter omtrent 400 enheters fall. De ekte
+banene ligger på 171-369, og bane 5 og 6 på 285 og 253 etter
+ombyggingen. Bane 1 faller litt lenger enn de andre, men den har gjort
+det siden Ørjan laget den, og den virker.
+
+Jeg la også kollisjonsformene oppå kunsten i et bilde for å se etter.
+De røde omrissene følger jordkanten under gresset hele veien. Ingenting
+å rette.
+
+**Ingen endring gjort i bane 1.** Den håndtegnede kunsten er urørt.
+Lærdommen tar jeg med meg: gjennomsiktighet er ikke det samme som luft
+når flisa har malt himmel, og bildestørrelse skal leses av fila, ikke
+antas.
