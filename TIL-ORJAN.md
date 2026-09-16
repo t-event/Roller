@@ -3153,3 +3153,82 @@ avsatsen. Spawn-fall 257 og 323 (ekte 171-369). Ingen motbakker i det
 hele tatt. Takhøyde 950-1510 enheter. Hitbox-presisjon 99,9 prosent,
 dekning 96,2-97,9. 0 ugyldige polygoner av 2096. Stilmålene ligger
 fortsatt innenfor de ekte banenes spenn.
+
+## 2026-09-16, spillet gikk av og til i slow motion
+
+Mathias: "Av og til etter vi gjør oppdateringer virker det som om at
+spillet går i slow motion. Og andre ganger fungerer det?"
+
+Jeg fant to lekkasjer, begge fra copy-paste fra `level1.lua`, og begge i
+`scene:hide`.
+
+### Den store: banene ble aldri revet ned
+
+`level5.lua` til `level9.lua` kaller
+
+```lua
+composer.removeScene ("scenes.level1")
+```
+
+i sin egen `scene:hide`. Altså river de ned **bane 1** i stedet for seg
+selv. Bane 1 til 4 gjør det riktig, så feilen gjelder nøyaktig de fem
+banene som er navngitt feil.
+
+Konsekvensen er at banen blir liggende fullt lastet i minnet etter at du
+forlater den. Regnet ut hva det koster i teksturminne:
+
+| bane | unike bilder | teksturminne |
+|---|---|---|
+| bane 2 | 14 | 174 MB |
+| bane 5 | 14 | 174 MB |
+| bane 6 | 14 | 306 MB |
+
+Hvert terrengbilde er 3840x2351 piksler, altså 34 MB som RGBA på
+skjermkortet. Fire per bane. Bakgrunnsbildene i bane 6 er 2000x6000, som
+er 46 MB hver.
+
+Spiller du bane 5 og går videre til bane 6, ligger det da 480 MB i
+GPU-minnet samtidig, og bane 5 er ikke engang synlig. Prøver du et par
+ganger til, vokser det videre. Når nettleseren går tom begynner den å
+kaste ut og laste inn teksturer på nytt hele tiden, og da faller
+bildefrekvensen.
+
+Det forklarer også hvorfor det kom og gikk: det avhenger av hvor mange
+baner du har vært innom i den fanen, ikke av hvilken oppdatering som
+ligger ute.
+
+### Den andre: kollisjonslyttere
+
+`onCollision1` ble ikke fjernet i `scene:hide` i noen av de ni banene,
+og `onCollision2` (som bare finnes i bane 5-9) ble bare fjernet på
+dødsstien. Den lekket altså hver gang du fullførte banen, pauset deg ut,
+eller byttet scene.
+
+Runtime-lyttere fjernes ikke når en scene rives ned, og en
+kollisjonslytter kalles for hver eneste kontakt i hele fysikkverdenen.
+Noen titalls lekkede lyttere blir fort merkbart.
+
+Begge deler er rettet i alle ni banefiler. Sjekket etterpå at hver bane
+nå fjerner nøyaktig de lytterne den legger til, og river ned sin egen
+scene.
+
+### Det som fortsatt står igjen
+
+Spillet kaller `physics.start()` uten `physics.setTimeStep()`. Corona
+bruker da et **fast tidssteg låst til 60 bilder i sekundet**. Klarer
+ikke nettleseren 60, går fysikken tilsvarende saktere i klokketid. Det
+er selve mekanismen bak "slow motion", og den har vært der hele tiden.
+
+`physics.setTimeStep(0)` slår på variabelt tidssteg, der fysikken går
+etter faktisk forløpt tid i stedet. Da holder farten seg riktig selv om
+bildefrekvensen faller, men bevegelsen blir hakkete i stedet.
+
+Jeg har **ikke** endret det, fordi det endrer hvordan spillet føles og
+alle hoppene er innstilt under det faste steget. Si fra om du vil at jeg
+skal prøve.
+
+Verdt å vite i tillegg: bane 6 sin bakgrunn koster nesten dobbelt så
+mye som bane 5 sin, fordi den bruker `back_cave*.png` på 2000x6000 der
+bane 5 bruker `1back_cave*.png` på 1000x3000 og viser dem i samme
+størrelse. Bytter vi bane 6 til de små, faller den fra 306 til rundt
+174 MB uten at noe ser annerledes ut. Ikke gjort, si fra.

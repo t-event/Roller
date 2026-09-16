@@ -2039,12 +2039,14 @@ Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener( "touch", trykk_knapp)
 Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
+Runtime:removeEventListener("collision", onCollision1)
+Runtime:removeEventListener("collision", onCollision2)
 
 
 Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
 composer.removeScene ("scenes.pausemenu1")
 
-       composer.removeScene ("scenes.level1")
+       composer.removeScene ("scenes.level6")
 
 
 

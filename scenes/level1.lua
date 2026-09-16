@@ -2444,6 +2444,7 @@ Runtime:removeEventListener("collision", onCollision)
 Runtime:removeEventListener( "touch", trykk_knapp)
 Runtime:removeEventListener( "tap", trykk_knapp)
 Runtime:removeEventListener("collision", knekk)
+Runtime:removeEventListener("collision", onCollision1)
 
 
 Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
