@@ -2853,3 +2853,63 @@ median**. Hullene var 98 piksler av gangen i en flis på 3840, altså rundt
 2,5 prosent, og forsvant i snittet. Det som fant feilen var å spørre
 "hvor er det IKKE dekning", ikke "hvor god er dekningen i snitt". Den
 sjekken ligger nå i verktøykassa.
+
+## 2026-09-16, bane 6 startet i oppoverbakke
+
+Mathias: "Bane 6 er umulig da man spawner i en oppoverbakke, så man
+ruller bakover og ut av kartet."
+
+Målte bakkehøyden rundt spawn i alle ni banene:
+
+| bane | x=100 | x=200 | x=300 | x=400 | fall |
+|---|---|---|---|---|---|
+| 2 | 117 | 262 | 378 | 459 | +303 |
+| 3 | 120 | 324 | 235 | 275 | +136 |
+| 4 | 210 | 274 | 310 | 378 | +193 |
+| 5 | 208 | 297 | 357 | 403 | +171 |
+| **6** | **228** | **210** | **192** | **184** | **−34** |
+
+Bane 6 steg altså 34 piksler oppover de første 300 pikslene etter spawn.
+Marken ruller fritt, så den trillet bakover og ut av kartet. Nøyaktig
+som beskrevet.
+
+### Årsaken
+
+Den tegnede helningen var riktig: `lin(24, 470)` faller jevnt utover
+flisa. Men konturstøyen, som har amplitude rundt 110 piksler, la seg
+oppå og snudde helningen lokalt akkurat i spawn-sonen. Bane 5 slapp unna
+med knapp margin, bane 6 gjorde det ikke. Det var flaks, ikke design.
+
+### Fiksen
+
+Skivene har nå en `ro`-parameter: ingen konturstøy før en gitt x, og
+full støy fra en annen. For flis 1 i begge baner er den satt til
+(520, 1500), altså null støy gjennom hele spawn-sonen og innfasing
+etterpå. Da er bakken der marken lander nøyaktig den tegnede kurven, og
+helningen er garantert.
+
+Første forsøk dempet på *andel* av skiva i stedet for absolutt x. Det
+virket ikke: dempingen vokste gjennom selve spawn-sonen, så støyens
+gradient slapp til likevel, og bane 6 ble fortsatt oppoverbakke (bare
++44 i stedet for +134). Målte det, og byttet til absolutte x-verdier.
+
+Etter fiksen faller bakken +140 (bane 5) og +134 (bane 6) piksler fra
+x=150 til x=450, mot 136 til 303 i de ekte banene, og det finnes ikke én
+motbakke mellom x=120 og x=900 i noen av dem.
+
+### Sjekken finnes nå
+
+Verifiseringen måler helningen fra spawn og verste motbakke, og
+sammenligner med de ekte banene. Den ville fanget dette.
+
+### Samtidig
+
+Senket spawn-bakken i bane 5 litt, fordi den nye kurven ga 463 enheters
+fall og spennet i de ekte banene er 171-369. Nå 381 og 329.
+
+La også inn **adaptiv oppdeling** i kollisjonssporeren: normalt 100
+piksler per kloss, men kortere der overflata bukter seg, så korden aldri
+ligger mer enn 6 piksler under den tegnede flata. Marken er bare 17
+enheter høy, så et avvik på 15 piksler er halvannen markhøyde ned i
+bakken. Verste gulvavvik er nå 5,4 piksler i alle åtte fliser, mot 102
+til 1542 i de ekte banene.
