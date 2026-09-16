@@ -3369,3 +3369,144 @@ De røde omrissene følger jordkanten under gresset hele veien. Ingenting
 Lærdommen tar jeg med meg: gjennomsiktighet er ikke det samme som luft
 når flisa har malt himmel, og bildestørrelse skal leses av fila, ikke
 antas.
+
+## 2026-09-16, bane 5 og 6 malt om fra bunnen
+
+Mathias sendte `level3/1.png` og sa: "Studer dette bildet ekstremt noye.
+Det er slik utseende vi vil ha pa banene du lager. Du er ikke i
+naerheten." Han hadde rett. Her er det jeg maalte, og hva jeg gjorde.
+
+### Den store feilen: lose blokker i tomrom
+
+Jeg hadde bygget flisene som separate plater som svevde. Den ekte
+kunsten er EN sammenhengende steinmasse med en gang hogd ut av seg.
+Det morke er tunnelen, ikke bakgrunnen.
+
+| | Ekte bane 2, 3, 4 | Mine for | Mine na |
+|---|---|---|---|
+| Fyllgrad | 38, 68, 38 % | 35 % | 44 til 50 % |
+| Storste del | 2,7 til 3,8 mill px | 1,3 til 1,5 | 1,7 til 1,8 |
+| Stein i flisekanten | 0,0 % | opptil 33 % | 0,0 % |
+
+Rettet med en takmasse over gangen i hver flis, og et oy-vindu paa 4 til
+26 px inn fra hver kant. De ekte formene lukker seg ALLTID inne i flisa,
+saa konturstreken gaar hele veien rundt. Klaringen deres er 2 til 210
+px, saa vinduet rorer ikke spillflata.
+
+### Renderen er skrevet om
+
+Den gamle malte hver skive for seg med to flate farger. Den nye bygger
+masken forst og henter all farge av avstanden til omrisset, slik kunsten
+faktisk er laget.
+
+| Dybde under kanten | Ekte bane 3 | Min for | Min na |
+|---|---|---|---|
+| 0,5 til 1,5 px | rgb(10, 2, 0) | ingen strek | rgb(10, 2, 0) |
+| 4 til 20 px | rgb(70, 32, 5) | rgb(70, 32, 6) | rgb(68, 33, 6) |
+| 80 til 130 px | rgb(47, 19, 2) | rgb(37, 13, 1) | rgb(46, 18, 1) |
+| over 130 px | rgb(38, 14, 1) | rgb(38, 14, 1) | rgb(38, 14, 1) |
+| Hyppigste farge | 56 % | 16 % | 48 % |
+
+Konturstreken er det som gjor at kunsten ser TEGNET ut. Den manglet helt
+hos meg. Kornet manglet ogsaa: 372 avlange prikker per flis, 16x10 px,
+en per 90x90 px rute.
+
+En feil paa veien: forste forsok la et mykt lysfelt oppaa hele massen.
+Da ble den hyppigste fargen borte, smurt utover 16/12/11/10/9 %.
+Variasjonen ligger na i HVOR DYPT rimen gaar, ikke i en
+lysmultiplikator, saa kropp og rim blir liggende flatt og mellomtonene
+oppstaar bare i overgangssonen.
+
+### Isen
+
+Mathias: "Du maa studere isen ogsaa da du ikke lager den likt."
+
+Forst hvor den finnes. Av seksten ekte fliser har bare level4/2, 3 og 4
+blaatt i det hele tatt, og der er det 0,4 til 1,9 % av massen. Bane 2 og
+3 har NULL. Det jeg trodde var is i bane 3 er gjennomsiktige sprekker.
+
+Saa hvordan den er malt, maalt som tverrsnitt inn fra kanten:
+
+| Dybde | Ekte bane 4 | Min for |
+|---|---|---|
+| 0 til 2 px | rgb(15, 50, 63) kald konturstrek | rgb(44,106,130) |
+| 2 til 7 px | rgb(36, 96, 118), glans mot 137 blaa | rgb(44,106,130) |
+| 7 til 16 px | rgb(30, 84, 104) | rgb(44,106,130) |
+| 16 til 30 px | rgb(20, 60, 74) | rgb(44,106,130) |
+
+Min var EN flat farge paa alle dybder. Tykkelsen var ogsaa konstant, p10
+31 og p90 33 px, mens den ekte varierer fra 10 til 123. Og dekningen var
+5,7 til 8,5 % av omrisset mot ekte 20 til 26.
+
+Na: skarpt band med det malte tverrsnittet, varierende tykkelse, og
+partier som toner ut til spisser. Ett tak paa dybden maatte til, ellers
+fylte den hele den tynne tuppen og ble en blaa kile.
+
+### Fire feil verifiseringen fanget
+
+1. **Sprekkene hogget i bakken.** Jeg la dem 4 px under gulvflata, saa de
+   brot selve flata marken ruller paa. Utslag: takhoyde 6 til 12
+   enheter, hull i gulvet, og verste motbakke 388 px som krever 675
+   enheter/s mot markens 156 til 248. I den ekte kunsten gaar sprekkene
+   ned fra overkanten av den ovre massen, i huletaket, aldri i gulvet.
+   Flyttet dit. Verste motbakke gikk fra 388 px til 0.
+
+2. **Takskaarene laa 3 til 22 px under takmassen.** Det er en splint,
+   ikke et skaar. Fjernet. Takmassens egen bolgete underside er
+   huletaket na.
+
+3. **Gulvprofilen festet seg i oy-vinduets frynse.** De ytterste tjue
+   kolonnene er klippet ned til en sliver, profilen laaste seg i den, og
+   overheng-regelen forkastet resten. Bane 5 flis 1 mistet 2297 av 3840
+   kolonner. Regelen manglet andre halvdel: et overheng har ogsaa
+   UNDERKANTEN hoyt oppe. Her gikk biten fra 143 til 2263, altsa nesten
+   hele flishoyden. Det er bakken.
+
+4. **Takhoyden ble maalt i samme frynse.** Alle de lave tallene laa paa
+   x = 12, 16 og 24. Maalingen hopper na over de ytterste 40 kolonnene.
+
+Etter det stod en ekte feil igjen: hulemunnen i bane 6 flis 4 laa paa
+680 enheter takhoyde mot grensa paa 700. Taket der er hevet 110 px i
+stedet for at jeg flyttet grensa.
+
+### Kollisjonsklossene
+
+Takmassen sendte dem fra 966 og 1020 til 1916 og 1545. De ekte banene
+ligger paa 505 til 743. Hver fixture ligger i Box2D sin bredfase hvert
+fysikksteg, og du melder allerede om slow motion.
+
+To grep: takmassen spores grovt, og dybden deles ikke lenger i jevne
+skiver. Sporeren delte hver kolonne i 160 px skiver, saa en 2000 px
+tjukk gulvblokk fikk 12 klosser der bare den overste noen gang blir
+berort. Skivene blir na tjukkere nedover, 80 px overst og saa
+fordobling. Resultat 1491 og 948. Fortsatt over de ekte, men halvparten
+av der det stod.
+
+Den andre halvparten var min egen gamle feil fra da jeg bygget
+sporeren, ikke noe takmassen innforte.
+
+### Malt resultat
+
+| | Bane 5 | Bane 6 | Krav eller fasit |
+|---|---|---|---|
+| Takhoyde | 930 til 1608 enh | 786 til 1554 | over 700 |
+| Spawn-fall | 285 enh | 253 | 171 til 369 |
+| Verste motbakke | 0 px | 0 px | marken har 156 til 248 e/s |
+| Fall mellom fliser | 784 til 4269 | 1090 til 3762 | 673 til 5244 |
+| Dodslinje-klaring | 612 til 618 | 612 til 622 | over 600 |
+| Hoppene | 202 til 229 e/s | 202 til 243 | ekte 48 til 1656 |
+
+Alle fjorten hopp lander lavere enn avsatsen.
+
+### Det som fortsatt ikke stemmer
+
+Formene mine har for mange lange rette kanter. Den ekte kunsten har
+flytende silhuetter med tunger og avrundede tupper. Det er neste ting.
+
+Filstorrelsen gikk ogsaa opp, fra 78 til 97 kB per flis til 191 til 234
+kB, fordi kornet og gradientene krever flere palettfarger, 80 til 99
+indekser mot 44. Det paavirker nedlastingen av HTML5-versjonen, ikke
+minnet paa skjermkortet.
+
+Ingenting av dette er spilletestet. Jeg har ingen nettleser her, bare
+maalinger.

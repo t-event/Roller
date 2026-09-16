@@ -644,11 +644,49 @@ midten og 644 under hodet, altså omtrent 400 enheters fall. Bane 1 er i
 orden. (Tidligere notat om at bane 1 spawner inni stein var feil,
 rettet 2026-09-16.)
 
-**Målt spillbarhet bane 5/6:** takhøyde 852-1676 enheter, fall mellom
-fliser 1722-4523 (mot 673-5244 i bane 1-4), spawn-fall 355/373,
-dødslinje-klaring 600-632, hull i gulvet 186-414 enheter.
+**Stilmodellen, målt på nytt 2026-09-16 mot `level3/1.png`:**
 
-Bildene er lagret som palett-PNG med egen gjennomsiktighet per indeks,
+| Dybde under omrisset | Farge |
+|---|---|
+| 0,5 til 1,5 px | `rgb(10, 2, 0)` konturstrek |
+| 1,5 til 60 px | `rgb(70, 32, 5)` rim |
+| 60 til 130 px | `rgb(47, 19, 2)` overgang |
+| over 130 px | `rgb(38, 14, 1)` kropp |
+
+Fargefordeling i de ekte: 56 prosent kropp, 12 prosent rim, 31 prosent
+mellomtoner. Korn: 372 avlange prikker per flis, 16 x 10 px, én per
+90 x 90 px rute.
+
+Renderen bygger masken først og henter all farge av avstandstransformen.
+Variasjonen ligger i hvor dypt rimen går, ikke i et lysfelt oppå massen.
+Legger man på et lysfelt forsvinner den flate kroppsfargen.
+
+**Is:** bare `level4/2.png`, `3` og `4` har blått blant de seksten ekte
+flisene, og der er det 0,4 til 1,9 prosent av massen. Bane 2 og 3 har
+null. Tverrsnitt inn fra kanten: `rgb(15,50,63)` kald konturstrek på 0
+til 2 px, `rgb(36,96,118)` med glans på 2 til 7, `rgb(30,84,104)` på 7
+til 16, `rgb(20,60,74)` på 16 til 30. Båndtykkelsen varierer 10 til 123
+px, og isen dekker 20 til 26 prosent av omrisset.
+
+**Flisene rører aldri flisekanten.** Alle fire kantradene er 0,0 prosent
+stein i de ekte. Formene lukker seg inne i flisa, så konturstreken går
+hele veien rundt. Klaringen er 2 til 210 px.
+
+**Sprekkene går i huletaket, aldri i gulvet.** De er gjennomsiktige
+spalter hogd ned fra overkanten av den øvre massen. Legger man dem i
+gulvflata bryter de bakken marken ruller på.
+
+**Målt spillbarhet bane 5/6 (2026-09-16):** takhøyde 786 til 1608
+enheter, spawn-fall 285 og 253, verste motbakke 0 px, fall mellom fliser
+784 til 4269, dødslinje-klaring 612 til 622, alle fjorten hopp krever
+202 til 243 enheter/s med landingen lavere enn avsatsen.
+
+**Kollisjonsklosser:** 1491 og 948 mot 505 til 743 i de ekte banene.
+Takmassen spores grovt, og dybden deles i skiver som blir tjukkere
+nedover (80 px øverst, så fordobling) i stedet for jevne 160 px. Jevne
+skiver ga 12 klosser per kolonne på en 2000 px tjukk gulvblokk, der bare
+den øverste noen gang blir berørt.
+
 samme format som den ekte kunsten, 79-97 kB per flis.
 
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
