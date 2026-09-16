@@ -2913,3 +2913,82 @@ ligger mer enn 6 piksler under den tegnede flata. Marken er bare 17
 enheter høy, så et avvik på 15 piksler er halvannen markhøyde ned i
 bakken. Verste gulvavvik er nå 5,4 piksler i alle åtte fliser, mot 102
 til 1542 i de ekte banene.
+
+## 2026-09-16, de første hoppene i bane 5 og 6 var umulige
+
+Mathias: "Man klarer ikke de første hoppene på bane 5 og 6."
+
+### Hva som var galt
+
+Målte avsats og landing for hvert hopp. Bane 5, første hopp: avsatsen
+ligger på y=614, landingen på y=542. **Landingen lå 72 piksler HØYERE
+enn avsatsen.** Marken skulle fly 180 piksler bortover og stige
+samtidig. Det går ikke for noe som ruller.
+
+Årsaken er den samme klassen som oppoverbakken ved spawn i går:
+konturstøyen, amplitude rundt 110 piksler, overstyrte de tegnede
+høydene. Blokken var tegnet til å starte på y=700, altså 110 piksler
+under avsatsen, men støyen løftet kanten til 542.
+
+Det gjaldt flere hopp. Med støyen fjernet fra kantene viste det seg at
+flere gap jeg trodde var greie, egentlig var like ille. Bane 6 sitt
+første hopp hadde et tegnet fall på bare 60 piksler over et 150 piksler
+bredt gap. Det så greit ut i målingen bare fordi støyen tilfeldigvis
+hadde senket landingen den gangen.
+
+### Fiksen, i tre deler
+
+**1. Støyen er null i begge ender av hver blokk.** Kantene er nettopp
+der høydene må stemme, siden de er avsats og landing. Det gjøres ved å
+trekke fra en rett linje gjennom støyens to endeverdier.
+
+Første forsøk tonet støyen ut mot endene i stedet. Det var feil: utoning
+lager en kunstig helning i de siste 150 pikslene, og i ett tilfelle
+snudde den avsatsen til en motbakke, så hoppet ble regnet som umulig.
+Å trekke fra en rett linje gir null i endene uten å vri på helningen.
+
+**2. Fallet ved hvert gap følger nå en regel.** For at farten som trengs
+skal ligge i samme spenn som de ekte banene, må landingen ligge minst
+rundt `bredde² / 100` piksler lavere enn avsatsen:
+
+| gap | minste fall |
+|---|---|
+| 140 px | 196 px |
+| 160 px | 256 px |
+| 200 px | 400 px |
+| 240 px | 576 px |
+
+Alle blokkhøydene i begge baner er satt etter den.
+
+**3. Kortere tilspissing på gulvblokker ved gap.** En blokk med lang
+tilspissing er tynn lenge før den geometriske enden, så det *effektive*
+hullet ble bredere enn tegnet. Ett gap på 150 piksler målte 459.
+
+### Resultatet
+
+| | før | etter | ekte baner |
+|---|---|---|---|
+| bane 5 første hopp | landing 72 px **høyere** | 161 e/s | 92-275 e/s |
+| bane 6 første hopp | fall 60 px over 150 px gap | 171 e/s | |
+| verste hopp | umulig | 232 e/s | |
+
+Alle tretten hoppene i de to banene krever nå 157 til 232 enheter per
+sekund, og alle landinger ligger lavere enn avsatsen. De to første er
+blant de letteste.
+
+Til sammenligning krever de hoppbare gapene i bane 2, 3 og 4 mellom 92
+og 275. De ekte banene har i tillegg noen gap der landingen ligger
+høyere enn avsatsen, opp til 837 piksler. De er neppe ment å hoppes,
+antagelig er de fallgruver.
+
+### Alt annet målt på nytt
+
+Takhøyde 780-1954 enheter, fall mellom fliser 1682-4201 (ekte 673-5244),
+spawn-fall 381 og 329, helning fra spawn +140 og +134, ingen kolonner
+uten hitbox, 0 ugyldige polygoner av 1905, hitbox-presisjon 99,8-99,9
+prosent, dekning 96,0-99,1, is-korrespondansen intakt.
+
+Verifiseringen har nå et eget skript for hoppene (`hopp.py` i
+verktøykassa) som finner gulvet med kontinuitet, skiller gulv fra
+takskår på tykkelse, ser bort fra overheng, og regner ut nødvendig
+utgangsfart for hvert gap.
