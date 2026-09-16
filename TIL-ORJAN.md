@@ -2992,3 +2992,74 @@ Verifiseringen har nå et eget skript for hoppene (`hopp.py` i
 verktøykassa) som finner gulvet med kontinuitet, skiller gulv fra
 takskår på tykkelse, ser bort fra overheng, og regner ut nødvendig
 utgangsfart for hvert gap.
+
+## 2026-09-16, marken ble stående i en grop i bane 5
+
+Mathias sendte skjermbilde: "Bane 5, kommer ikke opp denne bakken."
+Marken lå i en dump med bakken stigende foran seg.
+
+### Hva jeg målte
+
+Jeg hadde bare sjekket helningen ved spawn, ikke resten av banen. Målte
+alle sammenhengende stigninger i gulvet, og sammenlignet med bane 2, 3
+og 4.
+
+Høydene var ikke problemet. Mine motbakker var 40 til 172 piksler høye,
+de ekte har median 35 og p90 137. Det var **lengden**:
+
+| | ekte bane 2-4 | mine |
+|---|---|---|
+| lengde | 26-305 px | 165-**1427** px |
+
+En kort bratt kul tar man med fart. En lang slak stigning spiser opp
+farten uansett hvor lav den er, og da blir marken stående. Det var
+nøyaktig det som skjedde.
+
+### Årsaken
+
+Konturstøyens gradient var brattere enn den tegnede helningen. Målt per
+blokk:
+
+| blokk | tegnet helning | støyens gradient |
+|---|---|---|
+| bane 5 flis 1, tredje blokk | 0,278 px/px | 0,546 |
+| bane 5 flis 2, første blokk | 0,347 | 0,401 |
+| bane 6 flis 1, tredje blokk | 0,281 | 0,491 |
+| bane 6 flis 4, andre blokk | 0,091 | 0,357 |
+
+Støyen vant overalt. Da hjelper det ikke hvor fint helningen er tegnet.
+Gradienten er omtrent `amplitude / (lengde x bølgefaktor)`, så den kan
+regnes ut på forhånd.
+
+### Fiksen
+
+**Roligere kontur på gulvflater:** amplitude fra 110 til 60 piksler, og
+bølgefaktor fra 0,14 til 0,22. Det setter gradienten til 0,12-0,19, altså
+under de tegnede helningene. Takskår og overheng er urørt, de har ingen
+slik begrensning siden ingen ruller på dem.
+
+**Hard grense i tillegg:** en gulvflate får ikke stige mer enn 8 piksler
+over sitt eget laveste punkt. Det er en garanti uavhengig av tall, og
+koster lite visuelt.
+
+**Brattere gulv i bane 6 flis 4,** der den tegnede helningen bare var
+0,091 piksler per piksel. Nå 0,2.
+
+### Resultatet
+
+Verste motbakke i de to banene er nå 8 piksler, som krever 97 enheter per
+sekund. Marken har 156 til 248 ved hoppene, så den ruller over uten å
+merke det. Fem av åtte fliser har ingen motbakke i det hele tatt.
+
+Hoppene er uendret gode: 156 til 248 enheter per sekund, alle landinger
+lavere enn avsatsen.
+
+Verifiseringen sjekker nå motbakker langs hele gulvet, ikke bare ved
+spawn.
+
+### Til ettertanke
+
+Dette er tredje gang på rad at konturstøyen har ødelagt noe som var
+riktig tegnet: først oppoverbakke ved spawn, så umulige hopp, nå en
+grop midt i banen. Hver gang var den tegnede formen riktig og støyen
+sterkere enn den. Jeg burde sett mønsteret etter den første.
