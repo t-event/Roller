@@ -689,10 +689,37 @@ den øverste noen gang blir berørt.
 
 samme format som den ekte kunsten, 79-97 kB per flis.
 
+## Bane 7: søylene, bygget etter bane 4 (2026-09-24)
+
+Bane 4 er ikke en tunnel slik bane 3 er. Den er **stående søyler man
+hopper mellom, som trapper seg nedover mot høyre.** Målt på de fire ekte
+flisene: 2 til 4 søyler per flis, bredde 596 til 2229 px, høyde 656 til
+2055, **underkanten på y 2148 til 2288 i alle**, altså samme grunnlinje.
+Gap 40 til 376 px, toppen av neste 237 til 1285 px lavere. Tetthet i
+omskrevet boks 0,51 til 0,82. Fyllgrad 31 til 41 prosent, flis 4
+(hulemunnen) 60. Is i flis 2, 3 og 4, ingen i flis 1.
+
+Bane 7 har derfor **ingen takmasse**. Det gir 828 kollisjonsklosser, mot
+bane 5 og 6 sine 1491 og 948 og de ekte banenes 505 til 743.
+
+**Regel om gap, lært tre ganger:** det effektive gapet er ikke avstanden
+mellom blokkene, det er avstanden mellom der de fortsatt er tjukke nok
+til å bære, altså 120 px. Tilspissingen på endene gjorde 150 px tegnet
+til 273 px målt, og i bane 5 til 459 px. En lavere topp gir en tynnere
+søyle og skyver landingspunktet enda lenger inn: da jeg senket en topp
+for å få større fall, ble gapet 363 px og kravet steg fra 245 til 286
+enheter/s. **Hold søyla tjukk, flytt den sidelengs.**
+
+**Kroppsfargen er rgb(38, 14, 1) i bane 2, 3 og 4, nøyaktig lik.** Den
+gradvise mørkningen i bane 5 og 6 finnes ikke i den ekte kunsten, den er
+innført av meg.
+
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
 
-1. ~~Delte kollisjonsformer~~ **Bane 1-4 løst 2026-09-14, bane 5-9
-   fortsatt åpent.** `lib/shapedefs.lua` har bare ett sett former
+1. ~~Delte kollisjonsformer~~ **Bane 1-4 løst 2026-09-14, bane 5, 6 og 7
+   løst, bane 8 og 9 fortsatt åpent.** Bane 8 og 9 deler kunst med bane
+   7 og bruker fortsatt `lib.shapedefs`, altså bane 1 sine former, mot
+   helt annen kunst. `lib/shapedefs.lua` har bare ett sett former
    ("1"-"4"), sporet fra level1 sine bilder, men ble likevel brukt av
    ALLE baner — stemte bare for bane 1. Ørjan sendte en nyere versjon
    av spillet med egne, riktig sporede formsett for bane 2-4

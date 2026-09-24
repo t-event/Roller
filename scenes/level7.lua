@@ -11,7 +11,10 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
+-- Bane 7 har egne kollisjonsformer fra 2026-09-24. For det brukte den
+-- lib.shapedefs, altsa bane 1 sine former, som ikke passet kunsten i det
+-- hele tatt. Bane 8 og 9 gjor fortsatt det samme.
+local physicsData = (require "lib.shapedefs7").physicsData(scaleFactor)
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX

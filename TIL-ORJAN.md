@@ -3510,3 +3510,97 @@ minnet paa skjermkortet.
 
 Ingenting av dette er spilletestet. Jeg har ingen nettleser her, bare
 maalinger.
+
+## 2026-09-24, ny bane 7 bygget etter bane 4
+
+Mathias: "Kan du proeve aa lage en ny bane med utgangspunkt fra level 4.
+fordi det er den beste banen."
+
+### Bane 4 er ikke en tunnel
+
+Det forste jeg maatte forstaa: bane 4 har et helt annet formsprak enn
+bane 3. Bane 3 er en gang hogd gjennom en steinmasse. **Bane 4 er
+staaende soyler som man hopper mellom, og som trapper seg nedover mot
+hoyre.** Det er antakelig derfor du liker den best: det er tydelig hva
+du skal gjore.
+
+Malt paa de fire ekte flisene:
+
+| | Bane 4 |
+|---|---|
+| Soyler per flis | 2 til 4 |
+| Bredde | 596 til 2229 px |
+| Hoyde | 656 til 2055 px |
+| Underkanten | alle paa y 2148 til 2288, samme grunnlinje |
+| Gap mellom dem | 40 til 376 px |
+| Toppen av neste | 237 til 1285 px lavere enn forrige |
+| Tetthet i boksen | 0,51 til 0,82 |
+| Fyllgrad | 31 til 41 %, flis 4 (hulemunnen) 60 % |
+| Is | flis 2, 3 og 4. Flis 1 har ingen |
+
+Derfor har bane 7 **ingen takmasse**. Bane 4 har ikke tak i flis 1 til 3
+i det hele tatt. Massen kommer av at soylene er hoye og staar paa samme
+grunnlinje. Det gir ogsaa 828 kollisjonsklosser mot bane 5 og 6 sine
+1491 og 948, altsa rett i de ekte banenes eget spenn paa 505 til 743.
+
+### Resultat mot fasiten
+
+| | Ekte bane 4 | Ny bane 7 |
+|---|---|---|
+| Soyler per flis | 2, 4, 3, 2 | 3, 4, 3, 2 |
+| Fyllgrad flis 1-3 | 31 til 41 % | 30 til 37 % |
+| Fyllgrad flis 4 | 60 % | 51 % |
+| Tetthet i boksen | 0,45 til 0,82 | 0,42 til 0,82 |
+| Is flis 1 / 2 / 3 / 4 | 0 / 0,39 / 1,44 / 1,85 % | 0 / 0,64 / 1,53 / 1,24 % |
+| Kollisjonsklosser | 526 | 828 |
+| Stein i flisekanten | 0,0 % | 0,0 % |
+
+Spillbarhet: ingen tak i flis 1-3, hulemunnen 744 enheter, spawn-fall
+321 (ekte 171-369), verste motbakke 0 px, fall mellom fliser 3870 til
+4334 (ekte 673-5244), dodslinje-klaring 610 til 614.
+
+Alle sju hopp krever 135 til 202 enheter/s. Marken har 156 til 248.
+
+### Feilen som kostet to runder
+
+Jeg regnet hoppene ut PAA FORHAND denne gangen, til 150 til 214
+enheter/s, i stedet for aa tegne forst og maale etterpa. Sekse av sju
+traff. Det sjuende ble 245.
+
+Aarsaken er verdt aa skrive ned, for dette er tredje gang den samme
+tingen lurer meg:
+
+**Det effektive gapet er ikke avstanden mellom blokkene. Det er
+avstanden mellom der de fortsatt er tjukke nok til aa baere**, altsa 120
+px. Tilspissingen paa endene gjorde 150 px tegnet til 273 px maalt.
+(I bane 5 ble 150 px til 459 px i september.)
+
+Forste forsok paa aa rette det gjorde det verre: jeg flyttet soyla 40 px
+mot venstre OG senket toppen 80 px for aa faa storre fall. Gapet ble 363
+px og kravet steg til 286 e/s. En LAVERE topp gir en TYNNERE soyle, og
+da flytter landingspunktet seg enda lenger inn. Den effekten var storre
+enn de 40 pikslene jeg vant.
+
+Rettet ved aa holde soyla tjukk og flytte den 80 px sidelengs i stedet.
+Gapet ble 219 px og kravet 202 e/s. Regelen staar na i baner.py.
+
+### To ting til
+
+**Bane 7 hadde ingen egne kollisjonsformer.** Den brukte
+`lib.shapedefs`, altsa bane 1 sine former, mot helt annen kunst. Na har
+den `lib.shapedefs7`. **Bane 8 og 9 gjor fortsatt det samme, og de deler
+kunst med bane 7.** Det staar igjen.
+
+**Den gradvise morkningen finnes ikke i den ekte kunsten.** Jeg malte
+kroppsfargen i bane 2, 3 og 4: noyaktig rgb(38,14,1) i alle tre. Den
+morkningen jeg innforte i bane 5 og 6 er min egen. Bane 7 har bane 4 sin
+farge rett av. Si fra om du vil at jeg tar den ut av bane 5 og 6 ogsaa.
+
+### Det jeg ikke faar til
+
+Bane 4 sine soyler har **bolgete loddrette sidekanter**. Mine er glatte.
+Renderen bygger hver form av en toppkurve og en bunnkurve per kolonne,
+saa sidene oppstaar implisitt der de to motes, og det finnes ingen plass
+aa legge bolger paa. Det krever en annen formbeskrivelse.
+
+Ingenting er spilletestet. Alt er malt.
