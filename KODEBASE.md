@@ -745,6 +745,50 @@ Målt: spawn-fall 145-170 px, verste motbakke 20-25 px etter landing, alle
 tre landinger på toppen av neste hode ved 156, 200 og 248 enheter/s. Ut
 av flis 4 treffer marken `mal2` før `dod` ved alle tre fartene.
 
+## Bane 8: fri plassering av flisene, fra Ørjans tegning (2026-09-27)
+
+Laget med samme verktøy som bane 7, nå `Util/baner/lag_bane.py`, som tar
+banenummeret som argument:
+
+    python3 Util/baner/lag_bane.py 8 --sjekk   # bare målinger
+    python3 Util/baner/lag_bane.py 8           # skriver level8/*.png, lib/shapedefs8.lua og lib/baneoppsett8.lua
+
+Tegning 8 (`Util/baner/tegning8.jpg`) har smalere og brattere masser
+enn tegning 7, med hodet 400-1000 px inn bak en skrå venstreside. Lagt i
+den faste diagonalen måtte de strekkes 2-2,4 ganger bortover, og marken
+landet i en motbakke uansett. Derfor:
+
+- **Flisene ligger fritt.** Massene er skalert likt i begge retninger
+  (7,1-9,5 flispiksler per tegningspiksel), og hver flis er lagt slik at
+  hodetoppen på neste masse står 180 px til høyre for og 600 px under
+  kanten på den forrige. Flisene overlapper hverandre, det er greit fordi
+  bildene er gjennomsiktige utenfor massene.
+- **`lib/baneoppsett8.lua` er generert** og gir sentrum for de fire
+  flisene, `dod` (posisjon og rotasjon) og `mal2`. `level8.lua` leser den,
+  så bilder, kollisjon og plassering kan ikke komme i utakt.
+- **Dødslinja** er en rett linje med samme helning som banen, lagt 250 px
+  under all bakke man kan stå på. Den krysser inn i massene, som i
+  tegningen.
+- **Spawn:** hele marken skal stå i helningen etter kammen, med minst
+  20 px fall under seg og ingen lavere bakke bak. Første forsøk tillot 40
+  px lavere bakke bak, og marken ble liggende i balanse på kammen.
+- I tegning 8 krysser den lilla streken inn i massene, så avskjæringen
+  under den (brukt i bane 7) er slått av.
+
+Målt: spawn-fall 160-226 px, alle tre hopp lander på eller bak neste
+hodetopp ved 156, 200 og 248 enheter/s, verste motbakke 17 px, ingen
+overlapp mellom massene, 879 kollisjonsklosser. Testet i Chromium mot
+den publiserte versjonen: marken ruller gjennom hele banen og treffer
+målet uten at noen trykker.
+
+**Måltreffet lekket mellom banene (rettet i alle ni banefilene).**
+`onCollision1` sjekket bare `agro.type == "mal2" and hit.type == "del4"`.
+Mens neste bane starter, ligger marken fra forrige bane fortsatt i
+fysikkverdenen og faller gjennom sitt eget mål. Det utløste målet i den
+nye banen med en gang: bane 8 -> 9 hoppet rett videre til banevalget og
+krasjet med `attempt to compare nil with number`. Sjekken sammenligner nå
+med banens egne objekter (`agro == mal2 and hit == del4`).
+
 ### Forrige utgave: tynne svevende band (2026-09-27), forkastet
 
 Tolket tegningen som én flis og la 3-4 tynne band i hver flis, 13 i alt i

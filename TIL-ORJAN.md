@@ -3768,3 +3768,40 @@ Etter rettelsen startet bane 7 uten krasj, men marken døde etter rundt
 vippet bakover og falt ut. Banen er derfor flyttet 1130 enheter i
 stedet for 600, så marken starter der toppen begynner å helle nedover
 (124 px fall over de neste 300 px, ingen bakke som faller bort bak den).
+
+## 2026-09-27, bane 8 laget rett fra tegningen
+
+Mathias sendte Ørjans tegning for bane 8: "Gjør det samme og lag en
+bane 8."
+
+### Hva som var annerledes enn bane 7
+
+Massene i tegning 8 er smalere og brattere, og hodet ligger 400-1000 px
+inn bak en skrå venstreside. Lagt én per flis i den faste diagonalen
+måtte de strekkes 2-2,4 ganger bortover (bane 7: 1,3-1,7), og marken
+landet i en motbakke på 130-260 px uansett.
+
+### Hva som er gjort
+
+- Verktøyet er flyttet til `Util/baner/lag_bane.py` og tar banenummeret
+  som argument. Bane 7 gjenskapes byte for byte.
+- **Flisene ligger fritt** i stedet for i den faste diagonalen. Massene er
+  skalert likt i begge retninger, så formene er som tegnet, og hver flis
+  er lagt der hoppet til neste hode går opp. Posisjonene til flisene,
+  dødslinja og målet står i den genererte `lib/baneoppsett8.lua`, som
+  `level8.lua` leser.
+- Spawn krever nå at hele marken står i helningen etter kammen. Første
+  forsøk ble liggende i balanse på toppen av hodet.
+
+### En feil som gjaldt alle baner
+
+Da jeg testet bane 8 til mål, hoppet spillet rett gjennom bane 9 og
+krasjet (`attempt to compare nil with number`). Årsaken: målsjekken så
+bare på `.type`, og marken fra bane 8 lå fortsatt i fysikken og falt
+gjennom sitt eget mål mens bane 9 startet. Bane 9 trodde da at den var
+fullført. Rettet i alle ni banefilene ved å sammenligne med banens egne
+`mal2` og `del4`.
+
+Testet i Chromium mot den publiserte versjonen. Ingenting er spilletestet
+av et menneske.
+

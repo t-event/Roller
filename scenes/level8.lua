@@ -918,7 +918,12 @@ onCollision1 = function(event)
 if event.phase == "began" then
 local agro = event.object1
 local hit = event.object2
-if agro.type == "mal2" and hit.type == "del4" then
+-- Rettet 2026-09-27: sammenlign med denne banens egne objekter, ikke
+-- bare .type. Mens neste bane starter, ligger marken fra forrige bane
+-- fortsatt i fysikkverdenen og faller gjennom sitt eget mål, og det
+-- utløste målet i den nye banen med en gang (bane 8 -> 9 hoppet rett
+-- videre og krasjet med "attempt to compare nil with number").
+if agro == mal2 and hit == del4 then
     -- Rettet 2026-09-15: "collision1" var en udefinert global (skulle
     -- vært selve funksjonsnavnet onCollision1), så dette kallet kastet
     -- en feil hver gang målet ble nådd og stoppet resten av
