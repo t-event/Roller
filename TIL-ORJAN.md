@@ -3802,6 +3802,11 @@ gjennom sitt eget mål mens bane 9 startet. Bane 9 trodde da at den var
 fullført. Rettet i alle ni banefilene ved å sammenligne med banens egne
 `mal2` og `del4`.
 
+Etter det startet bane 9 som den skulle, men krasjet likevel med samme
+melding idet bane 8 ble ryddet bort. `camera` er global, og bane 8 sin
+`scene:hide` kjørte `camera:destroy()` etter at bane 9 hadde laget sitt
+kamera. Rettet i alle ni banefilene: hver bane ødelegger bare sitt eget.
+
 Testet i Chromium mot den publiserte versjonen. Ingenting er spilletestet
 av et menneske.
 

@@ -789,6 +789,12 @@ nye banen med en gang: bane 8 -> 9 hoppet rett videre til banevalget og
 krasjet med `attempt to compare nil with number`. Sjekken sammenligner nå
 med banens egne objekter (`agro == mal2 and hit == del4`).
 
+**Kameraet ble ødelagt av forrige bane (rettet i alle ni banefilene).**
+`camera` er global (`_G.camera`). Når spillet går rett videre til neste
+bane, lager neste bane sitt kamera før forrige banes `scene:hide` kjører,
+og den kalte `camera:destroy()` på det nye kameraet. Hver bane husker nå
+sitt eget kamera i `egetKamera` og ødelegger bare det.
+
 ### Forrige utgave: tynne svevende band (2026-09-27), forkastet
 
 Tolket tegningen som én flis og la 3-4 tynne band i hver flis, 13 i alt i

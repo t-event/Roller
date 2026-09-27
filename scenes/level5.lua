@@ -137,6 +137,13 @@ local sjekkUtenforBanen
 
         
 
+-- Denne banens eget kamera. camera er global (_G.camera), og når
+-- spillet går rett videre til neste bane, lager neste bane sitt kamera
+-- FØR denne banens scene:hide kjører. Da ødela hide kameraet til den
+-- nye banen, og den krasjet med "attempt to compare nil with number"
+-- (funnet 2026-09-27, bane 8 -> 9).
+local egetKamera
+
 function scene:create( event )
 lm.currentLevel = 5 -- så retry vet hvilken bane den skal restarte
 
@@ -153,6 +160,7 @@ lm.currentLevel = 5 -- så retry vet hvilken bane den skal restarte
     -- egen anbefaling): lib/liv.lua sin liv.hent() skriver til denne
     -- gruppa direkte og har ingen annen måte å nå den på.
     _G.camera = perspective.createView()
+    egetKamera = camera
     physics.start( )
     --physics.pause( )
     --physics.setGravity(0 , 9.81 )
@@ -2054,8 +2062,9 @@ function scene:hide( event )
        print ("level1 scene:hide will")
    elseif ( phase == "did" ) then
        print ("level1 scene:hide did")
-camera:destroy()
-        camera=nil
+if egetKamera then egetKamera:destroy() end
+        if camera == egetKamera then camera = nil end
+        egetKamera = nil
 
 
       -- camera:setFocus( nil )
