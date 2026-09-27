@@ -3720,8 +3720,10 @@ gangen, så banen kan lages på nytt eller justeres.
   gapet mellom dem rundt 650 px, og marken ville landet på den avrundede
   venstresiden av neste hode og måttet klatre. Nå er gapet 44 til 70 px,
   med 765 til 939 px fall rett ned på toppen av neste hode.
-- Spawn er flyttet til `del1.x = 600` i `level7.lua`, slik at marken
-  starter over hodet på første masse, slik tegningen viser.
+- Banen er flyttet 600 enheter mot venstre i `level7.lua` (flisene,
+  `dod` og `mal2`), slik at marken starter over hodet på første masse,
+  slik tegningen viser. (Første utgave flyttet marken i stedet, se
+  rettelsen under.)
 - To små oppbøyde lepper ytterst på masse 1 og 3 er slipt ned, ellers
   ville marken blitt liggende i dumpa foran dem.
 - Fargene er målt i `level4/1.png`: lys rim langs topp og bunn, mørk
@@ -3742,3 +3744,21 @@ Bildene er 360-410 kB per flis mot 100-200 kB i de ekte banene, på grunn
 av den myke overgangen og kornet.
 
 Ingenting er spilletestet. Alt er målt.
+
+### Rettelse samme kveld: bane 7 krasjet i nettleseren
+
+Mathias fikk `assertion failed!` i `transition.to` med en gang bane 7
+startet. Gjenskapt i Chromium mot den publiserte versjonen: rett etter
+start meldte spillet `mal2vsdel4` (marken "traff" målet), så `knott3 og
+knott4`, så `Attempt to set property y to NaN`, og så krasjet. Versjonen
+før endringen startet uten feil.
+
+Årsaken var at jeg hadde flyttet selve marken til `del1.x = 600`.
+Kollisjonsformene er ikke årsaken: minste flate og kant er på nivå med
+bane 4. Trolig er det sveiseleddene til knottene, som bruker
+`(knott.x, knott.x)` som festepunkt og dermed havner 400-600 enheter
+unna marken når den ikke står rundt x=0.
+
+Rettet ved å sette marken tilbake til `del1.x = 0`, som i alle de andre
+banene, og heller flytte flisene, `dod` og `mal2` 600 enheter mot
+venstre. Geometrien marken møter er nøyaktig den samme.

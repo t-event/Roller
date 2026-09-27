@@ -403,13 +403,18 @@ def baerer(m, x, tykk=120):
     return k[t:t + tykk].all()
 
 
-SPAWN_X = (411, 600)   # del1.x i level7.lua er 600, marken går 189 enheter bakover
+# Marken står i del1.x = 0 og går 189 enheter bakover. I bane 7 er flisene
+# (firkant1.x), dod og mal2 flyttet 600 enheter mot venstre i level7.lua,
+# så marken starter over hodet på første masse. Marken selv kan ikke
+# flyttes: med del1.x = 600 ble fysikken NaN og banen krasjet.
+FIRKANT1_X = 2900
+SPAWN_X = (-189, 0)
 SPAWN_Y = 0
 
 
 def til_bilde(X, Y):
     """Spillkoordinat -> bildepunkt i flis 1."""
-    return (X - 3500) / 2 + 1920, (Y - 2300) / 2 + 1175.5
+    return (X - FIRKANT1_X) / 2 + 1920, (Y - 2300) / 2 + 1175.5
 
 
 def kast(fra_x, fra_y, v, treff):
