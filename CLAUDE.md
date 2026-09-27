@@ -11,5 +11,11 @@
   kjører, kan derfor ikke skjules der, heller ikke via GitHub secrets. Den må
   i så fall ligge bak en egen server.
 
+- **Gi alltid lenken til spillet etter endringer som kan prøves:**
+  https://thurbohnek.github.io/Roller/ . Siden bygges og publiseres
+  automatisk ved hver push til `main` (tar et par minutter). Vent til
+  byggingen er publisert før lenken gis, og si fra at en privat fane eller
+  omlasting kan trengs for å få nyeste versjon.
+
 Se `KODEBASE.md` for hvordan koden henger sammen og `SPILLIDE.md` for
 spillideen.
