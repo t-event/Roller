@@ -11,7 +11,12 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
-local physicsData = (require "lib.shapedefs").physicsData(scaleFactor)
+-- Bane 8 er laget av Util/baner/lag_bane.py fra Ørjans tegning (2026-09-27).
+-- Flisene ligger ikke i den faste diagonalen som i de andre banene, men der
+-- hoppene mellom massene går opp. Posisjonene til flisene, dod og mal2
+-- kommer fra lib/baneoppsett8.lua, som genereres sammen med bildene.
+local physicsData = (require "lib.shapedefs8").physicsData(scaleFactor)
+local oppsett = require "lib.baneoppsett8"
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -171,9 +176,9 @@ lm.currentLevel = 8 -- så retry vet hvilken bane den skal restarte
 
 
           local dod = display.newRect (0, 0, 70000, 50) 
-          dod.x = bredde -bredde-bredde
-          dod.y = hoyde
-          dod:rotate( 31.48 ) 
+          dod.x = oppsett.dod.x
+          dod.y = oppsett.dod.y
+          dod:rotate( oppsett.dod.rotasjon ) 
           dod.myName = "dod"
           grp:insert( dod ) 
           dod.alpha = 0
@@ -186,8 +191,8 @@ lm.currentLevel = 8 -- så retry vet hvilken bane den skal restarte
           
           local mal2 = display.newRect( 0, 0, 10, 3000 )
           --mal2:setReferencePoint( display.BottomLeftReferencePoint )
-          mal2.x = 31000
-          mal2.y = 18000
+          mal2.x = oppsett.mal2.x
+          mal2.y = oppsett.mal2.y
           mal2.myName = "mal2"
           mal2:rotate(45)
           grp:insert ( mal2 )
@@ -794,30 +799,29 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
 
                                      
                                       local     firkant1 = display.newImageRect("level8/1.png", 7680,4702)
-                                                firkant1.x = 3500
-                                                --firkant1.x = 3850
-                                                firkant1.y = 2300
+                                                firkant1.x = oppsett.fliser[1].x
+                                                firkant1.y = oppsett.fliser[1].y
                                                 physics.addBody(firkant1,"static", physicsData:get("1") )
                                                 firkant1.alpha = 1  
                                                 firkant1.myName = "firkant1"                                
                                                 
                                       local     firkant2 = display.newImageRect("level8/2.png", 7680,4702)
-                                                firkant2.x = firkant1.x+firkant2.width
-                                                firkant2.y = firkant1.y+firkant2.height
+                                                firkant2.x = oppsett.fliser[2].x
+                                                firkant2.y = oppsett.fliser[2].y
                                                 physics.addBody(firkant2,"static", physicsData:get("2") )
                                                 firkant2.myName = "firkant2"   
                                                 
                                                  
                                       local     firkant3 = display.newImageRect("level8/3.png", 7680,4702)
-                                                firkant3.x = firkant2.x+firkant3.width
-                                                firkant3.y = firkant2.y+firkant3.height
+                                                firkant3.x = oppsett.fliser[3].x
+                                                firkant3.y = oppsett.fliser[3].y
                                                 physics.addBody(firkant3,"static", physicsData:get("3") )
                                                 firkant3.myName = "firkant3"   
                                                 
                                                 
                                       local     firkant4 = display.newImageRect("level8/4.png", 7680,4702)
-                                                firkant4.x = firkant3.x+firkant4.width
-                                                firkant4.y = firkant3.y+firkant4.height
+                                                firkant4.x = oppsett.fliser[4].x
+                                                firkant4.y = oppsett.fliser[4].y
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
                                                 firkant4.myName = "firkant4"   
                                                 

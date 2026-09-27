@@ -3710,7 +3710,7 @@ To feil, den ene verre enn den andre:
 
 ### Hva som er gjort
 
-Tegningen ligger nå i `Util/bane7/tegning.jpg`, og `Util/bane7/lag_bane7.py`
+Tegningen ligger nå i `Util/baner/tegning7.jpg`, og `Util/baner/lag_bane.py`
 lager bildene og kollisjonen rett fra den. Scriptet ligger i repoet denne
 gangen, så banen kan lages på nytt eller justeres.
 

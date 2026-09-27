@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Lager bane 7 (level7/1-4.png og lib/shapedefs7.lua) rett fra Ørjans tegning,
-Util/bane7/tegning.jpg.
+Lager en bane (levelN/1-4.png og lib/shapedefsN.lua) rett fra Ørjans
+tegning, Util/baner/tegningN.jpg. Bane 7 og 8 er laget slik.
 
 Kjør fra roten av repoet:
 
     pip install numpy scipy pillow
-    python3 Util/bane7/lag_bane7.py            # lager bilder og kollisjon
-    python3 Util/bane7/lag_bane7.py --sjekk    # bare målinger, skriver ingenting
+    python3 Util/baner/lag_bane.py 8            # lager bilder og kollisjon
+    python3 Util/baner/lag_bane.py 8 --sjekk    # bare målinger, skriver ingenting
+
+Ny bane: legg tegningen i Util/baner/, legg banen til i BANER under, kjør
+med --sjekk og juster MAAL og forskyvning til målingene er innenfor.
+Husk å sette forskyvningen inn i levelN.lua (firkant1.x, dod.x, mal2.x)
+og bytte til lib.shapedefsN der.
 
 HVORDAN TEGNINGEN LESES
 Tegningen viser HELE banen, ikke én flis: rød prikk = spawn, lilla strek =
@@ -33,7 +38,6 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage as nd
 
-TEGNING = "Util/bane7/tegning.jpg"
 W, H = 3840, 2351          # én flis i bildepunkter
 
 # Plassering av hver masse i sin flis: venstre og høyre kant, øverste og
@@ -46,12 +50,42 @@ W, H = 3840, 2351          # én flis i bildepunkter
 # 900-1200 px rett ned på neste hode. Tegningen er ikke rotert: de flate
 # toppene på hodene skal være flate. Dreies den slik at den lilla streken
 # får spillets vinkel, begynner toppene å stige mot høyre.
-MAAL = [
-    dict(x0=60, x1=3790, y0=150, y1=2200),
-    dict(x0=12, x1=3790, y0=170, y1=2270),
-    dict(x0=12, x1=3790, y0=170, y1=2270),
-    dict(x0=12, x1=3560, y0=170, y1=2270),
-]
+#
+# forskyvning: hvor mange enheter flisene, dod og mal2 er flyttet mot
+# venstre i levelN.lua, slik at marken (som alltid står i del1.x = 0)
+# starter der toppen av første masse begynner å helle nedover.
+BANER = {
+    7: dict(
+        maal=[
+            dict(x0=60, x1=3790, y0=150, y1=2200),
+            dict(x0=12, x1=3790, y0=170, y1=2270),
+            dict(x0=12, x1=3790, y0=170, y1=2270),
+            dict(x0=12, x1=3560, y0=170, y1=2270),
+        ],
+        forskyvning=1130,
+        # Den publiserte bane 7 ble slipt fra x=375 i flis 1 (spawn før
+        # banen ble flyttet 1130 i stedet for 600). Låst slik at scriptet
+        # gjenskaper den byte for byte.
+        slip_fra_flis1=375,
+    ),
+    # Bane 8 bruker fri plassering (se plasser_fritt): massene skaleres likt
+    # i begge retninger, og flisene legges der hoppene går opp, i stedet
+    # for i den faste diagonalen. Posisjonene skrives til
+    # lib/baneoppsett8.lua, som level8.lua leser.
+    8: dict(
+        fri=True,
+        skala_maks=9.5,     # bildepunkter i flis per tegningspiksel
+        hopp_bort=180,      # hodetoppen på neste masse ligger så langt til
+        hopp_ned=600,       # høyre for og under kanten på den forrige
+        klipp_lilla=False,
+    ),
+}
+
+# Settes av main() ut fra banenummeret.
+BANE = None
+TEGNING = None
+MAAL = None
+FIRKANT1_X = None
 
 GLATTING = 1.6   # sigma i tegningspiksler (1 tegningspiksel er ca 15 i flis)
 
@@ -96,9 +130,11 @@ def hent_masser():
         m = nd.binary_erosion(m, iterations=2)
         # Den lilla streken er dødslinja, ikke en kontur: det som ligger på
         # eller under den er ikke en del av massen. Det tar også bort den
-        # spisse haken nederst til venstre på første masse, der den blå og
-        # den lilla streken møtes.
-        m &= ~under_lilla
+        # spisse haken nederst til venstre på første masse i bane 7, der den
+        # blå og den lilla streken møtes. I tegning 8 krysser den lilla
+        # streken inn i massene, og der er avskjæringen slått av.
+        if BANER[BANE].get("klipp_lilla", True):
+            m &= ~under_lilla
         # Fjerner smale flak (under ca 10 tegningspiksler) som oppstår der
         # den blå og den lilla streken går tett i tett langs bunnen.
         m = nd.binary_opening(m, iterations=5)
@@ -335,10 +371,15 @@ def til_spill(px, py):
 
 
 def skriv_shapedefs(alle_former):
-    gammel = open("lib/shapedefs7.lua", encoding="utf-8").read()
+    # "del1" (markens egen form) hentes fra en eksisterende fil
+    kilde = "lib/shapedefs%d.lua" % BANE
+    try:
+        gammel = open(kilde, encoding="utf-8").read()
+    except FileNotFoundError:
+        gammel = open("lib/shapedefs7.lua", encoding="utf-8").read()
     start = gammel.index('\t\t["del1"]')
     hale = gammel[start:]
-    ut = [HODE, "local unpack = unpack\nlocal pairs = pairs\nlocal ipairs = ipairs\n\n",
+    ut = [HODE.replace("{N}", str(BANE)), "local unpack = unpack\nlocal pairs = pairs\nlocal ipairs = ipairs\n\n",
           "local M = {}\n\nfunction M.physicsData(scale)\n\tlocal physics = { data =\n\t{\n"]
     for nr, former in enumerate(alle_former, 1):
         ut.append('\t\t["%d"] = {\n' % nr)
@@ -354,13 +395,13 @@ def skriv_shapedefs(alle_former):
         ut.append("                     ,\n".join(biter))
         ut.append("\t\t}\n\t\t,\n")
     ut.append(hale)
-    open("lib/shapedefs7.lua", "w", encoding="utf-8").write("".join(ut))
+    open(kilde, "w", encoding="utf-8").write("".join(ut))
 
 
 HODE = """-- This file is for use with Corona(R) SDK
 --
--- Kollisjonsformer for bane 7, generert av Util/bane7/lag_bane7.py rett
--- fra Ørjans tegning (Util/bane7/tegning.jpg). Ikke rediger for hånd:
+-- Kollisjonsformer for bane {N}, generert av Util/baner/lag_bane.py rett
+-- fra Ørjans tegning (Util/baner/tegning{N}.jpg). Ikke rediger for hånd:
 -- endre scriptet og kjør det på nytt, så følger bildene med.
 --
 -- Hver form er et trapes på 100 px bortover med loddrette sider og
@@ -374,7 +415,7 @@ HODE = """-- This file is for use with Corona(R) SDK
 --
 -- Usage example:
 --			local scaleFactor = 1.0
---			local physicsData = (require "lib.shapedefs7").physicsData(scaleFactor)
+--			local physicsData = (require "lib.shapedefs{N}").physicsData(scaleFactor)
 --			local shape = display.newImage("objectname.png")
 --			physics.addBody( shape, physicsData:get("objectname") )
 --
@@ -403,12 +444,10 @@ def baerer(m, x, tykk=120):
     return k[t:t + tykk].all()
 
 
-# Marken står i del1.x = 0 og går 189 enheter bakover. I bane 7 er flisene
-# (firkant1.x), dod og mal2 flyttet 1130 enheter mot venstre i level7.lua,
-# så marken starter der toppen av første masse begynner å helle nedover.
-# Marken selv kan ikke flyttes: med del1.x = 600 ble fysikken NaN og
-# banen krasjet.
-FIRKANT1_X = 3500 - 1130
+# Marken står i del1.x = 0 og går 189 enheter bakover. Flisene (firkant1.x),
+# dod og mal2 er flyttet mot venstre i levelN.lua i stedet, se BANER.
+# Marken selv kan ikke flyttes: med del1.x = 600 i bane 7 ble fysikken NaN
+# og banen krasjet.
 SPAWN_X = (-189, 0)
 SPAWN_Y = 0
 
@@ -531,19 +570,252 @@ def sjekk(masker):
     ok &= all(t == "mål" for t in treff)
     return ok
 
+# ------------------------------------------------------------ fri plassering
 
-def main():
-    masser = hent_masser()
+def til_bilde_f(X, forskyvning):
+    """Spill-x -> bildepunkt-x i flis 1 når flis 1 er flyttet `forskyvning`
+    enheter mot venstre."""
+    return (X - (3500 - forskyvning)) / 2 + 1920
+
+
+def lag_maske_fri(masse, s, x0, y0):
+    """Tegningsmasse -> glatt maske i flisa med lik skala s i x og y, med
+    øvre venstre hjørne av massen i (x0, y0)."""
+    ys, xs = np.nonzero(masse)
+    glatt = nd.gaussian_filter(masse.astype(float), GLATTING)
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    tx = (xx - x0) / s + xs.min()
+    ty = (yy - y0) / s + ys.min()
+    return nd.map_coordinates(glatt, [ty, tx], order=1, cval=0.0)
+
+
+def hodetopp(m):
+    """Høyeste punkt på overflaten i venstre halvdel av massen."""
+    top = overflate(m)
+    xs = [x for x in range(W) if top[x] >= 0 and baerer(m, x, 40)]
+    venstre = xs[: max(1, len(xs) // 2)]
+    x = min(venstre, key=lambda u: top[u])
+    return x, top[x]
+
+
+def spawnpunkt(m):
+    """Første x etter hodetoppen der bakken heller nedover mot høyre som i
+    de ekte banene (minst 100 px fall over 300 px) uten at bakken bak
+    marken faller bort."""
+    top = overflate(m)
+    hx, _ = hodetopp(m)
+    for x in range(hx, W - 400):
+        if top[x] < 0 or top[x + 300] < 0:
+            continue
+        bak = max(top[u] for u in range(max(x - 150, 0), x + 1) if top[u] >= 0) - top[x]
+        if top[x + 300] - top[x] >= 100 and bak <= 40:
+            return x
+    raise SystemExit("fant ikke noe spawnpunkt i flis 1")
+
+
+def plasser_fritt(masser, cfg):
+    """Lager maskene og regner ut hvor hver flis skal ligge.
+
+    Returnerer (felt, origo, forskyvning): felt er maskene per flis, origo
+    er øvre venstre hjørne av hver flis i bildepunkter i flis 1 sitt
+    koordinatsystem, forskyvning er hvor mange enheter flis 1 flyttes mot
+    venstre så markens bakende (del8, x=-189) står over spawnpunktet."""
     felt = []
-    for i, (masse, maal) in enumerate(zip(masser, MAAL)):
-        f, (sx, sy) = lag_maske(masse, maal)
-        print("flis %d: skala %.1f bortover, %.1f nedover (strukket %.2f)" % (i + 1, sx, sy, sx / sy))
-        felt.append(f)
-    for i, fra in enumerate(starter([f >= 0.5 for f in felt])):
+    for i, masse in enumerate(masser):
+        ys, xs = np.nonzero(masse)
+        h, w = ys.max() - ys.min(), xs.max() - xs.min()
+        s = min(cfg["skala_maks"], (H - 120) / h, (W - 120) / w)
+        y0 = 60
+        if i == 0:
+            # flis 1: løft eller senk massen så bakken ligger ca 160 px
+            # under marken der den starter (ekte baner 111-210)
+            f = lag_maske_fri(masse, s, 60, y0)
+            sx_ = spawnpunkt(f >= 0.5)
+            y0 += 26 + 160 - overflate(f >= 0.5)[sx_]
+            if y0 < 20 or y0 + h * s > H - 20:
+                raise SystemExit("flis 1: massen får ikke plass med riktig spawn-fall")
+        felt.append(lag_maske_fri(masse, s, 60, y0))
+        print("flis %d: skala %.1f i begge retninger" % (i + 1, s))
+    masker = [f >= 0.5 for f in felt]
+    spawn_x = spawnpunkt(masker[0])
+    forskyvning = int(round(2 * (spawn_x - til_bilde_f(SPAWN_X[0], 0))))
+    origo = [(0, 0)]
+    for k in range(3):
+        lx, ly = ledge(masker[k])
+        px, py = hodetopp(masker[k + 1])
+        ox, oy = origo[k]
+        origo.append((ox + lx + cfg["hopp_bort"] - px, oy + ly + cfg["hopp_ned"] - py))
+    return felt, origo, forskyvning
+
+
+def verden_treff(masker, origo, x, y, unntatt=None):
+    """Hvilken flis (indeks, lokal x) har stein i verdenspunktet (x, y)."""
+    for j, (m, (ox, oy)) in enumerate(zip(masker, origo)):
+        if j == unntatt:
+            continue
+        u, v = int(x - ox), int(y - oy)
+        if 0 <= u < W and 0 <= v < H and m[v, u]:
+            return j, u
+    return None
+
+
+def dodslinje(masker, origo):
+    """Rett linje y = a x + b (verden, bildepunkter) under all bakke man
+    kan stå på, med samme helning som banen fra spawn til siste kant."""
+    punkter = []
+    for m, (ox, oy) in zip(masker, origo):
+        top = overflate(m)
+        for x in range(0, W, 20):
+            if top[x] >= 0:
+                punkter.append((ox + x, oy + top[x]))
+    lx, ly = ledge(masker[3])
+    a = (origo[3][1] + ly) / (origo[3][0] + lx)
+    b = max(py - a * px for px, py in punkter) + 250
+    return a, b
+
+
+def maalpunkt(masker, origo):
+    lx, ly = ledge(masker[3])
+    return origo[3][0] + lx + 350, origo[3][1] + ly + 450
+
+
+def landinger_fri(masker, origo, k, dod):
+    """Hvor marken lander når den ruller av kanten på flis k: (flis, x)
+    per fart, eller 'død'."""
+    a, b = dod
+    lx, ly = ledge(masker[k])
+    fx, fy = origo[k][0] + lx, origo[k][1] + ly
+
+    def treff(x, y):
+        t = verden_treff(masker, origo, x, y, unntatt=k)
+        if t:
+            return t
+        if y >= a * x + b:
+            return "død"
+        return None
+    return [kast(fx, fy, v, treff)[0] for v in (156, 200, 248)]
+
+
+def sjekk_fri(masker, origo, forskyvning, dod, maal):
+    ok = True
+    print("\nMålinger (bildepunkter, spillenheter = 2 x bildepunkter)")
+    m1 = masker[0]
+    top = overflate(m1)
+    x0 = int(round(til_bilde_f(SPAWN_X[0], forskyvning)))
+    fall = [top[x] - 26 for x in range(x0, x0 + 96)]
+    helning = top[x0 + 300] - top[x0]
+    bak = max(top[x] for x in range(x0 - 150, x0 + 1) if top[x] >= 0) - top[x0]
+    print("  spawn over x=%d-%d, fall %d-%d px (ekte 111-210), %d px fall over 300 px "
+          "(ekte 136-303), bakken bak marken inntil %d px lavere"
+          % (x0, x0 + 95, min(fall), max(fall), helning, bak))
+    ok &= min(fall) >= 90 and max(fall) <= 230 and helning >= 100 and bak <= 40
+
+    for i, m in enumerate(masker):
+        kant = m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any()
+        print("  flis %d: origo %s, fyllgrad %.1f %%, rører kanten: %s"
+              % (i + 1, origo[i], m.mean() * 100, kant))
+        ok &= not kant
+
+    # massene fra ulike fliser skal ikke gå inn i hverandre
+    for i in range(4):
+        for j in range(i + 1, 4):
+            dx, dy = origo[j][0] - origo[i][0], origo[j][1] - origo[i][1]
+            if abs(dx) >= W or abs(dy) >= H:
+                continue
+            a_ = masker[i][max(dy, 0):H + min(dy, 0), max(dx, 0):W + min(dx, 0)]
+            b_ = masker[j][max(-dy, 0):H + min(-dy, 0), max(-dx, 0):W + min(-dx, 0)]
+            n = int((a_ & b_).sum())
+            if n:
+                print("  OVERLAPP flis %d og %d: %d px" % (i + 1, j + 1, n))
+                ok = False
+
+    starter_ = [x0]
+    for k in range(3):
+        land = landinger_fri(masker, origo, k, dod)
+        print("  hopp flis %d->%d: lander %s med 156/200/248 e/s"
+              % (k + 1, k + 2, ["død" if l == "død" else "flis %d x=%d" % (l[0] + 1, l[1])
+                                for l in land]))
+        riktig = [l for l in land if l != "død" and l[0] == k + 1]
+        ok &= len(riktig) == 3
+        starter_.append(min(l[1] for l in riktig) if riktig else 0)
+
+    for i, m in enumerate(masker):
+        verst, hvor = motbakke(m, starter_[i])
+        print("  flis %d: verste motbakke fra x=%d: %d px (ved x=%s)" % (i + 1, starter_[i], verst, hvor))
+        ok &= verst <= 30
+
+    a, b = dod
+    lx, ly = ledge(masker[3])
+    fx, fy = origo[3][0] + lx, origo[3][1] + ly
+    cx, cy = maal
+
+    def mal_treff(x, y):
+        if y - cy >= -(x - cx) and abs(x - cx) <= 530:
+            return "mål"
+        if y >= a * x + b or verden_treff(masker, origo, x, y, unntatt=3):
+            return "død"
+        return None
+    treff = [kast(fx, fy, v, mal_treff)[0] for v in (156, 200, 248)]
+    print("  ut av flis 4 med 156/200/248 e/s: %s" % ", ".join(str(t) for t in treff))
+    ok &= all(t == "mål" for t in treff)
+    return ok, starter_
+
+
+def skriv_oppsett(origo, forskyvning, dod, maal):
+    """lib/baneoppsettN.lua: posisjonene levelN.lua trenger, i spillenheter."""
+    f1x = 3500 - forskyvning
+
+    def enheter(px, py):
+        return (px - 1920) * 2 + f1x, (py - 1175.5) * 2 + 2300
+    a, b = dod
+    dx_ = maal[0] / 2
+    dodx, dody = enheter(dx_, a * dx_ + b)
+    mx, my = enheter(*maal)
+    linjer = ["-- Generert av Util/baner/lag_bane.py %d. Ikke rediger for hånd." % BANE,
+              "-- Plassering av flisene (sentrum), dødslinja og målet for bane %d," % BANE,
+              "-- i spillenheter. Marken står som i alle baner i del1 = (0, 0).",
+              "return {",
+              "    fliser = {"]
+    for ox, oy in origo:
+        linjer.append("        { x = %d, y = %d }," % (round(2 * ox + f1x), round(2 * oy + 2300)))
+    linjer += ["    },",
+               "    dod = { x = %d, y = %d, rotasjon = %.2f }," % (round(dodx), round(dody), math.degrees(math.atan(a))),
+               "    mal2 = { x = %d, y = %d }," % (round(mx), round(my)),
+               "}", ""]
+    open("lib/baneoppsett%d.lua" % BANE, "w", encoding="utf-8").write("\n".join(linjer))
+
+
+def main_fri(cfg):
+    masser = hent_masser()
+    felt, origo, forskyvning = plasser_fritt(masser, cfg)
+    masker = [f >= 0.5 for f in felt]
+    dod = dodslinje(masker, origo)
+    maal = maalpunkt(masker, origo)
+    _, starter_ = sjekk_fri(masker, origo, forskyvning, dod, maal)
+    for i, fra in enumerate(starter_):
         n = slip_lepper(felt[i], fra)
         print("flis %d: slipt bort %d px oppbøyd kant etter x=%d" % (i + 1, n, fra))
     masker = [f >= 0.5 for f in felt]
-    ok = sjekk(masker)
+    dod = dodslinje(masker, origo)
+    maal = maalpunkt(masker, origo)
+    ok, _ = sjekk_fri(masker, origo, forskyvning, dod, maal)
+    return felt, masker, ok, (origo, forskyvning, dod, maal)
+
+
+def main():
+    global BANE, TEGNING
+    tall = [a for a in sys.argv[1:] if a.isdigit()]
+    if len(tall) != 1 or int(tall[0]) not in BANER:
+        sys.exit("Bruk: python3 Util/baner/lag_bane.py <bane> [--sjekk], bane er en av %s"
+                 % sorted(BANER))
+    BANE = int(tall[0])
+    TEGNING = "Util/baner/tegning%d.jpg" % BANE
+    cfg = BANER[BANE]
+    oppsett = None
+    if cfg.get("fri"):
+        felt, masker, ok, oppsett = main_fri(cfg)
+    else:
+        felt, masker, ok = main_fast(cfg)
     if "--sjekk" in sys.argv:
         return
     if not ok:
@@ -551,11 +823,36 @@ def main():
         sys.exit(1)
     alle = []
     for i, (f, m) in enumerate(zip(felt, masker)):
-        mal(f, 70 + i).save("level7/%d.png" % (i + 1), optimize=True)
+        mal(f, 10 * BANE + i).save("level%d/%d.png" % (BANE, i + 1), optimize=True)
         alle.append(kollisjon(m))
-        print("level7/%d.png skrevet, %d kollisjonsklosser" % (i + 1, len(alle[-1])))
+        print("level%d/%d.png skrevet, %d kollisjonsklosser" % (BANE, i + 1, len(alle[-1])))
     skriv_shapedefs(alle)
-    print("lib/shapedefs7.lua skrevet, %d klosser totalt" % sum(len(a) for a in alle))
+    print("lib/shapedefs%d.lua skrevet, %d klosser totalt" % (BANE, sum(len(a) for a in alle)))
+    if oppsett:
+        skriv_oppsett(*oppsett)
+        print("lib/baneoppsett%d.lua skrevet" % BANE)
+
+
+def main_fast(cfg):
+    """Bane 7: én masse per flis i den faste diagonalen."""
+    global MAAL, FIRKANT1_X
+    MAAL = cfg["maal"]
+    FIRKANT1_X = 3500 - cfg["forskyvning"]
+    masser = hent_masser()
+    felt = []
+    for i, (masse, maal) in enumerate(zip(masser, MAAL)):
+        f, (sx, sy) = lag_maske(masse, maal)
+        print("flis %d: skala %.1f bortover, %.1f nedover (strukket %.2f)" % (i + 1, sx, sy, sx / sy))
+        felt.append(f)
+    fra_liste = starter([f >= 0.5 for f in felt])
+    if "slip_fra_flis1" in cfg:
+        fra_liste[0] = cfg["slip_fra_flis1"]
+    for i, fra in enumerate(fra_liste):
+        n = slip_lepper(felt[i], fra)
+        print("flis %d: slipt bort %d px oppbøyd kant etter x=%d" % (i + 1, n, fra))
+    masker = [f >= 0.5 for f in felt]
+    ok = sjekk(masker)
+    return felt, masker, ok
 
 
 if __name__ == "__main__":

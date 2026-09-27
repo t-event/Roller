@@ -700,13 +700,13 @@ flisene. Flisene ligger på skrå, hver 7680 x 4702 enheter forskjøvet fra
 den forrige, så dødslinja går gjennom hver flis på samme sted: bildepunkt
 y = 567 + 0,612 x.
 
-Alt lages av `Util/bane7/lag_bane7.py` fra `Util/bane7/tegning.jpg`.
+Alt lages av `Util/baner/lag_bane.py` fra `Util/baner/tegning7.jpg`.
 Scriptet ligger i repoet, og bildene og kollisjonen er generert av det,
 så de skal ikke redigeres for hånd:
 
     pip install numpy scipy pillow
-    python3 Util/bane7/lag_bane7.py --sjekk   # bare målinger
-    python3 Util/bane7/lag_bane7.py           # skriver level7/*.png og lib/shapedefs7.lua
+    python3 Util/baner/lag_bane.py 7 --sjekk   # bare målinger
+    python3 Util/baner/lag_bane.py 7           # skriver level7/*.png og lib/shapedefs7.lua
 
 Scriptet nekter å skrive noe hvis målingene faller utenfor kravene.
 
