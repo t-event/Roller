@@ -163,7 +163,13 @@ end
     ----grp:insert(spillknapp)
    -- camera:add(spillknapp,1,true)
     
+    -- Bare én stein kan trykkes: den første som faller bestemmer hvor
+    -- spillet går videre.
+    local steinTrykket = false
+
     local function spill( event)
+        if steinTrykket then return true end
+        steinTrykket = true
         print ("trokk")
        lock()
       --lm.resetLevels(dataFile)
@@ -175,6 +181,32 @@ end
     
     end
     storyknapp:addEventListener( "tap", spill )
+
+    -- Flere steiner i hulveggen (lagt til 2026-09-27). De sitter fast som
+    -- Story-steinen og faller løs når man trykker på dem. Bildene er
+    -- Story-steinen med ny tekst, så de bruker samme fysikkform.
+    local function lagStein( bilde, x, y, maal )
+        local stein = display.newImageRect( bilde, 2880, 1620 )
+        stein.width  = 91
+        stein.height = 107
+        stein.x      = x
+        stein.y      = y
+        grp:insert(stein)
+        camera:add(stein,1,false)
+        stein:addEventListener( "tap", function()
+            if steinTrykket then return true end
+            steinTrykket = true
+            physics.addBody(stein,"dynamic", physicsData:get("storyknapp") )
+            camera:setFocus( nil )
+            timer.performWithDelay( 2000, function()
+                composer.gotoScene( maal, {effect = "slideUp" , time = 1000} )
+            end )
+            return true
+        end )
+        return stein
+    end
+    lagStein( "settingsknapp.png", 213, 277, "scenes.innstillinger" )
+    lagStein( "gamesknapp.png", 840, 139, "scenes.minispill" )
     --storyknapp:addEventListener( "tap", hent )
 checkpoint("menu:after_spill_listener")
 ------------------------------------------------------------------------------

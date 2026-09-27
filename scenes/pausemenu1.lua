@@ -72,6 +72,14 @@ grp=sceneGroup
   pausemenusound.y = pausemenu.y-30
   pausemenusound.alpha=1
   grp:insert(pausemenusound)
+  -- Lagt til 2026-09-27: knappen var der, men gjorde ingenting. Slår nå
+  -- lyden av/på, samme valg som Settings-steinen på startskjermen.
+  local innstillinger = require( "lib.innstillinger" )
+  if not innstillinger.lydPaa() then pausemenusound.alpha = 0.45 end
+  pausemenusound:addEventListener( "tap", function()
+    pausemenusound.alpha = innstillinger.byttLyd() and 1 or 0.45
+    return true
+  end )
 
   local pausemenulevels = display.newImageRect( "pausemenulevels.png",109,45)
   pausemenulevels.x = pausemenu.x-142

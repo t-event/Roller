@@ -24,6 +24,9 @@ end
 -- (composer.gotoScene("scenes.gotolevel1")), som hoppet over
 -- menu.lua helt. menu.lua sin "storyknapp" leder videre til
 -- scenes.chooselevel (banevalg) når den trykkes.
+-- Lyd av/på fra Settings-skjermen, lagret mellom hver gang spillet startes.
+require( "lib.innstillinger" ).brukLyd()
+
 composer.gotoScene( "scenes.gotomenu" )
 
  
