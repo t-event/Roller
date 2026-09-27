@@ -182,10 +182,29 @@ end
     end
     storyknapp:addEventListener( "tap", spill )
 
-    -- Flere steiner i hulveggen (lagt til 2026-09-27). De sitter fast som
-    -- Story-steinen og faller løs når man trykker på dem. Bildene er
-    -- Story-steinen med ny tekst, så de bruker samme fysikkform.
-    local function lagStein( bilde, x, y, maal )
+    -- Flere steiner på kantene av hulåpningen (lagt til 2026-09-27). De
+    -- henger som Story-steinen, halvveis ut over den mørke kanten, og
+    -- faller løs når man trykker på dem. Bildene er Story-steinen med ny
+    -- tekst, så de bruker samme fysikkform. Settings henger på venstre
+    -- kant og er speilvendt (den mørke siden vender inn mot åpningen),
+    -- så fysikkformen speiles også.
+    local function speiletForm( navn )
+        local ut = {}
+        for i, f in ipairs( { physicsData:get( navn ) } ) do
+            local ny = {}
+            for k, v in pairs( f ) do ny[k] = v end
+            local form = {}
+            for j = #f.shape - 1, 1, -2 do
+                form[#form + 1] = -f.shape[j]
+                form[#form + 1] = f.shape[j + 1]
+            end
+            ny.shape = form
+            ut[i] = ny
+        end
+        return ut
+    end
+
+    local function lagStein( bilde, x, y, maal, speilet )
         local stein = display.newImageRect( bilde, 2880, 1620 )
         stein.width  = 91
         stein.height = 107
@@ -196,7 +215,11 @@ end
         stein:addEventListener( "tap", function()
             if steinTrykket then return true end
             steinTrykket = true
-            physics.addBody(stein,"dynamic", physicsData:get("storyknapp") )
+            if speilet then
+                physics.addBody(stein,"dynamic", unpack( speiletForm("storyknapp") ) )
+            else
+                physics.addBody(stein,"dynamic", physicsData:get("storyknapp") )
+            end
             camera:setFocus( nil )
             timer.performWithDelay( 2000, function()
                 composer.gotoScene( maal, {effect = "slideUp" , time = 1000} )
@@ -205,8 +228,8 @@ end
         end )
         return stein
     end
-    lagStein( "settingsknapp.png", 213, 277, "scenes.innstillinger" )
-    lagStein( "gamesknapp.png", 840, 139, "scenes.minispill" )
+    lagStein( "settingsknapp.png", 292, 320, "scenes.innstillinger", true )
+    lagStein( "gamesknapp.png", 634, 444, "scenes.minispill" )
     --storyknapp:addEventListener( "tap", hent )
 checkpoint("menu:after_spill_listener")
 ------------------------------------------------------------------------------
