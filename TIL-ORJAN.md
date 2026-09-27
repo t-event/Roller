@@ -3810,3 +3810,19 @@ kamera. Rettet i alle ni banefilene: hver bane ødelegger bare sitt eget.
 Testet i Chromium mot den publiserte versjonen. Ingenting er spilletestet
 av et menneske.
 
+## 2026-09-27, bakgrunnen i bane 7 og 8
+
+Mathias: "Bakgrunnen på både bane 7 og 8 er feil. Helt ute av posisjon
+på bane 8 pga at den er så bratt og på bane 7 er paralaxen feil så noe
+av bakgrunnen forsvinner før banen er ferdig spillet."
+
+- **Bane 7** hadde fortsatt det gamle bakgrunnsoppsettet. Jordlaget
+  (`dirt1`, lag 6) følger banen 1:1, men var bare 20 skjermer langt og
+  rakk til omtrent x = 16 400, mens banen går til rundt 30 000. Samme
+  feil som bane 5 og 6 fikk rettet 2026-09-15. Byttet til nøyaktig samme
+  oppsett som bane 5: `1dirt1` 40 skjermer langt og 20 hulebiter per lag.
+- **Bane 8** går i 56 grader, men hele bakgrunnen lå langs 31,48 grader
+  som i de andre banene og gled bort fra banen. Samme oppsett som bane 5,
+  men vinkelen og steget mellom bitene kommer nå fra linja spawn -> mål i
+  `lib/baneoppsett8.lua`.
+

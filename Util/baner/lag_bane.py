@@ -786,6 +786,13 @@ def skriv_oppsett(origo, forskyvning, dod, maal):
     linjer += ["    },",
                "    dod = { x = %d, y = %d, rotasjon = %.2f }," % (round(dodx), round(dody), math.degrees(math.atan(a))),
                "    mal2 = { x = %d, y = %d }," % (round(mx), round(my)),
+               # Bakgrunnen legges langs linja fra spawn (0, 0) til målet,
+               # med samme steglengde mellom bitene som de andre banene
+               # (1705, 1044 langs 31,48 grader, altså 1999 enheter).
+               "    bakgrunn = { rotasjon = %.2f, steg_x = %d, steg_y = %d },"
+               % (math.degrees(math.atan2(my, mx)),
+                  round(1999 * math.cos(math.atan2(my, mx))),
+                  round(1999 * math.sin(math.atan2(my, mx)))),
                "}", ""]
     open("lib/baneoppsett%d.lua" % BANE, "w", encoding="utf-8").write("\n".join(linjer))
 

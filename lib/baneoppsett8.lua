@@ -10,4 +10,5 @@ return {
     },
     dod = { x = 6102, y = 12274, rotasjon = 55.10 },
     mal2 = { x = 13029, y = 19705 },
+    bakgrunn = { rotasjon = 56.53, steg_x = 1103, steg_y = 1667 },
 }

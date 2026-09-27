@@ -781,6 +781,18 @@ overlapp mellom massene, 879 kollisjonsklosser. Testet i Chromium mot
 den publiserte versjonen: marken ruller gjennom hele banen og treffer
 målet uten at noen trykker.
 
+**Bakgrunnen** følger banens retning: vinkelen fra spawn til målet og
+steget mellom hulebitene (1999 enheter, som 1705/1044 i de andre banene)
+står i `lib/baneoppsett8.lua` under `bakgrunn`. Ellers er oppsettet det
+samme som i bane 4-7: `1dirt1` 40 skjermer langt i lag 6 (følger banen
+1:1) og 20 hulebiter per lag.
+
+**Bakgrunnen i bane 7 (rettet 2026-09-27)** var fortsatt det gamle
+oppsettet: `dirt1` bare 20 skjermer langt og 12 hulebiter per lag.
+Jordlaget i lag 6 følger banen 1:1 og rakk bare til omtrent x = 16 400
+av rundt 30 000, så bakgrunnen forsvant halvveis. Samme feil som bane 5
+og 6 hadde 2026-09-15. Byttet til nøyaktig samme blokk som bane 5.
+
 **Måltreffet lekket mellom banene (rettet i alle ni banefilene).**
 `onCollision1` sjekket bare `agro.type == "mal2" and hit.type == "del4"`.
 Mens neste bane starter, ligger marken fra forrige bane fortsatt i
