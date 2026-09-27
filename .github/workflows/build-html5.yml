@@ -33,8 +33,6 @@ jobs:
         run: |
           chmod +x Util/build-html5.sh
           Util/build-html5.sh
-      - name: Legg Ringfarer ved siden av Roller
-        run: cp -R ringfarer "${{ runner.temp }}/Output/Roller.html5/ringfarer"
       - name: Publiser til gh-pages-grenen
         uses: peaceiris/actions-gh-pages@v4
         with:

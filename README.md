@@ -15,13 +15,6 @@ opprinnelige, urørte filene fra Dropbox ligger til sammenligning i
 `KODEBASE.md` for hvordan spillet henger sammen, og `sporsmal.md` for
 åpne spørsmål til Ørjan.
 
-## Ringfarer (eget spill i `ringfarer/`)
-
-Et nytt, separat romskipspill med ekte fysikk, inspirert av Stargate:
-gruvedrift i asteroider, frakt og handel mellom stjernesystemer koblet
-sammen av en ringport. Ren HTML5/JavaScript, åpne `ringfarer/index.html`
-i nettleseren. Se `ringfarer/README.md`.
-
 ## Kjøre spillet
 
 Trenger [Solar2D](https://solar2d.com/) (etterfølgeren til Corona SDK).
