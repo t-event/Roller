@@ -1,6 +1,9 @@
 name: Bygg HTML5 og publiser til GitHub Pages
 
 on:
+  # Bygger og publiserer automatisk ved hver push til main.
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       AppVersion:
@@ -13,8 +16,9 @@ on:
         default: '2026.3731'
 
 env:
-  APP_VERSION_NAME: '${{ github.event.inputs.AppVersion }}'
-  S2D_BUILD_NAME: '${{ github.event.inputs.Solar2DBuild }}'
+  # Ved push finnes ingen inputs, saa standardverdiene brukes.
+  APP_VERSION_NAME: "${{ github.event.inputs.AppVersion || '1.0' }}"
+  S2D_BUILD_NAME: "${{ github.event.inputs.Solar2DBuild || '2026.3731' }}"
 
 permissions:
   contents: write
