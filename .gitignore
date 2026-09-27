@@ -1,0 +1,10 @@
+# Hemmeligheter skal aldri inn i repoet, se CLAUDE.md
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.keystore
+*.jks
+*.mobileprovision
+secrets.*
