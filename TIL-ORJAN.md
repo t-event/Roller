@@ -3688,3 +3688,57 @@ Flis 4 ble ogsaa rotete: overhenget er delt i to av sprekken og leser
 som to lose biter.
 
 Ingenting er spilletestet. Alt er malt.
+
+## 2026-09-27, bane 7 laget på nytt, rett fra tegningen
+
+Mathias: "Kan du finne ut hvorfor bane 7 er så firkantet. Oppgaven var å
+lage banen etter en tegning, men det ble ikke bra."
+
+### Hvorfor den ble firkantet
+
+To feil, den ene verre enn den andre:
+
+1. **Tegningen ble lest i feil skala.** Den viser hele banen, ikke én
+   flis. Den røde prikken er spawn, den lilla streken er `dod` (rotert
+   31,48 grader i koden), den gule er `mal2` (rotert 45 grader, nederst
+   til høyre), og de fire blå massene er de fire flisene. Forrige runde
+   la 3-4 tynne band i hver flis, 13 i alt i stedet for 4.
+2. **Formene kunne ikke ha runde ender.** Hver masse var bygget av én
+   toppkurve og én bunnkurve per kolonne. Da blir begge endene
+   loddrette kutt, og hodene, knekkene og de bølgete kantene Ørjan tegnet
+   gikk ikke an å lage. Det ble notert som "ikke løst" forrige gang.
+
+### Hva som er gjort
+
+Tegningen ligger nå i `Util/bane7/tegning.jpg`, og `Util/bane7/lag_bane7.py`
+lager bildene og kollisjonen rett fra den. Scriptet ligger i repoet denne
+gangen, så banen kan lages på nytt eller justeres.
+
+- De fire blå konturene hentes ut som lukkede former og legges én per
+  flis. Konturen er Ørjans egen strek, bare glattet litt.
+- Massene er strukket 1,3 til 1,7 ganger bortover. I riktig forhold blir
+  gapet mellom dem rundt 650 px, og marken ville landet på den avrundede
+  venstresiden av neste hode og måttet klatre. Nå er gapet 44 til 70 px,
+  med 765 til 939 px fall rett ned på toppen av neste hode.
+- Spawn er flyttet til `del1.x = 600` i `level7.lua`, slik at marken
+  starter over hodet på første masse, slik tegningen viser.
+- To små oppbøyde lepper ytterst på masse 1 og 3 er slipt ned, ellers
+  ville marken blitt liggende i dumpa foran dem.
+- Fargene er målt i `level4/1.png`: lys rim langs topp og bunn, mørk
+  kropp, tynn kontur og korn. Ingen is.
+
+### Målt
+
+| | |
+|---|---|
+| spawn-fall | 145-170 px (ekte baner 111-210) |
+| landing etter hvert hopp, 156/200/248 e/s | på toppen av neste hode |
+| verste motbakke etter landing | 20-25 px |
+| ut av flis 4 | treffer `mal2` før `dod` ved alle tre fartene |
+| kollisjonsklosser | 1013, ingen ugyldige, dekning 99,7-99,8 % |
+| rører flisekanten | nei |
+
+Bildene er 360-410 kB per flis mot 100-200 kB i de ekte banene, på grunn
+av den myke overgangen og kornet.
+
+Ingenting er spilletestet. Alt er målt.

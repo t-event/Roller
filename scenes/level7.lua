@@ -539,7 +539,11 @@ timer.performWithDelay(3000, hent, 1)
 
     local del1 = display.newImageRect( "hale.png", 55, 35 )
 
-    del1.x=0
+    -- Bane 7 starter 600 enheter lenger til høyre enn de andre banene.
+    -- I Ørjans tegning står spawn over hodet på første masse, og hodet
+    -- har en skrå venstreside. Med x=0 ville marken landet på den og
+    -- sklidd bakover ut av banen. Se Util/bane7/lag_bane7.py.
+    del1.x=600
     del1.y=0
     --del1.x=15200
     --del1.y=8500

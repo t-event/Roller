@@ -623,7 +623,8 @@ og hjørnene må ha positiv signert flate (alle 400 undersøkte fixtures i
 **Spawn.** Marken står i `del1 = (0,0)`, og `firkant1` er sentrert i
 (3500, 2300) med 7680 x 4702 enheter mot et bilde på 3840 x 2351 px.
 Marken starter derfor ved bildepunkt **(116-170, 26)** i flis 1 i bane 2
-til 9. Bane 1 har dobbelt så stor flis, se NB under. Flis 1 må ha bakke rett under der: de ekte banene har den
+til 9, unntatt bane 7, som har `del1.x = 600` og starter ved (375-470, 26)
+(se bane 7 under). Bane 1 har dobbelt så stor flis, se NB under. Flis 1 må ha bakke rett under der: de ekte banene har den
 111-210 px nede, altså 171-369 enheters fall. Første utgave av bane 5/6
 hadde 1699 og 1809, og banen åpnet med at marken stupte nesten en hel
 flishøyde (meldt av Mathias 2026-09-15). Rettet, nå 355 og 373.
@@ -689,23 +690,58 @@ den øverste noen gang blir berørt.
 
 samme format som den ekte kunsten, 79-97 kB per flis.
 
-## Bane 7: tynne svevende band, etter Ørjans tegning (2026-09-27)
+## Bane 7: én masse per flis, rett fra Ørjans tegning (2026-09-27)
 
-Ørjan tegnet hvordan bane 7 bør være. **Nøkkelen til å lese skalaen på
-en slik skisse: finn dødslinja.** Den ligger 600 enheter under bakken i
-spillet, og i tegningen lå den 107 til 112 px under toppen. Bare én
-skala gir det tallet, og den sier at tegningen viser én flis: 3,80 i x
-og 2,85 i y.
+**Tegningen viser hele banen, ikke én flis.** Rød prikk er spawn, lilla
+strek er `dod` (rotert 31,48 grader i `level7.lua`), gul strek er `mal2`
+(rotert 45 grader, nederst til høyre), og de fire blå massene er de fire
+flisene. Flisene ligger på skrå, hver 7680 x 4702 enheter forskjøvet fra
+den forrige, så dødslinja går gjennom hver flis på samme sted: bildepunkt
+y = 567 + 0,612 x.
 
-Bane 7 er nå **tynne svevende band**, 190 til 224 px tjukke, med tomrom
-under og dødslinja rett nedenfor. Ingen grunnlinje, ingen masse ned til
-bunnen av flisa. Fyllgrad 7,9 til 8,4 prosent. Det gir **507
-kollisjonsklosser**, det laveste av alt: ekte baner 505 til 743, bane 5
-og 6 ligger på 1491 og 948.
+Alt lages av `Util/bane7/lag_bane7.py` fra `Util/bane7/tegning.jpg`.
+Scriptet ligger i repoet, og bildene og kollisjonen er generert av det,
+så de skal ikke redigeres for hånd:
 
-Gapene er IKKE som tegnet. Tegningens forhold mellom gap og fall krever
-462 enheter/s, marken har 156 til 248. Formen er Ørjans, gaptallene er
-dimensjonert etter hoppformelen.
+    pip install numpy scipy pillow
+    python3 Util/bane7/lag_bane7.py --sjekk   # bare målinger
+    python3 Util/bane7/lag_bane7.py           # skriver level7/*.png og lib/shapedefs7.lua
+
+Scriptet nekter å skrive noe hvis målingene faller utenfor kravene.
+
+- **Formen er en fri, lukket kontur** hentet rett fra den blå streken, ikke
+  en topp- og en bunnkurve. Endene blir derfor runde, og hodene, knekkene
+  og de bølgete kantene er Ørjans egne. Den gamle modellen med topp- og
+  bunnkurve kunne bare gi loddrett avkuttede ender, og det var derfor den
+  forrige utgaven så firkantet ut.
+- **Massene er strukket 1,3 til 1,7 ganger bortover.** Tegnet i riktig
+  forhold blir gapet over flisekanten rundt 650 px, og hodet på neste
+  masse har en avrundet venstreside. Marken ville da landet der og måttet
+  klatre. Gapet er nå 44 til 70 px, med et fall på 765 til 939 px rett ned
+  på toppen av neste hode.
+- **Spawn er flyttet til `del1.x = 600`** (marken over bildepunkt
+  375-470). I tegningen står spawn over hodet på første masse, og under
+  x=0 ligger bare den skrå venstresiden.
+- **To oppbøyde lepper er slipt ned**, ytterst på masse 1 og 3. Marken
+  ville blitt liggende i dumpa foran dem. Bølger under 25 px er beholdt.
+- **Kollisjonen** har 1013 klosser. Trapesene er høyst 100 px brede, og en
+  kolonne deles så lenge toppen avviker mer enn 8 px fra en rett linje,
+  ellers blir det en usynlig rampe over hakk og overheng. Dekning er
+  99,7-99,8 %.
+- **Stilen** er målt i `level4/1.png`: rim `rgb(72,33,6)` omtrent 70 px ned
+  fra toppen og opp fra bunnen (loddrett avstand, ikke euklidsk, derfor
+  nesten ingen rim på sidene), glir over i kroppen `rgb(38,14,1)`. Ingen
+  is.
+
+Målt: spawn-fall 145-170 px, verste motbakke 20-25 px etter landing, alle
+tre landinger på toppen av neste hode ved 156, 200 og 248 enheter/s. Ut
+av flis 4 treffer marken `mal2` før `dod` ved alle tre fartene.
+
+### Forrige utgave: tynne svevende band (2026-09-27), forkastet
+
+Tolket tegningen som én flis og la 3-4 tynne band i hver flis, 13 i alt i
+stedet for 4. Formene var bygget av en topp- og en bunnkurve per kolonne,
+så endene ble loddrette kutt, og banen så firkantet ut.
 
 ### Forrige utgave: søyler etter bane 4 (2026-09-24), forkastet
 
