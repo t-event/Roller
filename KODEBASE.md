@@ -689,7 +689,25 @@ den øverste noen gang blir berørt.
 
 samme format som den ekte kunsten, 79-97 kB per flis.
 
-## Bane 7: søylene, bygget etter bane 4 (2026-09-24)
+## Bane 7: tynne svevende band, etter Ørjans tegning (2026-09-27)
+
+Ørjan tegnet hvordan bane 7 bør være. **Nøkkelen til å lese skalaen på
+en slik skisse: finn dødslinja.** Den ligger 600 enheter under bakken i
+spillet, og i tegningen lå den 107 til 112 px under toppen. Bare én
+skala gir det tallet, og den sier at tegningen viser én flis: 3,80 i x
+og 2,85 i y.
+
+Bane 7 er nå **tynne svevende band**, 190 til 224 px tjukke, med tomrom
+under og dødslinja rett nedenfor. Ingen grunnlinje, ingen masse ned til
+bunnen av flisa. Fyllgrad 7,9 til 8,4 prosent. Det gir **507
+kollisjonsklosser**, det laveste av alt: ekte baner 505 til 743, bane 5
+og 6 ligger på 1491 og 948.
+
+Gapene er IKKE som tegnet. Tegningens forhold mellom gap og fall krever
+462 enheter/s, marken har 156 til 248. Formen er Ørjans, gaptallene er
+dimensjonert etter hoppformelen.
+
+### Forrige utgave: søyler etter bane 4 (2026-09-24), forkastet
 
 Bane 4 er ikke en tunnel slik bane 3 er. Den er **stående søyler man
 hopper mellom, som trapper seg nedover mot høyre.** Målt på de fire ekte

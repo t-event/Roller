@@ -3604,3 +3604,87 @@ saa sidene oppstaar implisitt der de to motes, og det finnes ingen plass
 aa legge bolger paa. Det krever en annen formbeskrivelse.
 
 Ingenting er spilletestet. Alt er malt.
+
+## 2026-09-27, bane 7 bygget om etter Orjan sin tegning
+
+Mathias: "Bane 7 ble ikke bra. Orjan tegnet hvordan den bor vaere."
+Tegningen: rod = spawn, blaa = bane, gul = maal, lilla = dod.
+
+### Hvordan jeg leste skalaen
+
+Tegningen kunne vaere hele banen eller en flis. Det avgjorende tallet er
+den lilla doedslinja: den ligger 107 til 112 piksler under toppen av
+massene. Spillets egen doedslinje ligger 600 enheter under bakken. Bare
+EN skala gir det tallet, nemlig at tegningen viser en flis: da blir det
+610 til 638 enheter. Skalaen er da 3,80 i x og 2,85 i y.
+
+| | Tegnet | I flis |
+|---|---|---|
+| Masser | 4 | 4 |
+| Bredde | 194-236 px | 737-897 px |
+| Gap | 34-61 px | 129-232 px |
+| Tykkelse | 72-99 px | 205-282 px |
+| Tetthet i boksen | 0,35-0,47 | |
+| Toppen faller | 133-153 px | 379-436 px |
+| Neste masse | 60-70 px lavere | 171-200 px |
+
+### Hva som var feil
+
+Soylene mine var massive plater som stod paa en grunnlinje i bunnen av
+flisa, 656 til 2055 px hoye, tetthet 0,42 til 0,82. **Orjan tegner tynne
+svevende band**, rundt 240 px tjukke, med tomrom under og doedslinja rett
+nedenfor.
+
+Jeg tok bane 4 sine soyler som fasit fordi Mathias sa bane 4 var best.
+Det var riktig observert om bane 4, men feil oppgave: det Orjan vil ha
+er naermere tungene i bane 3, lagt ut som en trapp.
+
+### Resultat
+
+| | Orjan tegnet | Ny bane 7 |
+|---|---|---|
+| Band per flis | 4 | 3, 4, 3, 3 |
+| Tykkelse | 205-282 px | 190-224 px |
+| Tetthet | 0,35-0,47 | 0,36-0,68 |
+| Fyllgrad | mye tomrom | 7,9-8,4 % |
+| Kollisjonsklosser | | 507 |
+
+507 klosser er det laveste av alt vi har laget: ekte baner 505-743, bane
+5 og 6 ligger paa 1491 og 948, soyleversjonen av bane 7 laa paa 828.
+Tynne band er billig fysikk fordi det ikke finnes masse under gulvet aa
+spore.
+
+Spillbarhet: alle atte hopp krever 166 til 207 enheter/s (marken har 156
+til 248), spawn-fall 381, helning ut fra spawn +160 px (ekte 136-303),
+verste motbakke 0 px, takhoyde i hulemunnen 776 enheter,
+doedslinje-klaring 696 til 1506.
+
+To ting maatte rettes underveis, begge ekte:
+
+1. **Starten var for slak.** Fallet fra x=150 til x=450 var 78 px mot de
+   ekte banenes 136-303. Forste band i flis 1 og 3 er kortet inn fra
+   1300 til 1140 px og gjort brattere, fra 290 til 520 px fall.
+2. **Takhoyden i flis 4 laa paa 496 enheter** mot kravet 700. Overhenget
+   er hevet 130 til 160 px.
+
+### En bevisst avvikelse fra tegningen
+
+Gap/fall-forholdet i tegningen gir umulige hopp. Et gap paa 129 px med
+171 px fall krever 462 enheter/s, og marken har 156 til 248. Formen og
+oppsettet er Orjan sitt. Gapene er dimensjonert etter
+v = 2W * sqrt(73,5/D) saa de gaar an aa hoppe. Si fra om han heller vil
+ha det saa stramt som tegnet, saa maa marken ha mer fart i stedet.
+
+### Det jeg fortsatt ikke faar til
+
+Orjan sine masser har en knekk paa midten og bolgete kanter. Mine er
+rette kiler, og det syns paa tettheten: 0,49 til 0,68 paa det forste
+bandet i hver flis mot hans 0,35 til 0,47. Renderen bygger hver form av
+en toppkurve og en bunnkurve per kolonne, saa sidene oppstaar implisitt
+og det finnes ingen plass aa legge bolger paa. Det krever en annen
+formbeskrivelse.
+
+Flis 4 ble ogsaa rotete: overhenget er delt i to av sprekken og leser
+som to lose biter.
+
+Ingenting er spilletestet. Alt er malt.
