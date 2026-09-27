@@ -600,15 +600,18 @@ def hodetopp(m):
 
 def spawnpunkt(m):
     """Første x etter hodetoppen der bakken heller nedover mot høyre som i
-    de ekte banene (minst 100 px fall over 300 px) uten at bakken bak
-    marken faller bort."""
+    de ekte banene (minst 100 px fall over 300 px), hele marken (95 px)
+    står i helningen med minst 20 px fall under seg, og ingen bakke bak
+    marken ligger lavere. Står marken på selve kammen, blir den liggende i
+    balanse (bane 8, første forsøk: 40 px lavere bak, marken rørte seg
+    ikke på 50 sekunder)."""
     top = overflate(m)
     hx, _ = hodetopp(m)
     for x in range(hx, W - 400):
         if top[x] < 0 or top[x + 300] < 0:
             continue
         bak = max(top[u] for u in range(max(x - 150, 0), x + 1) if top[u] >= 0) - top[x]
-        if top[x + 300] - top[x] >= 100 and bak <= 40:
+        if top[x + 300] - top[x] >= 100 and top[x + 95] - top[x] >= 20 and bak <= 0:
             return x
     raise SystemExit("fant ikke noe spawnpunkt i flis 1")
 
@@ -708,7 +711,9 @@ def sjekk_fri(masker, origo, forskyvning, dod, maal):
     print("  spawn over x=%d-%d, fall %d-%d px (ekte 111-210), %d px fall over 300 px "
           "(ekte 136-303), bakken bak marken inntil %d px lavere"
           % (x0, x0 + 95, min(fall), max(fall), helning, bak))
-    ok &= min(fall) >= 90 and max(fall) <= 230 and helning >= 100 and bak <= 40
+    under = top[x0 + 95] - top[x0]
+    print("  fall under selve marken: %d px (bane 7: 27)" % under)
+    ok &= min(fall) >= 90 and max(fall) <= 230 and helning >= 100 and bak <= 0 and under >= 20
 
     for i, m in enumerate(masker):
         kant = m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any()
