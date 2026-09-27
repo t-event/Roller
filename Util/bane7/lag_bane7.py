@@ -404,10 +404,11 @@ def baerer(m, x, tykk=120):
 
 
 # Marken står i del1.x = 0 og går 189 enheter bakover. I bane 7 er flisene
-# (firkant1.x), dod og mal2 flyttet 600 enheter mot venstre i level7.lua,
-# så marken starter over hodet på første masse. Marken selv kan ikke
-# flyttes: med del1.x = 600 ble fysikken NaN og banen krasjet.
-FIRKANT1_X = 2900
+# (firkant1.x), dod og mal2 flyttet 1130 enheter mot venstre i level7.lua,
+# så marken starter der toppen av første masse begynner å helle nedover.
+# Marken selv kan ikke flyttes: med del1.x = 600 ble fysikken NaN og
+# banen krasjet.
+FIRKANT1_X = 3500 - 1130
 SPAWN_X = (-189, 0)
 SPAWN_Y = 0
 
@@ -483,6 +484,14 @@ def sjekk(masker):
     fall = [top[x] - sy for x in range(x0, x1 + 1)]
     print("  spawn over x=%d-%d, fall %d-%d px (ekte baner 111-210)" % (x0, x1, min(fall), max(fall)))
     ok &= min(fall) >= 90 and max(fall) <= 230
+    # Bakken skal helle nedover mot høyre fra spawn (ekte baner: 136-303 px
+    # fall over de neste 300 px) og ikke falle bort bak marken. Står den
+    # på venstre kant av en flat topp, vipper den bakover og faller ut.
+    helning = top[x0 + 300] - top[x0]
+    bak = max(top[x] for x in range(x0 - 150, x0 + 1)) - top[x0]
+    print("  fra spawn: %d px fall over 300 px (ekte 136-303), bakken bak marken "
+          "ligger inntil %d px lavere" % (helning, bak))
+    ok &= helning >= 100 and bak <= 40
 
     for i, m in enumerate(masker):
         kant = m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any()

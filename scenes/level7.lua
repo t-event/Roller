@@ -174,13 +174,15 @@ lm.currentLevel = 7 -- så retry vet hvilken bane den skal restarte
 
 
           local dod = display.newRect (0, 0, 70000, 50) 
-          -- Bane 7: flisene, dod og mal2 er flyttet 600 enheter mot
-          -- venstre (se firkant1.x), slik at marken starter over hodet
-          -- på første masse. Marken selv må stå i x=0 som i de andre
+          -- Bane 7: flisene, dod og mal2 er flyttet 1130 enheter mot
+          -- venstre (se firkant1.x), slik at marken starter der toppen av
+          -- første masse begynner å helle nedover mot høyre. Med 600 sto
+          -- den ytterst på venstre kant av den flate toppen, vippet
+          -- bakover og falt ut. Marken selv må stå i x=0 som i de andre
           -- banene. Med marken i x=600 ble fysikken NaN og banen krasjet
           -- med en gang (2026-09-27), trolig fordi sveiseleddene til
           -- knottene bruker (knott.x, knott.x) som festepunkt.
-          dod.x = bredde -bredde-bredde - 600
+          dod.x = bredde -bredde-bredde - 1130
           dod.y = hoyde
           dod:rotate( 31.48 ) 
           dod.myName = "dod"
@@ -195,7 +197,7 @@ lm.currentLevel = 7 -- så retry vet hvilken bane den skal restarte
           
           local mal2 = display.newRect( 0, 0, 10, 3000 )
           --mal2:setReferencePoint( display.BottomLeftReferencePoint )
-          mal2.x = 31000 - 600
+          mal2.x = 31000 - 1130
           mal2.y = 18000
           mal2.myName = "mal2"
           mal2:rotate(45)
@@ -803,7 +805,7 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
 
                                      
                                       local     firkant1 = display.newImageRect("level7/1.png", 7680,4702)
-                                                firkant1.x = 3500 - 600   -- bane 7, se dod.x
+                                                firkant1.x = 3500 - 1130   -- bane 7, se dod.x
                                                 --firkant1.x = 3850
                                                 firkant1.y = 2300
                                                 physics.addBody(firkant1,"static", physicsData:get("1") )

@@ -3720,7 +3720,7 @@ gangen, så banen kan lages på nytt eller justeres.
   gapet mellom dem rundt 650 px, og marken ville landet på den avrundede
   venstresiden av neste hode og måttet klatre. Nå er gapet 44 til 70 px,
   med 765 til 939 px fall rett ned på toppen av neste hode.
-- Banen er flyttet 600 enheter mot venstre i `level7.lua` (flisene,
+- Banen er flyttet 1130 enheter mot venstre i `level7.lua` (flisene,
   `dod` og `mal2`), slik at marken starter over hodet på første masse,
   slik tegningen viser. (Første utgave flyttet marken i stedet, se
   rettelsen under.)
@@ -3762,3 +3762,9 @@ unna marken når den ikke står rundt x=0.
 Rettet ved å sette marken tilbake til `del1.x = 0`, som i alle de andre
 banene, og heller flytte flisene, `dod` og `mal2` 600 enheter mot
 venstre. Geometrien marken møter er nøyaktig den samme.
+
+Etter rettelsen startet bane 7 uten krasj, men marken døde etter rundt
+10 sekunder: den sto ytterst på venstre kant av den flate toppen,
+vippet bakover og falt ut. Banen er derfor flyttet 1130 enheter i
+stedet for 600, så marken starter der toppen begynner å helle nedover
+(124 px fall over de neste 300 px, ingen bakke som faller bort bak den).

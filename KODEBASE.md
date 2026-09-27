@@ -623,8 +623,9 @@ og hjørnene må ha positiv signert flate (alle 400 undersøkte fixtures i
 **Spawn.** Marken står i `del1 = (0,0)`, og `firkant1` er sentrert i
 (3500, 2300) med 7680 x 4702 enheter mot et bilde på 3840 x 2351 px.
 Marken starter derfor ved bildepunkt **(116-170, 26)** i flis 1 i bane 2
-til 9, unntatt bane 7, der flisene er flyttet 600 enheter mot venstre
-(`firkant1.x = 2900`) så marken starter ved (375-470, 26) (se bane 7 under). Bane 1 har dobbelt så stor flis, se NB under. Flis 1 må ha bakke rett under der: de ekte banene har den
+til 9, unntatt bane 7, der flisene er flyttet 1130 enheter mot venstre
+(`firkant1.x = 3500 - 1130`) så marken starter ved (640-735, 26) (se bane
+7 under). Bane 1 har dobbelt så stor flis, se NB under. Flis 1 må ha bakke rett under der: de ekte banene har den
 111-210 px nede, altså 171-369 enheters fall. Første utgave av bane 5/6
 hadde 1699 og 1809, og banen åpnet med at marken stupte nesten en hel
 flishøyde (meldt av Mathias 2026-09-15). Rettet, nå 355 og 373.
@@ -719,10 +720,11 @@ Scriptet nekter å skrive noe hvis målingene faller utenfor kravene.
   masse har en avrundet venstreside. Marken ville da landet der og måttet
   klatre. Gapet er nå 44 til 70 px, med et fall på 765 til 939 px rett ned
   på toppen av neste hode.
-- **Banen er flyttet 600 enheter mot venstre** (`firkant1.x`, `dod.x` og
-  `mal2.x` i `level7.lua`), så marken står over bildepunkt 375-470. I
-  tegningen står spawn over hodet på første masse, og under x=0 ligger
-  bare den skrå venstresiden. **Flytt aldri selve marken (`del1.x`).**
+- **Banen er flyttet 1130 enheter mot venstre** (`firkant1.x`, `dod.x` og
+  `mal2.x` i `level7.lua`), så marken står over bildepunkt 640-735, der
+  toppen av første masse begynner å helle nedover mot høyre. Med 600 sto
+  marken ytterst på venstre kant av den flate toppen, vippet bakover og
+  falt ut. Scriptet sjekker nå både fallet fremover og bakken bak marken. **Flytt aldri selve marken (`del1.x`).**
   Første forsøk satte `del1.x = 600`, og da ble fysikken NaN og bane 7
   krasjet med en gang i nettleseren (`assertion failed!` i
   `transition.to`). Trolig fordi sveiseleddene til knottene bruker
