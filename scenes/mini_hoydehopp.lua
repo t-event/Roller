@@ -1,28 +1,50 @@
--- Minispill: høydehopp (lagt til 2026-09-28).
--- Still lista med "Bar up" / "Bar down" (5 cm om gangen). Trykk fort for
--- tilløpsfart, hold inne for å lade hoppet (kraftmåleren går opp og ned, full etter 0,4 s)
--- og slipp for å hoppe. Hele marken må over lista. Tre forsøk per høyde,
--- som i ekte høydehopp. Høyeste klarte høyde er rekorden.
+-- Minispill: høydehopp (lagt til 2026-09-28, ekte markfysikk fra samme
+-- dag). Marken ruller ned tilløpet og kastes opp av en hoppkant. Lista
+-- står like etter kanten og stilles med "Bar up" / "Bar down" (5 cm om
+-- gangen). Hele marken må over lista. Tre forsøk per høyde.
+--
+-- Målt i en kopi av fysikken (se KODEBASE.md): uten å gjøre noe kommer
+-- marken ca. 0,4 m over lista. Strekker man den ut (holder inne) litt før
+-- kanten, farer den opp kanten som en stiv pinne og kan komme over 3 m,
+-- men det er følsomt for når man trykker, som hoppene i banene.
+-- 100 px = 1 m, målt fra kanten.
 
 local composer = require( "composer" )
+local physics = require( "physics" )
 local sport = require( "lib.minisport" )
+local markfysikk = require( "lib.markfysikk" )
 
 local scene = composer.newScene()
 
-local START = 120
-local LISTE = START + 700
-local PX_PER_M_H = 90           -- oppover: 90 px per meter
-local G = 1100
-local MIN, MAKS, STEG = 0.50, 2.60, 0.05
+local GRADER, LENGDE, UT, R = 35, 3000, 45, 450
+local PX_PER_M = 100
+local MIN, MAKS, STEG = 0.00, 3.50, 0.05
+local TAN = math.tan( math.rad( GRADER ) )
 
-local tilstand, x, h, v, vx, vy, kraft, kraftRetning, sist
-local hoyde, bom, klarte, beste
-local verden, mark, liste, stolpe, maaler, maalerFyll, info, status, fart
-local opp, ned
+-- tilløpet og hoppkanten (en bue fra bakken og opp til UT grader)
+local function lagBane()
+	local pkt = { { -300, -300 * TAN + 230 }, { LENGDE, LENGDE * TAN + 230 } }
+	local a0 = math.rad( GRADER )
+	local x, y = pkt[2][1], pkt[2][2]
+	local cx, cy = x + R * math.sin( a0 ), y - R * math.cos( a0 )
+	local n = 24
+	for i = 1, n do
+		local a = -a0 + ( a0 + math.rad( UT ) ) * i / n
+		pkt[#pkt + 1] = { cx + R * math.sin( a ), cy + R * math.cos( a ) }
+	end
+	return pkt, pkt[#pkt]
+end
+
+local BANE, LEPP = lagBane()
+local LISTEX = LEPP[1] + 200
+local GULVY = LEPP[2] + 400
+
+local tilstand, mark, hoyde, bom, beste, lavest, stilleTid, flyTid
+local verden, bakgrunn, liste, info, status, opp, ned
 local lytter
 
 local function listeY()
-	return sport.BAKKE_Y - hoyde * PX_PER_M_H
+	return LEPP[2] - hoyde * PX_PER_M
 end
 
 local function visStatus()
@@ -34,16 +56,15 @@ end
 
 local function nyttForsok()
 	tilstand = "klar"
-	x, h, v = START, 0, 0
-	kraft, kraftRetning = 0, 1
-	mark:strekk( false )
-	mark.rotation = 0
-	maaler.isVisible = false
+	physics.pause()
+	if mark then mark:fjern() end
+	mark = markfysikk.lag( verden, 0, 0 )
+	lavest, stilleTid, flyTid = nil, 0, 0
+	transition.cancel( liste )
 	liste.rotation = 0
-	liste.x, liste.y = LISTE, listeY()
-	liste.alpha = 1
+	liste.x, liste.y = LISTEX, listeY()
 	opp.isVisible, ned.isVisible = true, true
-	info.text = "Set the bar. Tap fast to roll, hold to charge, let go to jump."
+	info.text = "Set the bar, then tap to start. Hold before the ramp to fly higher."
 	visStatus()
 end
 
@@ -60,7 +81,7 @@ local function ferdigForsok( klart, tekst )
 	if klart then
 		bom = 0
 		if beste == nil or hoyde > beste then beste = hoyde end
-		if sport.nyRekord( "hoydehopp", hoyde, true ) then
+		if sport.nyRekord( "hoydehopp_fysikk", hoyde, true ) then
 			tekst = tekst .. "  New record!"
 		end
 	else
@@ -72,147 +93,107 @@ local function ferdigForsok( klart, tekst )
 	end
 	info.text = tekst
 	visStatus()
-	timer.performWithDelay( 1800, function()
+	timer.performWithDelay( 2200, function()
 		if tilstand == "vent" then nyttForsok() end
 	end )
 end
 
 local function riv()
-	klarte = false
-	transition.to( liste, { time = 500, y = sport.BAKKE_Y - 6, rotation = 25, transition = easing.inQuad } )
-end
-
-local function hopp()
-	mark:strekk( false )
-	maaler.isVisible = false
-	vy = kraft * ( 300 + 0.62 * v )
-	vx = math.max( 120, v * 0.5 )
-	klarte = true
-	tilstand = "flyr"
+	transition.to( liste, { time = 600, y = GULVY - 10, rotation = 30, transition = easing.inQuad } )
 end
 
 function scene:create( event )
 	local grp = self.view
-	local bakgrunn = sport.bakgrunn( grp )
-	hoyde, bom = 1.00, 0
+	physics.start()
+	hoyde, bom = 0.30, 0
+	bakgrunn = sport.bakgrunn( grp )
 
 	verden = display.newGroup()
 	grp:insert( verden )
-	sport.bakke( verden, -400, LISTE + 1400 )
+	verden.xScale, verden.yScale = sport.SKALA, sport.SKALA
 
-	-- matta: myk og lys, bak lista
-	local matte = display.newRoundedRect( verden, LISTE + 170, sport.BAKKE_Y - 16, 300, 40, 10 )
-	matte:setFillColor( 0.5, 0.33, 0.18 )
-	matte.strokeWidth = 3
-	matte:setStrokeColor( 0.25, 0.13, 0.05 )
+	sport.terreng( verden, BANE )
+	-- matta under og bak lista
+	sport.terreng( verden, { { LEPP[1] - 150, GULVY }, { LEPP[1] + 2500, GULVY } },
+		{ farge = { 0.55, 0.36, 0.2 } } )
 
-	-- stativet: en stolpe med høydemerker, og lista som en stripe
-	stolpe = display.newRect( verden, LISTE + 34, sport.BAKKE_Y - 140, 8, 280 )
+	-- stativet med høydemerker, og lista som en stripe
+	local stolpe = display.newRect( verden, LISTEX + 70, ( GULVY + LEPP[2] - 380 ) / 2, 14, GULVY - LEPP[2] + 380 )
 	stolpe:setFillColor( 0.55, 0.45, 0.35 )
-	for m = 0.5, 2.5, 0.5 do
-		local y = sport.BAKKE_Y - m * PX_PER_M_H
-		local s = display.newRect( verden, LISTE + 34, y, 18, 3 )
+	for m = 0, 3.5, 0.5 do
+		local y = LEPP[2] - m * PX_PER_M
+		local s = display.newRect( verden, LISTEX + 70, y, 36, 6 )
 		s:setFillColor( 0.9, 0.82, 0.7 )
-		local t = display.newText( { parent = verden, text = string.format( "%.1f", m ), x = LISTE + 64, y = y,
-			font = native.systemFontBold, fontSize = 14 } )
+		local t = display.newText( { parent = verden, text = string.format( "%.1f", m ), x = LISTEX + 130, y = y,
+			font = native.systemFontBold, fontSize = 30 } )
 		t:setFillColor( 0.9, 0.82, 0.7 )
 	end
-	liste = display.newRect( verden, LISTE, 0, 76, 7 )
+	liste = display.newRect( verden, LISTEX, 0, 150, 14 )
 	liste:setFillColor( 0.95, 0.9, 0.8 )
-	liste.strokeWidth = 2
+	liste.strokeWidth = 4
 	liste:setStrokeColor( 0.6, 0.25, 0.1 )
-
-	mark = sport.mark( verden )
-	maaler = display.newGroup()
-	verden:insert( maaler )
-	local mb = display.newRect( maaler, 0, 0, 12, 80 )
-	mb:setFillColor( 0.16, 0.16, 0.16, 0.9 )
-	maalerFyll = display.newRect( maaler, 0, 38, 8, 76 )
-	maalerFyll.anchorY = 1
-	maalerFyll:setFillColor( 0.62, 0.36, 0.2 )
 
 	sport.tekst( grp, "High jump", sport.B / 2, 30, 30 )
 	status = sport.tekst( grp, "", sport.B / 2, 68, 21, { 0.92, 0.9, 0.86 } )
-	info = sport.tekst( grp, "", sport.B / 2, 130, 20 )
-	fart = sport.fartsmaler( grp )
+	info = sport.tekst( grp, "", sport.B / 2, 110, 19 )
 
-	sport.trykkflate( grp, {
-		trykk = function()
-			if tilstand == "klar" then
-				tilstand = "loper"
-				opp.isVisible, ned.isVisible = false, false
-				info.text = "Jump a little before the bar!"
-				v = sport.gass( v )
-			elseif tilstand == "loper" then
-				v = sport.gass( v )
-			end
-		end,
-		hold = function()
-			if tilstand == "loper" then
-				tilstand = "lader"
-				kraft, kraftRetning = 0, 1
-				mark:strekk( true )
-				maaler.isVisible = true
-			end
-		end,
-		slipp = function()
-			if tilstand == "lader" then hopp() end
-		end,
-	} )
+	sport.trykkflate( grp, function() return mark end, function()
+		if tilstand == "klar" then
+			tilstand = "tillop"
+			opp.isVisible, ned.isVisible = false, false
+			info.text = ""
+			physics.start()
+			return false
+		end
+		return tilstand == "tillop" or tilstand == "flyr"
+	end )
 	opp = sport.knapp( grp, "knapp_opp.png", display.screenOriginX + 90, sport.H / 2 - 50, function() endreHoyde( STEG ) end )
 	ned = sport.knapp( grp, "knapp_ned.png", display.screenOriginX + 90, sport.H / 2 + 5, function() endreHoyde( -STEG ) end )
 	sport.tilbake( grp )
 	nyttForsok()
+	verden.x = sport.B * 0.35 - mark.midt.x * sport.SKALA
+	verden.y = sport.H * 0.55 - mark.midt.y * sport.SKALA
 
+	local sist = system.getTimer()
 	lytter = function()
 		local naa = system.getTimer()
-		local dt = sist and math.min( 0.05, ( naa - sist ) / 1000 ) or 0
+		local dt = math.min( 0.05, ( naa - sist ) / 1000 )
 		sist = naa
-		if tilstand == "loper" or tilstand == "lader" then
-			v = sport.brems( v, dt )
-			x = x + v * dt
-			mark:rull( v * dt )
-			if tilstand == "lader" then
-				kraft = kraft + kraftRetning * dt / 0.4
-				if kraft > 1 then kraft, kraftRetning = 1, -1 end
-				if kraft < 0 then kraft, kraftRetning = 0, 1 end
-			end
-			if x + sport.R > LISTE - 10 then
-				mark:strekk( false )
-				maaler.isVisible = false
-				riv()
-				ferdigForsok( false, "You ran into the bar." )
+		if not mark or not mark.midt.x then return end
+		local mx, my = mark.midt.x, mark.midt.y
+		if tilstand == "tillop" then
+			if mark:fart() < 8 then stilleTid = stilleTid + dt else stilleTid = 0 end
+			if stilleTid > 2 then
+				ferdigForsok( false, "The worm stopped. Only hold near the ramp." )
+			elseif mx > LEPP[1] - R * 0.3 then
+				tilstand = "flyr"
 			end
 		elseif tilstand == "flyr" then
-			x = x + vx * dt
-			h = h + vy * dt
-			vy = vy - G * dt
-			mark:rull( vx * dt )
-			-- hele ringen må over lista mens den passerer
-			if klarte and math.abs( x - LISTE ) < sport.R * 0.8 and h < hoyde * PX_PER_M_H then
-				riv()
+			flyTid = flyTid + dt
+			-- laveste del som passerer lista (bunnen av delen, over kanten)
+			for _, d in ipairs( mark.deler ) do
+				if math.abs( d.x - LISTEX ) < 14 then
+					local h = LEPP[2] - ( d.y + 9 )
+					if lavest == nil or h < lavest then lavest = h end
+				end
 			end
-			-- matta er 36 px høy
-			local gulv = ( x > LISTE + 20 and x < LISTE + 320 ) and 36 or 0
-			if h <= gulv and vy < 0 then
-				h = gulv
-				if x < LISTE then
-					ferdigForsok( false, "Too early, you came down before the bar." )
-				elseif klarte then
+			if mx > LISTEX + 300 or my > GULVY - 60 or flyTid > 8 then
+				if lavest == nil then
+					ferdigForsok( false, "The worm did not reach the bar." )
+				elseif lavest >= hoyde * PX_PER_M then
 					ferdigForsok( true, string.format( "Cleared %.2f m!", hoyde ) )
 				else
+					riv()
 					ferdigForsok( false, "The bar fell." )
 				end
 			end
 		end
-		mark.x = x
-		mark.y = sport.BAKKE_Y - sport.R - h
-		maaler.x, maaler.y = x - 45, mark.y - 30
-		maalerFyll.yScale = math.max( 0.01, kraft )
-		fart:sett( v / sport.VMAKS )
-		-- kameraet følger marken, men stopper så lista alltid synes
-		verden.x = -math.max( 0, math.min( x - 300, LISTE + 420 - sport.B ) )
-		bakgrunn:rull( -verden.x )
+		if tilstand == "klar" then
+			-- vis lista mens den stilles
+			sport.kamera( verden, bakgrunn, LISTEX - 500, LEPP[2] - 100, 0.5, 0.55, 0.08 )
+		else
+			sport.kamera( verden, bakgrunn, mx, my, 0.35, 0.55 )
+		end
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
@@ -222,6 +203,8 @@ function scene:hide( event )
 		Runtime:removeEventListener( "enterFrame", lytter )
 		tilstand = "borte"
 	elseif event.phase == "did" then
+		mark = nil
+		physics.start()
 		composer.removeScene( "scenes.mini_hoydehopp" )
 	end
 end

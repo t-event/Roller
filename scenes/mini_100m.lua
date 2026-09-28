@@ -1,28 +1,59 @@
--- Minispill: 100 m (lagt til 2026-09-28). Trykk fort for å rulle
--- fortere. Nedtelling først, og trykker man før "GO!" er det tyvstart.
--- En blek ring viser rekorden, så man ser om man ligger foran.
+-- Minispill: 100 m (lagt til 2026-09-28, ekte markfysikk fra samme dag).
+-- En nedoverløype i hulen med to trange istunneler og en liten sprekk.
+-- Marken ruller av seg selv (den ruller fortest når man lar den være),
+-- men ringen setter seg fast i tunnelene: gjør den slapp med
+-- dobbelttrykk rett før tunnelen, så glir den gjennom på isen, og gjør
+-- den stram igjen med ett trykk etterpå. Nedtelling først; trykker man
+-- før "GO!" er det tyvstart.
+--
+-- Målt i en kopi av fysikken (se KODEBASE.md): ringen står fast i
+-- tunneler med 30-60 px klaring og kommer ikke løs igjen, slapp glir
+-- gjennom hvis man trykker 200-300 px før tunnelen. God timing gir ca.
+-- 21-24 s. 50 px = 1 m.
 
 local composer = require( "composer" )
+local physics = require( "physics" )
 local sport = require( "lib.minisport" )
+local markfysikk = require( "lib.markfysikk" )
 
 local scene = composer.newScene()
 
-local START = 120
-local LENGDE = 100 * sport.PX_PER_M
-local MAAL = START + LENGDE
+local GRADER = 20
+local TAN = math.tan( math.rad( GRADER ) )
+local PX_PER_M = 50
+local START = -108                    -- midten av marken ved start
+local MAAL = START + 100 * PX_PER_M
+local SPREKK, SPREKK_B, SPREKK_FALL = 2700, 90, 40
+local TUNNELER = { { 1500, 500, 45 }, { 3700, 500, 40 } }  -- x, lengde, klaring
 
-local tilstand, x, v, tid, sist
-local verden, mark, spokelse, tidtekst, info, fart
+local function bakkeY( x )
+	local y = x * TAN + 230
+	if x > SPREKK then y = y + SPREKK_FALL end
+	return y
+end
+
+local tilstand, mark, tid, fastTid
+local verden, bakgrunn, tidtekst, info, status
 local lytter
+
+local function nyMark()
+	if mark then mark:fjern() end
+	mark = markfysikk.lag( verden, 0, 0 )
+end
+
+local function visStatus()
+	local r = sport.rekord( "100m_fysikk" )
+	status.text = r and string.format( "Record: %.2f s", r ) or "Record: -"
+end
 
 local function klar()
 	tilstand = "klar"
-	x, v, tid = START, 0, 0
-	mark.x, mark.y = x, sport.BAKKE_Y - sport.R
-	mark:strekk( false )
-	if spokelse then spokelse.x = START end
+	physics.pause()
+	nyMark()
+	tid, fastTid = 0, 0
 	tidtekst.text = "0.00 s"
-	info.text = "Tap to start. Then tap as fast as you can!"
+	info.text = "Tap to start. Double tap before the icy tunnels to slide through, tap once after."
+	visStatus()
 end
 
 local function tyvstart()
@@ -41,99 +72,128 @@ local function nedtelling()
 			if tilstand ~= "nedtelling" then return end
 			info.text = o
 			if i == #ord then
-				tilstand = "loper"
-				sist = system.getTimer()
+				tilstand = "lop"
+				physics.start()
+				timer.performWithDelay( 900, function()
+					if tilstand == "lop" and info.text == "GO!" then info.text = "" end
+				end )
 			end
 		end )
 	end
 end
 
-local function ferdig()
+local function ferdig( fullfort, tekst )
 	tilstand = "ferdig"
-	local ny = sport.nyRekord( "100m", tid, false )
-	local r = sport.rekord( "100m" )
+	local linjer = { { "100 m", 30 } }
+	if fullfort then
+		local ny = sport.nyRekord( "100m_fysikk", tid, false )
+		linjer[2] = { string.format( "Time: %.2f s", tid ), 28, { 0.92, 0.9, 0.86 } }
+		linjer[3] = { ny and "New record!" or string.format( "Record: %.2f s", sport.rekord( "100m_fysikk" ) ), 24 }
+	else
+		linjer[2] = { tekst, 26, { 0.92, 0.9, 0.86 } }
+	end
 	info.text = ""
-	sport.resultat( scene.view, {
-		{ "100 m", 30 },
-		{ string.format( "Time: %.2f s", tid ), 28, { 0.92, 0.9, 0.86 } },
-		{ ny and "New record!" or string.format( "Record: %.2f s", r ), 24 },
-	}, function()
-		if spokelse == nil then
-			spokelse = sport.mark( verden )
-			spokelse.alpha = 0.35
-			spokelse.y = sport.BAKKE_Y - sport.R
-		end
-		klar()
-	end )
+	sport.resultat( scene.view, linjer, klar )
 end
 
 function scene:create( event )
 	local grp = self.view
-	local bakgrunn = sport.bakgrunn( grp )
+	physics.start()
+	bakgrunn = sport.bakgrunn( grp )
 
 	verden = display.newGroup()
 	grp:insert( verden )
-	sport.bakke( verden, -400, MAAL + 1200 )
-	for m = 0, 100, 10 do
-		sport.merke( verden, START + m * sport.PX_PER_M, m .. " m" )
-	end
-	-- mållinje: en lys stripe og en stein med "Finish"
-	local linje = display.newRect( verden, MAAL, sport.BAKKE_Y + 14, 10, 28 )
-	linje:setFillColor( 0.85, 0.8, 0.7 )
-	local skilt = display.newImageRect( verden, "pausemenu.png", 150, 70 )
-	skilt.x, skilt.y = MAAL, sport.BAKKE_Y - 110
-	sport.tekst( verden, "Finish", MAAL, sport.BAKKE_Y - 110, 22 )
+	verden.xScale, verden.yScale = sport.SKALA, sport.SKALA
 
-	if sport.rekord( "100m" ) then
-		spokelse = sport.mark( verden )
-		spokelse.alpha = 0.35
-		spokelse.y = sport.BAKKE_Y - sport.R
+	-- bakken: stein, is i tunnelene, en sprekk
+	local function strekning( a, b, is )
+		if b <= a then return end
+		local pkt = {}
+		local n = math.max( 1, math.floor( ( b - a ) / 200 ) )
+		for i = 0, n do
+			local x = a + ( b - a ) * i / n
+			pkt[#pkt + 1] = { x, bakkeY( x ) }
+		end
+		sport.terreng( verden, pkt, { is = is } )
 	end
-	mark = sport.mark( verden )
+	strekning( -300, TUNNELER[1][1] - 150 )
+	strekning( TUNNELER[1][1] - 150, TUNNELER[1][1] + TUNNELER[1][2] + 50, true )
+	strekning( TUNNELER[1][1] + TUNNELER[1][2] + 50, SPREKK )
+	strekning( SPREKK + SPREKK_B, TUNNELER[2][1] - 150 )
+	strekning( TUNNELER[2][1] - 150, TUNNELER[2][1] + TUNNELER[2][2] + 50, true )
+	strekning( TUNNELER[2][1] + TUNNELER[2][2] + 50, MAAL + 3000 )
+	-- tak over tunnelene, med is på undersiden
+	for _, t in ipairs( TUNNELER ) do
+		local tak = {}
+		for i = 0, 20 do
+			local x = t[1] - 250 + ( t[2] + 300 ) * i / 20
+			local k = t[3] + 250 * ( math.abs( i - 10 ) / 10 ) ^ 2
+			tak[#tak + 1] = { x, bakkeY( x ) - k }
+		end
+		sport.terreng( verden, tak, { opp = true, is = true } )
+	end
+	for m = 0, 100, 10 do
+		local x = START + m * PX_PER_M
+		sport.merke( verden, x, bakkeY( x ), m .. " m", 34 )
+	end
+	-- mål
+	local linje = display.newRect( verden, MAAL, bakkeY( MAAL ) + 10, 20, 40 )
+	linje:setFillColor( 0.92, 0.9, 0.84 )
+	linje.rotation = GRADER
+	local skilt = display.newImageRect( verden, "pausemenu.png", 300, 140 )
+	skilt.x, skilt.y = MAAL, bakkeY( MAAL ) - 260
+	sport.tekst( verden, "Finish", MAAL, bakkeY( MAAL ) - 260, 48 )
 
 	sport.tekst( grp, "100 m", sport.B / 2, 30, 30 )
-	tidtekst = sport.tekst( grp, "0.00 s", sport.B / 2, 68, 26, { 0.92, 0.9, 0.86 } )
-	info = sport.tekst( grp, "", sport.B / 2, 130, 24 )
-	fart = sport.fartsmaler( grp )
+	tidtekst = sport.tekst( grp, "0.00 s", sport.B / 2, 66, 26, { 0.92, 0.9, 0.86 } )
+	status = sport.tekst( grp, "", sport.B - 110, 30, 18, { 0.85, 0.85, 0.85 } )
+	info = sport.tekst( grp, "", sport.B / 2, 108, 19 )
 
-	sport.trykkflate( grp, {
-		trykk = function()
-			if tilstand == "klar" then
-				nedtelling()
-			elseif tilstand == "nedtelling" then
-				tyvstart()
-			elseif tilstand == "loper" then
-				v = sport.gass( v )
-			end
-		end,
-	} )
+	sport.trykkflate( grp, function() return mark end, function()
+		if tilstand == "klar" then
+			nedtelling()
+			return false
+		elseif tilstand == "nedtelling" then
+			tyvstart()
+			return false
+		end
+		return tilstand == "lop"
+	end )
 	sport.tilbake( grp )
 	klar()
+	verden.x = sport.B * 0.35 - mark.midt.x * sport.SKALA
+	verden.y = sport.H * 0.55 - mark.midt.y * sport.SKALA
 
+	local sist = system.getTimer()
 	lytter = function()
 		local naa = system.getTimer()
-		local dt = sist and math.min( 0.05, ( naa - sist ) / 1000 ) or 0
+		local dt = math.min( 0.05, ( naa - sist ) / 1000 )
 		sist = naa
-		if tilstand == "loper" then
+		if not mark or not mark.midt.x then return end
+		local mx, my = mark.midt.x, mark.midt.y
+		if tilstand == "lop" then
 			tid = tid + dt
-			v = sport.brems( v, dt )
-			x = x + v * dt
-			mark:rull( v * dt )
-			if spokelse then
-				spokelse.x = math.min( MAAL, START + LENGDE * tid / sport.rekord( "100m" ) )
-				spokelse:rull( LENGDE / sport.rekord( "100m" ) * dt )
-			end
-			if x >= MAAL then
-				tid = tid - ( x - MAAL ) / math.max( v, 1 )
-				x = MAAL
-				ferdig()
-			end
 			tidtekst.text = string.format( "%.2f s", tid )
+			if mark:fart() < 8 then fastTid = fastTid + dt else fastTid = 0 end
+			-- Står ringen fast i en tunnel, kommer den ikke løs igjen (målt),
+			-- så da er løpet over. Slapp marke stopper på steinen etter
+			-- tunnelen til den gjøres stram.
+			if mark:erSlapp() and fastTid > 1 then
+				info.text = "Tap once to make the worm firm again."
+			elseif info.text ~= "GO!" then
+				info.text = ""
+			end
+			if not mark:erSlapp() and fastTid > 2.5 then
+				ferdig( false, "Stuck! Go limp just before the tunnel." )
+			elseif mark:erSlapp() and fastTid > 8 then
+				ferdig( false, "The worm stopped." )
+			elseif mx >= MAAL then
+				ferdig( true )
+			elseif my > bakkeY( mx ) + 500 then
+				ferdig( false, "The worm fell into the crack." )
+			end
 		end
-		mark.x = x
-		fart:sett( v / sport.VMAKS )
-		verden.x = math.min( 0, -( x - 300 ) )
-		bakgrunn:rull( -verden.x )
+		sport.kamera( verden, bakgrunn, mx, my, 0.35, 0.55 )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
@@ -143,7 +203,8 @@ function scene:hide( event )
 		Runtime:removeEventListener( "enterFrame", lytter )
 		tilstand = "borte"
 	elseif event.phase == "did" then
-		spokelse = nil
+		mark = nil
+		physics.start()
 		composer.removeScene( "scenes.mini_100m" )
 	end
 end

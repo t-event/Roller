@@ -925,17 +925,39 @@ fra før denne datoen er historikk.
   øverst til venstre, på høyde med livene. Kalles fra alle ni banefilene
   rett etter mørket.
 - **Games** (`scenes/minispill.lua`) har tre idrettsøvelser med rekord:
-  - 100 m (`scenes/mini_100m.lua`) har nedtelling og tyvstart, og en
-    blek ring som viser rekordløpet.
-  - Lengdehopp (`scenes/mini_lengdehopp.lua`): hold inne for å sikte,
-    slipp før planken. Hoppet måles fra planken, med tre hopp.
-  - Høydehopp (`scenes/mini_hoydehopp.lua`): lista stilles med "Bar up" /
-    "Bar down", 5 cm om gangen, med tre forsøk per høyde. Med godt
-    tilløp og timing kan man klare ca. 1,0 til 2,2 m.
-- Felles for minispillene er `lib/minisport.lua`: bakgrunn, bane, marken,
-  trykkflate, fart og rekorder (GGData "minispill"). Styringen er den
-  samme som i banene: trykk fort gir fart, hold strekker marken ut og
-  lader hoppet, slipp hopper.
+  - 100 m (`scenes/mini_100m.lua`): nedtelling og tyvstart, nedoverløype
+    med to istunneler og en sprekk.
+  - Lengdehopp (`scenes/mini_lengdehopp.lua`): tilløpsbakke og kant, hold
+    rett før kanten, tre hopp målt fra kanten.
+  - Høydehopp (`scenes/mini_hoydehopp.lua`): tilløp og hoppkant, lista
+    stilles med "Bar up" / "Bar down", 5 cm om gangen, med tre forsøk per
+    høyde.
+- **Ekte markfysikk i minispillene (samme dag, etter ønske fra Mathias).**
+  `lib/markfysikk.lua` bygger marken nøyaktig som i banefilene (ni
+  deler, samme former, motorledd +30 / -50 / -130, grenser 0-38 grader,
+  dobbelttrykk = slapp). Knekk er ikke med. Øvelsene er laget etter
+  målinger i en kopi av fysikken i Box2D 2.3 (pybox2d, samme motor som
+  Solar2D):
+  - Marken kommer seg ikke frem på flat bakke. Den ruller bare nedover,
+    og ruller fortest når man lar den være. Rytmiske trykk og holding
+    bremser den.
+  - `isCollideConnected = true` i banefilene virker ikke (egenskapen kan
+    bare leses i Solar2D), så nabodelene kolliderer ikke.
+  - Lengdehopp (26 graders tilløp, 250 px fall): passivt ca. 530 px,
+    strekk ca. 40 px før kanten ca. 600 px, for tidlig eller sent
+    430-470.
+  - Høydehopp (35 grader, bue R 450 opp til 45 grader, lista 200 px
+    etter kanten): passivt ca. 40 px over kanten, godt timet strekk
+    100-330 px. Resultatene spriker med timingen, som hoppene i banene.
+  - 100 m (20 grader, istunneler med 40-45 px klaring): ringen står fast
+    i tunnelen og kommer ikke løs. Slapp 200-300 px før tunnelen glir
+    gjennom, og stram etterpå. Det gir ca. 21-24 s.
+  Rekordene lagres som "100m_fysikk", "lengdehopp_fysikk" og
+  "hoydehopp_fysikk", så tider fra den første utgaven (uten ekte fysikk)
+  ikke henger igjen.
+- Felles for minispillene er `lib/minisport.lua`: bakgrunn, terreng med
+  fysikk (stein friksjon 3, is 0,05, som i banene), kamera, trykkflate,
+  knapper og rekorder (GGData "minispill").
 - Nye knapper, Controls-steinen og bakgrunnene `meny_bg.jpg` og
   `arena_bg.jpg` lages av `Util/knapper/lag_knapper.py`, i samme stil som
   de gamle.

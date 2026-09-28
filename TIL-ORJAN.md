@@ -3902,3 +3902,12 @@ for marken i Games (høydehopp med lista som kan justeres, lengdehopp,
 
 Knappene og steinen er laget i samme stil som de du tegnet
 (`Util/knapper/lag_knapper.py`). Du må gjerne tegne dem på nytt.
+
+Samme dag, Mathias: "kan du la marken gjøre slik som i spillet i
+minigames. Altså fysikken osv". Minispillene bruker nå den ekte marken
+fra banene (`lib/markfysikk.lua`), med samme styring. Siden marken bare
+ruller nedover av seg selv, er øvelsene bygget rundt det: tilløpsbakke
+og kant i lengdehopp, hoppkant i høydehopp, og istunneler i 100 m der
+marken må gjøres slapp. En ting jeg fant underveis: `isCollideConnected
+= true` på leddene i banefilene gjør ingenting (den kan bare leses i
+Solar2D). Det er ikke endret, fordi banene er laget med den fysikken.

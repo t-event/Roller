@@ -39,9 +39,9 @@ function scene:create( event )
 	end
 
 	local ovelser = {
-		{ "knapp_hoydehopp.png", "scenes.mini_hoydehopp", rekord( "hoydehopp", "%.2f m" ) },
-		{ "knapp_lengdehopp.png", "scenes.mini_lengdehopp", rekord( "lengdehopp", "%.2f m" ) },
-		{ "knapp_100m.png", "scenes.mini_100m", rekord( "100m", "%.2f s" ) },
+		{ "knapp_hoydehopp.png", "scenes.mini_hoydehopp", rekord( "hoydehopp_fysikk", "%.2f m" ) },
+		{ "knapp_lengdehopp.png", "scenes.mini_lengdehopp", rekord( "lengdehopp_fysikk", "%.2f m" ) },
+		{ "knapp_100m.png", "scenes.mini_100m", rekord( "100m_fysikk", "%.2f s" ) },
 	}
 	for i, o in ipairs( ovelser ) do
 		local x = panel.x + ( i - 2 ) * 170

@@ -2,25 +2,28 @@
 -- scenes/mini_100m.lua, scenes/mini_lengdehopp.lua og
 -- scenes/mini_hoydehopp.lua.
 --
--- Styringen er den samme som i banene, så minispillene øver på det
--- samme: marken ruller som en ring, TRYKK fort for å rulle fortere, HOLD
--- inne for å strekke marken ut (lade hoppet), SLIPP for å hoppe.
+-- Marken er den ekte marken fra banene med samme fysikk
+-- (lib/markfysikk.lua), og styres likt: slipp = ring som ruller, hold =
+-- strekker seg ut, dobbelttrykk = slapp, ett trykk = stram igjen.
+-- Øvelsene er bygget rundt det marken faktisk kan (målt i en kopi av
+-- fysikken, se KODEBASE.md): den ruller bare nedover av seg selv, strekk
+-- før en kant gir lengre og høyere hopp, og slapp glir gjennom trange
+-- sprekker med is.
 --
--- Grafikken er spillets egen: hulebakgrunnen fra startskjermen, bakken i
--- fargene fra banene, marken som ring (mark.png) eller strukket ut
--- (hale.png, del1.png, hode.png), og steinknappene fra pausemenyen.
+-- Banene er i "verdenspiksler" som i Box2D-oppsettet i banene, og
+-- verdensgruppa vises i SKALA (som kamera og grp i banene, 0,6 x 0,6).
 
 local composer = require( "composer" )
+local physics = require( "physics" )
 local GGData = require( "lib.GGData" )
 
 local M = {}
 
 M.B = display.contentWidth
 M.H = display.contentHeight
-M.BAKKE_Y = M.H - 105          -- toppen av bakken på skjermen
-M.R = 27                       -- radius på marken som ring
-M.PX_PER_M = 40                -- bortover: 40 px per meter
-M.VMAKS = 600                  -- px/s
+M.SKALA = 0.42                 -- verden på skjermen (banene: 0,36)
+M.STEIN = 3.0                  -- friksjon på stein, som i banene
+M.IS = 0.05                    -- friksjon på is, som i banene
 
 -- Rekorder, lagret mellom hver gang spillet startes.
 local data = GGData:new( "minispill" )
@@ -67,38 +70,58 @@ function M.bakgrunn( forelder, meny )
 	return g
 end
 
--- Bakke fra x0 til x1 i verdensgruppa, i fargene fra banene (lys kant
--- øverst, mørk kropp).
-function M.bakke( verden, x0, x1, farge )
-	local b = x1 - x0
-	local kropp = display.newRect( verden, ( x0 + x1 ) / 2, M.BAKKE_Y + 150, b, 300 )
-	kropp:setFillColor( 38 / 255, 14 / 255, 1 / 255 )
-	local kant = display.newRect( verden, ( x0 + x1 ) / 2, M.BAKKE_Y + 14, b, 28 )
-	if farge then
-		kant:setFillColor( unpack( farge ) )
-	else
-		kant:setFillColor( 72 / 255, 33 / 255, 6 / 255 )
+local KANT = { 72 / 255, 33 / 255, 6 / 255 }
+local KROPP = { 38 / 255, 14 / 255, 1 / 255 }
+local ISFARGE = { 36 / 255, 96 / 255, 118 / 255 }
+
+local function flat( pkt )
+	local ut = {}
+	for _, p in ipairs( pkt ) do
+		ut[#ut + 1] = p[1]
+		ut[#ut + 1] = p[2]
 	end
-	local strek = display.newRect( verden, ( x0 + x1 ) / 2, M.BAKKE_Y + 1, b, 3 )
-	strek:setFillColor( 10 / 255, 2 / 255, 0 )
-	-- noen små steiner i bakken, så man ser at det går fort
-	for x = x0 + 60, x1, 173 do
-		local s = display.newImageRect( verden, "rock.png", 50, 28 )
-		s.x = x + ( x * 7 ) % 90
-		s.y = M.BAKKE_Y + 40 + ( x * 13 ) % 110
-		s:setFillColor( 0.55, 0.36, 0.24 )
-		s.alpha = 0.7
-		s.rotation = ( x * 31 ) % 360
-	end
+	return ut
 end
 
--- Merke langs banen (en liten stolpe med tekst).
-function M.merke( verden, x, tekst )
-	local p = display.newRect( verden, x, M.BAKKE_Y - 14, 4, 28 )
+-- Stein langs pkt (liste med {x, y}, fra venstre mot høyre). opp = true
+-- gir tak (steinen fylles oppover i stedet for nedover). Tegnes i
+-- fargene fra banene, med en fysisk kjede langs overflata.
+function M.terreng( verden, pkt, valg )
+	valg = valg or {}
+	local dybde = valg.dybde or 900
+	local fyll = {}
+	for _, p in ipairs( pkt ) do fyll[#fyll + 1] = { p[1], p[2] } end
+	local siste, forste = pkt[#pkt], pkt[1]
+	local retning = valg.opp and -1 or 1
+	fyll[#fyll + 1] = { siste[1], siste[2] + retning * dybde }
+	fyll[#fyll + 1] = { forste[1], forste[2] + retning * dybde }
+	local minx, maxx, miny, maxy = math.huge, -math.huge, math.huge, -math.huge
+	for _, p in ipairs( fyll ) do
+		minx, maxx = math.min( minx, p[1] ), math.max( maxx, p[1] )
+		miny, maxy = math.min( miny, p[2] ), math.max( maxy, p[2] )
+	end
+	local poly = display.newPolygon( verden, ( minx + maxx ) / 2, ( miny + maxy ) / 2, flat( fyll ) )
+	poly:setFillColor( unpack( KROPP ) )
+	local linje = display.newLine( verden, pkt[1][1], pkt[1][2], pkt[2][1], pkt[2][2] )
+	for i = 3, #pkt do linje:append( pkt[i][1], pkt[i][2] ) end
+	linje:setStrokeColor( unpack( valg.farge or ( valg.is and ISFARGE ) or KANT ) )
+	linje.strokeWidth = valg.is and 22 or 30
+	-- fysikken: en kjede langs overflata, fra et usynlig ankerpunkt i (0, 0)
+	local anker = display.newRect( verden, 0, 0, 1, 1 )
+	anker.isVisible = false
+	physics.addBody( anker, "static", { chain = flat( pkt ), connectFirstAndLast = false,
+		friction = valg.is and M.IS or M.STEIN } )
+	return anker
+end
+
+-- Merke i verden (en liten stolpe med tekst over bakken i x, y).
+function M.merke( verden, x, y, tekst, storrelse )
+	local p = display.newRect( verden, x, y - 30, 8, 60 )
 	p:setFillColor( 0.55, 0.45, 0.35 )
-	local t = display.newText( { parent = verden, text = tekst, x = x, y = M.BAKKE_Y - 40,
-		font = native.systemFontBold, fontSize = 16 } )
+	local t = display.newText( { parent = verden, text = tekst, x = x, y = y - 90,
+		font = native.systemFontBold, fontSize = storrelse or 40 } )
 	t:setFillColor( 0.9, 0.82, 0.7 )
+	return t
 end
 
 function M.tekst( forelder, t, x, y, storrelse, farge )
@@ -146,96 +169,35 @@ function M.tilbake( forelder )
 	return p
 end
 
--- Marken: en ring som ruller, eller strukket ut når man holder inne.
-function M.mark( forelder )
-	local g = display.newGroup()
-	forelder:insert( g )
-	local ring = display.newImageRect( g, "mark.png", 121, 141 )
-	ring.width, ring.height = 2 * M.R + 6, ( 2 * M.R + 6 ) * 141 / 121
-	local rett = display.newGroup()
-	g:insert( rett )
-	local biter = { { "hale.png", 44, 28 }, { "del1.png", 30, 15 }, { "del1.png", 30, 15 },
-		{ "del1.png", 30, 15 }, { "del1.png", 30, 15 }, { "hode.png", 30, 22 } }
-	local px = 0
-	for _, b in ipairs( biter ) do
-		local d = display.newImageRect( rett, b[1], b[2], b[3] )
-		d.x = px + b[2] / 2
-		px = px + b[2] - 6
-	end
-	rett.anchorChildren = true
-	rett.x, rett.y = 0, M.R - 8
-	rett.isVisible = false
-
-	g.vinkel = 0
-	function g:strekk( paa )
-		ring.isVisible = not paa
-		rett.isVisible = paa
-	end
-	-- Ruller ringen: vinkelen følger strekningen, så den ser ut til å rulle.
-	function g:rull( dx )
-		g.vinkel = g.vinkel + math.deg( dx / M.R )
-		ring.rotation = g.vinkel
-	end
-	return g
-end
-
--- Hele skjermen tar imot trykk: tapp gir fart, hold lader, slipp hopper.
--- lyttere = { trykk = function(), hold = function(), slipp = function(holdtid) }
--- Et trykk som varer lenger enn HOLDGRENSE sekunder regnes som hold.
-M.HOLDGRENSE = 0.16
-function M.trykkflate( forelder, lyttere )
+-- Hele skjermen tar imot trykk og sender dem til marken, som i banene
+-- (began = trykk, ended = slipp). vedTrykk kalles i tillegg ved hvert
+-- trykk, så scenen kan starte løpet.
+function M.trykkflate( forelder, hentMark, vedTrykk )
 	local flate = display.newRect( forelder, M.B / 2, M.H / 2, M.B * 3, M.H * 3 )
 	flate.isVisible = false
 	flate.isHitTestable = true
-	local start, holder, timerId = nil, false, nil
 	flate:addEventListener( "touch", function( e )
+		local mark = hentMark()
 		if e.phase == "began" then
-			start = system.getTimer()
-			holder = false
-			if lyttere.trykk then lyttere.trykk() end
-			timerId = timer.performWithDelay( M.HOLDGRENSE * 1000, function()
-				if start then
-					holder = true
-					if lyttere.hold then lyttere.hold() end
-				end
-			end )
+			if vedTrykk and vedTrykk() == false then return true end
+			if mark then mark:trykk() end
 		elseif e.phase == "ended" or e.phase == "cancelled" then
-			if timerId then timer.cancel( timerId ) timerId = nil end
-			if start and holder and lyttere.slipp then
-				lyttere.slipp( ( system.getTimer() - start ) / 1000 )
-			end
-			start, holder = nil, false
+			if mark then mark:slipp() end
 		end
 		return true
 	end )
 	return flate
 end
 
--- Farten avtar av seg selv; hvert trykk gir mer.
-function M.brems( v, dt )
-	return math.max( 0, v - ( 55 + 0.33 * v ) * dt )
-end
-
-function M.gass( v )
-	return math.min( M.VMAKS, v + 52 )
-end
-
--- Fartsmåler nederst: en stein-farget stolpe som fylles.
-function M.fartsmaler( forelder )
-	local g = display.newGroup()
-	forelder:insert( g )
-	local x0, y = M.B / 2 - 150, M.H - 30
-	local bunn = display.newRoundedRect( g, M.B / 2, y, 304, 18, 8 )
-	bunn:setFillColor( 0.16, 0.16, 0.16, 0.9 )
-	local fyll = display.newRoundedRect( g, x0, y, 300, 14, 7 )
-	fyll.anchorX = 0
-	fyll:setFillColor( 0.62, 0.36, 0.2 )
-	local t = M.tekst( g, "Speed", x0 - 40, y, 16 )
-	function g:sett( andel )
-		fyll.xScale = math.max( 0.01, math.min( 1, andel ) )
-	end
-	g:sett( 0 )
-	return g
+-- Kamera: flytter verdensgruppa mykt mot et punkt i verden, som vises
+-- ved (andelX, andelY) av skjermen.
+function M.kamera( verden, bakgrunn, x, y, andelX, andelY, myk )
+	local mx = M.B * ( andelX or 0.4 ) - x * M.SKALA
+	local my = M.H * ( andelY or 0.5 ) - y * M.SKALA
+	local k = myk or 0.12
+	verden.x = verden.x + ( mx - verden.x ) * k
+	verden.y = verden.y + ( my - verden.y ) * k
+	if bakgrunn then bakgrunn:rull( -verden.x ) end
 end
 
 -- Resultatpanel (steinpanelet fra pausemenyen) med knapper.
