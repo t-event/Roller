@@ -686,6 +686,9 @@ def drei(masse, grader):
     return np.asarray(im) >= 128
 
 
+INN_FRA_KANT = 180
+
+
 def plasser_fritt(masser, cfg):
     """Lager maskene og regner ut hvor hver flis skal ligge.
 
@@ -717,11 +720,19 @@ def plasser_fritt(masser, cfg):
     spawn_x = spawnpunkt(masker[0])
     forskyvning = int(round(2 * (spawn_x - til_bilde_f(SPAWN_X[0], 0))))
     origo = [(0, 0)]
+    # Korteste flukt: 156 enheter/s bortover, fall hopp_ned.
+    flukt = 78 * math.sqrt(2 * cfg["hopp_ned"] / (G / 2))
     for k in range(3):
         lx, ly = ledge(masker[k])
         px, py = hodetopp(masker[k + 1])
+        venstre = int(np.nonzero(masker[k + 1].any(axis=0))[0].min())
+        # Marken skal lande minst INN_FRA_KANT inn fra venstre kant av neste
+        # masse. Sitter hodetoppen langt ute på kanten, flyttes neste flis
+        # nærmere, ellers lander marken på den runde kanten og ruller av
+        # (bane 9, første forsøk).
+        bort = int(min(cfg["hopp_bort"], (px - venstre) + flukt - INN_FRA_KANT - 20))
         ox, oy = origo[k]
-        origo.append((ox + lx + cfg["hopp_bort"] - px, oy + ly + cfg["hopp_ned"] - py))
+        origo.append((ox + lx + bort - px, oy + ly + cfg["hopp_ned"] - py))
     return felt, origo, forskyvning
 
 
@@ -816,6 +827,12 @@ def sjekk_fri(masker, origo, forskyvning, dod, maal):
                                 for l in land]))
         riktig = [l for l in land if l != "død" and l[0] == k + 1]
         ok &= len(riktig) == 3
+        venstre = int(np.nonzero(masker[k + 1].any(axis=0))[0].min())
+        if riktig:
+            inn = min(l[1] for l in riktig) - venstre
+            print("  hopp flis %d->%d: nærmeste landing %d px inn fra venstre kant (krav %d)"
+                  % (k + 1, k + 2, inn, INN_FRA_KANT))
+            ok &= inn >= INN_FRA_KANT
         starter_.append(min(l[1] for l in riktig) if riktig else 0)
 
     for i, m in enumerate(masker):
