@@ -11,7 +11,5 @@ return {
     dod = { x = 11030, y = 7260, rotasjon = 25.88 },
     mal2 = { x = 22060, y = 10999 },
     kamera = { x_maks = 20560, y_maks = 10341 },
-    -- BARE FOR TESTING: banen flyttes så marken starter 1200 px før slutten.
-    teststart = { x = 19960, y = 9917 },
     bakgrunn = { rotasjon = 26.50, steg_x = 1789, steg_y = 892 },
 }
