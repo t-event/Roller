@@ -3867,3 +3867,12 @@ Mathias: i bane 6 kom han i mål før banen tok slutt. Målet skal være som
 i bane 1-4, der kameraet stopper og marken fortsetter ut av skjermen til
 høyre. Nå stopper kameraet 1800 enheter før slutten av gulvet, og målet
 ligger rett før slutten, utenfor skjermen.
+
+## 2026-09-28, dødslinja lekket mellom banene
+
+Når marken kom i mål, døde den med en gang i neste bane. Marken fra
+forrige bane falt fortsatt i fysikkverdenen og traff den nye banens
+dødslinje, og sjekken så bare på navnet ("dod" og "del1"), ikke på om
+det var denne banens objekter. Samme feil som målet hadde 2026-09-27.
+Rettet i alle ni banefilene: sjekken sammenligner nå med banens egne
+`dod` og `del1`-`del9`.

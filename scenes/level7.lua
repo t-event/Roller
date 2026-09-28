@@ -1072,31 +1072,31 @@ onCollision = function(event)
 if event.phase == "began" then
 local agro = event.object1
 local hit = event.object2
-if      agro.type == "dod" and hit.type == "del1" then
+if      agro == dod and hit == del1 then
     knapp1.alpha = 0
     --print( "dod og del1" )
-elseif  agro.type == "dod" and hit.type == "del2" then
+elseif  agro == dod and hit == del2 then
     knapp1.alpha = 0
     --print( "dod og del2" )
-elseif  agro.type == "dod" and hit.type == "del3" then
+elseif  agro == dod and hit == del3 then
     knapp1.alpha = 0
     --print( "dod og del3" )
-elseif  agro.type == "dod" and hit.type == "del4" then
+elseif  agro == dod and hit == del4 then
     knapp1.alpha = 0
     --print( "dod og del4" )
-elseif  agro.type == "dod" and hit.type == "del5" then
+elseif  agro == dod and hit == del5 then
     knapp1.alpha = 0
     --print( "dod og del5" )
-elseif  agro.type == "dod" and hit.type == "del6" then
+elseif  agro == dod and hit == del6 then
     knapp1.alpha = 0
     --print( "dod og del6" )
-elseif  agro.type == "dod" and hit.type == "del7" then
+elseif  agro == dod and hit == del7 then
     knapp1.alpha = 0
     --print( "dod og del7" )
-elseif  agro.type == "dod" and hit.type == "del8" then
+elseif  agro == dod and hit == del8 then
     knapp1.alpha = 0
     --print( "dod og del8" )
-elseif  agro.type == "dod" and hit.type == "del9" then
+elseif  agro == dod and hit == del9 then
     knapp1.alpha = 0
     --print( "dod og del9" )
 

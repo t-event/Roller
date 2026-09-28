@@ -1081,31 +1081,31 @@ checkpoint("level1:cp_1062_before_onCollision_def")
 onCollision = function(event)
 if event.phase == "began" then
 
-if      event.object1.type == "dod" and event.object2.type == "del1" then
+if      event.object1 == dod and event.object2 == del1 then
     knapp1.alpha = 0
     --print( "dod og del1" )
-elseif  event.object1.type == "dod" and event.object2.type == "del2" then
+elseif  event.object1 == dod and event.object2 == del2 then
     knapp1.alpha = 0
     --print( "dod og del2" )
-elseif  event.object1.type == "dod" and event.object2.type == "del3" then
+elseif  event.object1 == dod and event.object2 == del3 then
     knapp1.alpha = 0
     --print( "dod og del3" )
-elseif  event.object1.type == "dod" and event.object2.type == "del4" then
+elseif  event.object1 == dod and event.object2 == del4 then
     knapp1.alpha = 0
     --print( "dod og del4" )
-elseif  event.object1.type == "dod" and event.object2.type == "del5" then
+elseif  event.object1 == dod and event.object2 == del5 then
     knapp1.alpha = 0
     --print( "dod og del5" )
-elseif  event.object1.type == "dod" and event.object2.type == "del6" then
+elseif  event.object1 == dod and event.object2 == del6 then
     knapp1.alpha = 0
     --print( "dod og del6" )
-elseif  event.object1.type == "dod" and event.object2.type == "del7" then
+elseif  event.object1 == dod and event.object2 == del7 then
     knapp1.alpha = 0
     --print( "dod og del7" )
-elseif  event.object1.type == "dod" and event.object2.type == "del8" then
+elseif  event.object1 == dod and event.object2 == del8 then
     knapp1.alpha = 0
     --print( "dod og del8" )
-elseif  event.object1.type == "dod" and event.object2.type == "del9" then
+elseif  event.object1 == dod and event.object2 == del9 then
     knapp1.alpha = 0
     --print( "dod og del9" )
 
