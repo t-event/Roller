@@ -17,10 +17,10 @@ hans ned i hulen. Han hopper etter og starter jakten på dem.
 
 ### Forslag til hvordan
 
-- **Mørke:** et svart lag over hele skjermen som blir tettere per bane
-  (for eksempel 0 % i bane 1 til 60 % i bane 9), med et lysere felt rundt
-  marken, så man ser nærmeste bakke men ikke langt frem. Kan gjøres i
-  koden uten nye bilder.
+- **Mørke: gjort 2026-09-28.** Et mørkt lag over banen, 0 i bane 1
+  (utendørs) og så 10, 18, 26 ... 66 % i bane 9, med et lyst felt rundt
+  marken. Styrken per bane står i `M.STYRKE` i `lib/morke.lua`, og
+  størrelsen på lyset er tegnet inn i `morke.png`.
 - **Stein i stedet for jord:** verktøyet `Util/baner/lag_bane.py` maler
   massene selv. Det kan få en fargepalett og et kornmønster per bane, fra
   brun jord (bane 1-4) via grå stein til mørkt berg, med skarpere kanter

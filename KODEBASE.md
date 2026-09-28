@@ -838,6 +838,25 @@ enheter/s. **Hold søyla tjukk, flytt den sidelengs.**
 gradvise mørkningen i bane 5 og 6 finnes ikke i den ekte kunsten, den er
 innført av meg.
 
+## Mørket i hulen (2026-09-28)
+
+`lib/morke.lua` legger et mørkt lag over banen, tettere for hver bane
+(`M.STYRKE`, 0 i bane 1 til 0,66 i bane 9). Hver banefil kaller
+`require( "lib.morke" ).lag( N, punkt )` rett etter
+`camera:layer(2):toFront()`.
+
+- **Laget ligger nederst i kameraets lag 2.** Lag 2 er skjermfast
+  (`parallaxRatio = 0`) og foran resten av banen, så mørket dekker alt
+  unntatt pauseknappen (øverst i lag 2) og livtelleren (rett i
+  scenegruppa).
+- **`morke.png`** er 1024 px, vises 4000 skjermenheter bredt og har et
+  klart felt ut til 170 enheter som glir over i fullt mørke ved 430.
+  Bildet flyttes til `punkt` (som følger marken) hvert bilde. Skalaen
+  regnes ut på nytt hvert bilde med `contentToLocal`, fordi både
+  `camera` og `grp` er skalert.
+- Lytteren fjerner seg selv når banen rives ned, så den kan ikke lekke
+  over i neste bane.
+
 ## Kjente feil (utover det som allerede er fikset, se `TIL-ORJAN.md`)
 
 1. ~~Delte kollisjonsformer~~ **Bane 1-4 løst 2026-09-14, bane 5, 6 og 7
