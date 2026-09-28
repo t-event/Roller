@@ -3879,4 +3879,10 @@ Rettet i alle ni banefilene: sjekken sammenligner nå med banens egne
 
 Samme feil fantes i knekk-systemet: når forrige bane ble revet ned,
 traff knottene i den gamle marken hverandre, og den nye banen trodde
-det var dens egen marke som knakk. Rettet likt i alle ni banene.
+det var dens egen marke som knakk. Rettet likt i alle ni banene. Men knekk-lytteren ble
+heller aldri fjernet når banen var ferdig (den var `local function` inni
+`scene:create`, så `scene:hide` fjernet en tom global). Den gamle banens
+knekk kjørte derfor da marken ble revet ned, og satte kameraet i neste
+bane til å følge den gamle marken ("attempt to compare nil with number").
+Nå er `knekk` deklarert øverst i fila som `onCollision`, og fjernes både i
+`scene:hide` og når målet nås.

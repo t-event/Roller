@@ -40,7 +40,11 @@ local trykk_knapp
 -- dermed på en udefinert global (alltid nil), ikke den faktiske
 -- lytteren - fjernet ingenting, lekket for hver gang banen ble
 -- forlatt. Se KODEBASE.md "Kjente feil".
-local onCollision, onCollision1
+-- knekk også (2026-09-28): den var "local function" inni scene:create,
+-- så scene:hide og goto2 fjernet en udefinert global. Lytteren ble
+-- stående etter at banen var ferdig og kjørte når den gamle marken
+-- ble revet ned, og flyttet kameraet til neste bane over på den.
+local onCollision, onCollision1, knekk
 -- Lagt til 2026-09-15: forhåndsdeklarert av samme grunn som de over,
 -- slik at både goto() og scene:hide kan fjerne enterFrame-lytteren
 -- igjen. Se der den settes opp (nederst i scene:create) for hvorfor
@@ -111,6 +115,7 @@ local sjekkUtenforBanen
         Runtime:removeEventListener( "enterFrame", sjekkUtenforBanen )
         Runtime:removeEventListener("collision", onCollision)
         Runtime:removeEventListener("collision", onCollision1)
+        Runtime:removeEventListener("collision", knekk)
         --Runtime:removeEventListener( "touch", trykk_knapp)
         --Runtime:removeEventListener( "tap", trykk_knapp)
         --knapp1.alpha = 0
@@ -1637,7 +1642,7 @@ del9:addEventListener( "collision" )
 
 
 
-local function knekk(event)
+knekk = function(event)
 if event.phase == "began" then
 
 
