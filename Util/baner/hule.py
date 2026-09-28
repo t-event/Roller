@@ -567,11 +567,19 @@ def dodslinje(g):
     return a, b
 
 
+def teststart_pos(g, x):
+    """Spillenheter for en marke med hodet i x px, litt over gulvet."""
+    topp = min(g.gulv_y(x - k) for k in range(0, 100, 10))
+    return 2 * x, 2 * (topp - 90)
+
+
 KAMERA_STOPP = 900
 MAL_FOR_SLUTT = 150
 
 
-def skriv_oppsett(bane, g, origo):
+def skriv_oppsett(bane, g, origo, teststart=None):
+    """teststart: px før slutten av gulvet der marken skal starte (bare
+    for testing, se lib/teststart.lua)."""
     a, b = dodslinje(g)
     # Som i bane 1-4: kameraet stopper KAMERA_STOPP px før slutten av
     # gulvet, og marken ruller videre ut av skjermen (halve skjermen er
@@ -594,6 +602,10 @@ def skriv_oppsett(bane, g, origo):
                "    mal2 = { x = %d, y = %d }," % (2 * mx, 2 * my),
                # kameraet følger marken hit, så ruller den ut til høyre
                "    kamera = { x_maks = %d, y_maks = %d }," % (2 * kx, 2 * ky),
+               ] + ([] if teststart is None else [
+               "    -- BARE FOR TESTING: banen flyttes så marken starter %d px før slutten." % teststart,
+               "    teststart = { x = %d, y = %d }," % teststart_pos(g, slutt[0] - teststart),
+               ]) + [
                "    bakgrunn = { rotasjon = %.2f, steg_x = %d, steg_y = %d }," % (
                    math.degrees(vinkel), round(1999 * math.cos(vinkel)), round(1999 * math.sin(vinkel))),
                "}", ""]
@@ -627,9 +639,12 @@ def main():
     ok = sjekk(g)
     if "--sjekk" in sys.argv:
         return
-    if "--oppsett" in sys.argv:
+    if "--oppsett" in sys.argv or "--teststart" in sys.argv:
         # bare lib/baneoppsettN.lua, bildene og formene er uendret
-        skriv_oppsett(bane, g, origo)
+        ts = None
+        if "--teststart" in sys.argv:
+            ts = int(sys.argv[sys.argv.index("--teststart") + 1])
+        skriv_oppsett(bane, g, origo, ts)
         print("lib/baneoppsett%d.lua skrevet" % bane)
         return
     if not ok:

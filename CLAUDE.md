@@ -17,5 +17,15 @@
   byggingen er publisert før lenken gis, og si fra at en privat fane eller
   omlasting kan trengs for å få nyeste versjon.
 
+- **Lenken skal stå helt sist i svaret**, så Mathias kan teste uten å
+  bla opp.
+
+- **Test slutten av en bane med teststart.** Marken kan ikke flyttes, men
+  banen kan: `python3 Util/baner/hule.py N --teststart PX` (bane 5-9)
+  flytter banen så marken starter PX px før slutten (se
+  `lib/teststart.lua`). Push, test i nettleseren, og sett det tilbake
+  med `python3 Util/baner/hule.py N --oppsett` og en ny push før lenken
+  gis. Hele banen må også testes fra vanlig start.
+
 Se `KODEBASE.md` for hvordan koden henger sammen og `SPILLIDE.md` for
 spillideen.
