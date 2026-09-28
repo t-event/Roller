@@ -86,7 +86,8 @@ function M.bakke( verden, x0, x1, farge )
 		local s = display.newImageRect( verden, "rock.png", 50, 28 )
 		s.x = x + ( x * 7 ) % 90
 		s.y = M.BAKKE_Y + 40 + ( x * 13 ) % 110
-		s.alpha = 0.55
+		s:setFillColor( 0.55, 0.36, 0.24 )
+		s.alpha = 0.7
 		s.rotation = ( x * 31 ) % 360
 	end
 end

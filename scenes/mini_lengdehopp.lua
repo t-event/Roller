@@ -87,8 +87,11 @@ local function hopp()
 end
 
 local function landet()
+	if x - sport.R * 0.6 < GROP0 then
+		videre( "Too early! Take off closer to the board." )
+		return
+	end
 	local lengde = ( x - sport.R * 0.6 - BRETT ) / sport.PX_PER_M
-	if lengde < 0 then lengde = 0 end
 	local m = display.newCircle( verden, x - sport.R * 0.6, sport.BAKKE_Y + 6, 7 )
 	m:setFillColor( 0.2, 0.1, 0.03 )
 	merker[#merker + 1] = m
@@ -113,8 +116,9 @@ function scene:create( event )
 		sport.merke( verden, BRETT - m * sport.PX_PER_M, "-" .. m .. " m" )
 	end
 	-- planken: hvit stripe
-	local brett = display.newRect( verden, BRETT - 8, sport.BAKKE_Y + 8, 16, 16 )
+	local brett = display.newRect( verden, BRETT - 9, sport.BAKKE_Y + 14, 18, 28 )
 	brett:setFillColor( 0.92, 0.9, 0.84 )
+	sport.tekst( verden, "Board", BRETT - 9, sport.BAKKE_Y - 62, 16 )
 
 	mark = sport.mark( verden )
 	mark.y = sport.BAKKE_Y - sport.R

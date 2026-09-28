@@ -3886,3 +3886,19 @@ knekk kjørte derfor da marken ble revet ned, og satte kameraet i neste
 bane til å følge den gamle marken ("attempt to compare nil with number").
 Nå er `knekk` deklarert øverst i fila som `onCollision`, og fjernes både i
 `scene:hide` og når målet nås.
+
+## 2026-09-28, Controls, banenummer og minispill
+
+Mathias ba om en forklaring av styringen i pausemenyen og på
+startskjermen, en måte å se hvilken bane man spiller, og idrettsminispill
+for marken i Games (høydehopp med lista som kan justeres, lengdehopp,
+100 m).
+
+- **Controls:** ny stein på startskjermen og ny knapp i pausemenyen.
+- **Banenummer:** nummersteinen fra banevalget vises øverst til venstre.
+- **Games:** høydehopp, lengdehopp og 100 m. Rekordene lagres.
+  Minispillene styres som banene: trykk fort for fart, hold for å strekke
+  marken ut og lade hoppet, slipp for å hoppe.
+
+Knappene og steinen er laget i samme stil som de du tegnet
+(`Util/knapper/lag_knapper.py`). Du må gjerne tegne dem på nytt.

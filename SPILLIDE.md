@@ -54,4 +54,13 @@ Gjort 2026-09-27:
 
 ## Minispill
 
-Idé: spillet skal ha minispill for marken. Ikke bestemt hva ennå.
+Gjort 2026-09-28: idrettsøvelser for marken under Games-steinen:
+høydehopp (lista kan stilles), lengdehopp og 100 m, med rekorder.
+Flere øvelser kan legges til med `lib/minisport.lua`, for eksempel
+stavsprang, hekkeløp eller stafett.
+
+## Controls og banenummer
+
+Gjort 2026-09-28: Controls-steinen på startskjermen og Controls i
+pausemenyen forklarer styringen. Banenummeret vises med nummersteinen
+øverst til venstre i hver bane.

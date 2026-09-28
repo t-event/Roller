@@ -912,6 +912,34 @@ fra før denne datoen er historikk.
 | 8 | 2 (1) | 3 med is | 2, 270-330 px | 1 |
 | 9 | 2 (2) | 2 med is | 2, 230-260 px | 2 |
 
+## Controls, banenummer og minispill (2026-09-28)
+
+- **Controls** (`lib/kontroller.lua`) forklarer styringen på et
+  steinpanel: slipp = ring som ruller, hold = strekker seg ut,
+  dobbelttrykk = slapp, ett trykk = stram igjen. Vises fra en ny stein på
+  startskjermen (`controlsknapp.png` -> `scenes/kontroller.lua`) og fra
+  en ny knapp øverst i pausemenyen. Pausemenyen er selv en overlay, så
+  forklaringen er en gruppe oppå, ikke en egen scene.
+- **Banenummeret** (`lib/banenummer.lua`) bruker nummersteinene fra
+  banevalget (`steinN.png`): stor midt på skjermen i starten, så liten
+  øverst til venstre, på høyde med livene. Kalles fra alle ni banefilene
+  rett etter mørket.
+- **Games** (`scenes/minispill.lua`) har tre idrettsøvelser med rekord:
+  - 100 m (`scenes/mini_100m.lua`) har nedtelling og tyvstart, og en
+    blek ring som viser rekordløpet.
+  - Lengdehopp (`scenes/mini_lengdehopp.lua`): hold inne for å sikte,
+    slipp før planken. Hoppet måles fra planken, med tre hopp.
+  - Høydehopp (`scenes/mini_hoydehopp.lua`): lista stilles med "Bar up" /
+    "Bar down", 5 cm om gangen, med tre forsøk per høyde. Med godt
+    tilløp og timing kan man klare ca. 1,0 til 2,2 m.
+- Felles for minispillene er `lib/minisport.lua`: bakgrunn, bane, marken,
+  trykkflate, fart og rekorder (GGData "minispill"). Styringen er den
+  samme som i banene: trykk fort gir fart, hold strekker marken ut og
+  lader hoppet, slipp hopper.
+- Nye knapper, Controls-steinen og bakgrunnene `meny_bg.jpg` og
+  `arena_bg.jpg` lages av `Util/knapper/lag_knapper.py`, i samme stil som
+  de gamle.
+
 ## Mørket i hulen (2026-09-28)
 
 `lib/morke.lua` legger et mørkt lag over banen, tettere for hver bane

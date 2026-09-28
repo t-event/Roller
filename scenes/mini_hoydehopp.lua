@@ -1,6 +1,6 @@
 -- Minispill: høydehopp (lagt til 2026-09-28).
 -- Still lista med "Bar up" / "Bar down" (5 cm om gangen). Trykk fort for
--- tilløpsfart, hold inne for å lade hoppet (kraftmåleren går opp og ned)
+-- tilløpsfart, hold inne for å lade hoppet (kraftmåleren går opp og ned, full etter 0,4 s)
 -- og slipp for å hoppe. Hele marken må over lista. Tre forsøk per høyde,
 -- som i ekte høydehopp. Høyeste klarte høyde er rekorden.
 
@@ -10,7 +10,7 @@ local sport = require( "lib.minisport" )
 local scene = composer.newScene()
 
 local START = 120
-local LISTE = START + 820
+local LISTE = START + 700
 local PX_PER_M_H = 90           -- oppover: 90 px per meter
 local G = 1100
 local MIN, MAKS, STEG = 0.50, 2.60, 0.05
@@ -159,8 +159,8 @@ function scene:create( event )
 			if tilstand == "lader" then hopp() end
 		end,
 	} )
-	opp = sport.knapp( grp, "knapp_opp.png", sport.B - 90, sport.H / 2 - 30, function() endreHoyde( STEG ) end )
-	ned = sport.knapp( grp, "knapp_ned.png", sport.B - 90, sport.H / 2 + 25, function() endreHoyde( -STEG ) end )
+	opp = sport.knapp( grp, "knapp_opp.png", display.screenOriginX + 90, sport.H / 2 - 50, function() endreHoyde( STEG ) end )
+	ned = sport.knapp( grp, "knapp_ned.png", display.screenOriginX + 90, sport.H / 2 + 5, function() endreHoyde( -STEG ) end )
 	sport.tilbake( grp )
 	nyttForsok()
 
@@ -173,7 +173,7 @@ function scene:create( event )
 			x = x + v * dt
 			mark:rull( v * dt )
 			if tilstand == "lader" then
-				kraft = kraft + kraftRetning * dt / 0.55
+				kraft = kraft + kraftRetning * dt / 0.4
 				if kraft > 1 then kraft, kraftRetning = 1, -1 end
 				if kraft < 0 then kraft, kraftRetning = 0, 1 end
 			end
@@ -197,7 +197,6 @@ function scene:create( event )
 			if h <= gulv and vy < 0 then
 				h = gulv
 				if x < LISTE then
-					if klarte then riv() end
 					ferdigForsok( false, "Too early, you came down before the bar." )
 				elseif klarte then
 					ferdigForsok( true, string.format( "Cleared %.2f m!", hoyde ) )
@@ -212,7 +211,7 @@ function scene:create( event )
 		maalerFyll.yScale = math.max( 0.01, kraft )
 		fart:sett( v / sport.VMAKS )
 		-- kameraet følger marken, men stopper så lista alltid synes
-		verden.x = -math.max( 0, math.min( x - 300, LISTE + 380 - sport.B ) )
+		verden.x = -math.max( 0, math.min( x - 300, LISTE + 420 - sport.B ) )
 		bakgrunn:rull( -verden.x )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
