@@ -2237,6 +2237,8 @@ camera:layer(2).parallaxRatio=0
 -- flytter kun lag 2 til fronten av kamera-gruppa, uten å endre hvilket
 -- lag knappen faktisk tilhører (og dermed ikke rulle-oppførselen).
 camera:layer(2):toFront()
+-- Mørket i hulen, tettere for hver bane (2026-09-28, se lib/morke.lua).
+require( "lib.morke" ).lag( 1, punkt )
 
 -- Lagt til 2026-09-15 (Mathias: "Marken kunne falle ut av banen på bane
 -- 2 uten at det kom opp at den døde. Gjør slik at man dør om man faller

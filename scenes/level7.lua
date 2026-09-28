@@ -1868,6 +1868,8 @@ Runtime:addEventListener("collision", knekk)
 camera:layer(2).parallaxRatio=0
 -- Rettet 2026-09-15: se level1.lua for forklaring.
 camera:layer(2):toFront()
+-- Mørket i hulen, tettere for hver bane (2026-09-28, se lib/morke.lua).
+require( "lib.morke" ).lag( 7, punkt )
 
 -- Lagt til 2026-09-15 (Mathias: "Marken kunne falle ut av banen på bane
 -- 2 uten at det kom opp at den døde. Gjør slik at man dør om man faller

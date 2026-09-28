@@ -2257,6 +2257,8 @@ camera:layer(2).parallaxRatio=0
 -- over), men linjen skader ikke og gjør oppførselen lik på tvers av
 -- alle banene om den samme mekanismen tas i bruk her senere.
 camera:layer(2):toFront()
+-- Mørket i hulen, tettere for hver bane (2026-09-28, se lib/morke.lua).
+require( "lib.morke" ).lag( 2, punkt )
 
 -- Lagt til 2026-09-15 (Mathias: "Marken kunne falle ut av banen på bane
 -- 2 uten at det kom opp at den døde. Gjør slik at man dør om man faller
