@@ -12,8 +12,8 @@ local hoyde = display.contentHeight
 
 function scene:create( event )
 	local grp = self.view
-	local bakgrunn = display.newImageRect( grp, "background/bg1.png", 2880, 1620 )
-	bakgrunn.width, bakgrunn.height = 1920, 1080
+	-- startskjermen som bakgrunn (Util/knapper/lag_knapper.py)
+	local bakgrunn = display.newImageRect( grp, "meny_bg.jpg", 1920, 1080 )
 	bakgrunn.x, bakgrunn.y = bredde / 2, hoyde / 2
 	kontroller.vis( grp, function()
 		local ok, err = pcall( composer.gotoScene, "scenes.gotomenu", { effect = "fade", time = 500 } )

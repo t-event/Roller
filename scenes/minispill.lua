@@ -23,7 +23,7 @@ end
 function scene:create( event )
 	local grp = self.view
 
-	sport.bakgrunn( grp )
+	sport.bakgrunn( grp, true )
 
 	local panel = display.newImageRect( grp, "pausemenu.png", 640, 330 )
 	panel.x = bredde / 2

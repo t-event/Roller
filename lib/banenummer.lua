@@ -13,11 +13,11 @@ local M = {}
 
 function M.vis( bane )
 	local bilde = "stein" .. bane .. ".png"
-	local x = display.screenOriginX + 62
+	local x = display.screenOriginX + 70
 	local y = 45
 
 	local liten = display.newImageRect( bilde, 1000, 868 )
-	liten.width, liten.height = 58, 50
+	liten.width, liten.height = 86, 75
 	liten.x, liten.y = x, y
 	grp:insert( liten )
 
@@ -26,7 +26,7 @@ function M.vis( bane )
 	stor.x, stor.y = display.contentCenterX, display.contentCenterY - 60
 	grp:insert( stor )
 	transition.to( stor, { delay = 1200, time = 700, alpha = 0, x = x, y = y,
-		width = 58, height = 50, onComplete = function() display.remove( stor ) end } )
+		width = 86, height = 75, onComplete = function() display.remove( stor ) end } )
 end
 
 return M

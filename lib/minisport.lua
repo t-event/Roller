@@ -41,14 +41,30 @@ function M.nyRekord( navn, verdi, storreErBedre )
 	return bedre
 end
 
--- Hulebakgrunnen fra startskjermen, fast på skjermen.
-function M.bakgrunn( forelder )
-	local bg = display.newImageRect( forelder, "background/bg1.png", 2880, 1620 )
-	bg.width, bg.height = 1920, 1080
-	bg.x, bg.y = M.B / 2, M.H / 2
-	local skygge = display.newRect( forelder, M.B / 2, M.H / 2, M.B * 3, M.H * 3 )
-	skygge:setFillColor( 0.08, 0.03, 0, 0.35 )
-	return bg
+-- Bakgrunn. meny = true: startskjermen flatet ut til ett bilde
+-- (meny_bg.jpg), fast på skjermen. Ellers hulepanoramaet (arena_bg.jpg),
+-- to bilder etter hverandre som ruller sakte bak banen: kall
+-- bg:rull( kameraX ) hvert bilde. Begge lages av
+-- Util/knapper/lag_knapper.py.
+function M.bakgrunn( forelder, meny )
+	local g = display.newGroup()
+	forelder:insert( g )
+	if meny then
+		local bg = display.newImageRect( g, "meny_bg.jpg", 1920, 1080 )
+		bg.x, bg.y = M.B / 2, M.H / 2
+		function g:rull() end
+		return g
+	end
+	local BB = 1200
+	for i = 0, 2 do
+		local bg = display.newImageRect( g, "arena_bg.jpg", BB, 540 )
+		bg.anchorX = 0
+		bg.x, bg.y = display.screenOriginX + ( i - 1 ) * BB, M.H / 2
+	end
+	function g:rull( kx )
+		g.x = -( ( kx * 0.3 ) % BB )
+	end
+	return g
 end
 
 -- Bakke fra x0 til x1 i verdensgruppa, i fargene fra banene (lys kant

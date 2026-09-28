@@ -50,7 +50,8 @@ local function slappMark( forelder, x, y )
 			navn == "hode.png" and 22 or ( navn == "hale.png" and 26 or 15 ) )
 		b.x = math.cos( vinkel ) * 62
 		b.y = math.sin( vinkel ) * 26
-		b.rotation = math.deg( math.atan2( math.cos( vinkel ) * 26, -math.sin( vinkel ) * 62 ) )
+		-- retningen langs buen, fra halen mot hodet
+		b.rotation = math.deg( math.atan2( -math.cos( vinkel ) * 26, math.sin( vinkel ) * 62 ) )
 	end
 	g.x = x
 	g.y = y - 6
@@ -59,7 +60,7 @@ end
 
 local function tekst( forelder, t, x, y, bredde, storrelse )
 	local o = display.newText( { parent = forelder, text = t, x = x, y = y, width = bredde,
-		font = native.systemFontBold, fontSize = storrelse or 17, align = "left" } )
+		font = native.systemFontBold, fontSize = storrelse or 21, align = "left" } )
 	o.anchorX = 0
 	o:setFillColor( 0.92, 0.9, 0.86 )
 	return o
@@ -75,35 +76,35 @@ function M.vis( forelder, vedLukk )
 	hinne:addEventListener( "touch", function() return true end )
 	hinne:addEventListener( "tap", function() return true end )
 
-	local panel = display.newImageRect( g, "pausemenu.png", 800, 470 )
+	local panel = display.newImageRect( g, "pausemenu.png", 900, 510 )
 	panel.x, panel.y = bredde / 2, hoyde / 2
 
-	local tittel = display.newText( { parent = g, text = "Controls", x = bredde / 2, y = panel.y - 188,
+	local tittel = display.newText( { parent = g, text = "Controls", x = bredde / 2, y = panel.y - 205,
 		font = native.systemFontBold, fontSize = 32 } )
 	tittel:setFillColor( 0.95, 0.85, 0.7 )
 
-	local ix = panel.x - 285
-	local tx = panel.x - 200
-	local tb = 470
+	local ix = panel.x - 320
+	local tx = panel.x - 235
+	local tb = 560
 
 	local ring = display.newImageRect( g, "mark.png", 52, 60 )
-	ring.x, ring.y = ix, panel.y - 115
+	ring.x, ring.y = ix, panel.y - 130
 	tekst( g, "Let go: the worm curls up into a ring and rolls down the cave.",
 		tx, ring.y, tb )
 
-	rettMark( g, ix, panel.y - 38 )
+	rettMark( g, ix, panel.y - 50 )
 	tekst( g, "Hold the screen: the worm stretches out straight. Use it to reach across gaps and to push off.",
-		tx, panel.y - 38, tb )
+		tx, panel.y - 50, tb )
 
-	slappMark( g, ix, panel.y + 42 )
+	slappMark( g, ix, panel.y + 35 )
 	tekst( g, "Double tap: the worm goes limp and can slide through narrow, icy cracks. Tap once to make it firm again.",
-		tx, panel.y + 42, tb )
+		tx, panel.y + 35, tb )
 
 	tekst( g, "Roll down through the cave and out to the right. The stone at the top left shows the level, the ring shows your lives.",
-		panel.x - 320, panel.y + 125, 640, 15 )
+		panel.x - 370, panel.y + 125, 740, 18 )
 
 	local ok = display.newImageRect( g, "knapp_ok.png", 109, 45 )
-	ok.x, ok.y = panel.x, panel.y + 185
+	ok.x, ok.y = panel.x, panel.y + 200
 	ok:addEventListener( "tap", function()
 		display.remove( g )
 		if vedLukk then vedLukk() end

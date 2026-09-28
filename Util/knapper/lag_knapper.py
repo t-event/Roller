@@ -102,7 +102,81 @@ def stein(kilde, tekst, vinkel):
     return ut
 
 
+def meny_bakgrunn():
+    """Startskjermens fem lag (bg1-bg5) lagt oppå hverandre i ett lite
+    bilde, til sider som skal se ut som startskjermen uten å laste fem
+    bilder på 5760 x 3240."""
+    ut = Image.open("background/bg1.png").convert("RGBA").resize((1600, 900), Image.LANCZOS)
+    for navn in ("bg2.png", "bg3.png", "bg4.png", "bg5.png"):
+        ut.alpha_composite(Image.open(navn).convert("RGBA").resize((1600, 900), Image.LANCZOS))
+    return ut.convert("RGB")
+
+
+def periodisk(n, bredde, rng, ledd):
+    """Bølgete kurve som går i ring bortover (bildet kan legges etter
+    hverandre uten skjøt)."""
+    x = np.arange(n)
+    y = np.zeros(n)
+    for periode, amp in ledd:
+        for _ in range(2):
+            k = max(1, round(bredde / periode))
+            y += amp * np.sin(2 * np.pi * k * x / n + rng.uniform(0, 2 * np.pi))
+    return y
+
+
+def arena_bakgrunn():
+    """Hulepanorama bak idrettsbanene, i fargene fra startskjermen:
+    mørk bakvegg, drypp og søyler i to lag, og lys hulevegg med steiner
+    i taket. Går i ring bortover, så det kan legges etter hverandre."""
+    W, H = 2400, 1080
+    rng = np.random.default_rng(7)
+    yy = np.arange(H)[:, None] * np.ones((1, W))
+    t = yy / H
+    bilde = np.zeros((H, W, 3))
+    topp, bunn = np.array([84, 40, 6]), np.array([22, 11, 4])
+    bilde[:] = (topp * (1 - t[..., None]) + bunn * t[..., None])
+    lag = [
+        ((46, 28, 14), 250, 250, [(900, 45), (300, 14), (90, 3)], 11),
+        ((72, 42, 20), 180, 170, [(1200, 40), (400, 12), (110, 3)], 23),
+    ]
+    for farge, tak, gulv, ledd, frø in lag:
+        r = np.random.default_rng(frø)
+        taklinje = tak + periodisk(W, W, r, ledd)
+        # drypp: smale spisser nedover fra taket
+        for _ in range(9):
+            x0 = r.integers(0, W)
+            lengde = r.uniform(60, 190)
+            brede = r.uniform(30, 70)
+            for dx in range(-int(brede), int(brede) + 1):
+                xi = (x0 + dx) % W
+                taklinje[xi] += lengde * (1 - abs(dx) / brede) ** 2
+        gulvlinje = H - gulv + periodisk(W, W, r, ledd)
+        maske = (yy < taklinje[None, :]) | (yy > gulvlinje[None, :])
+        bilde[maske] = farge
+    # nærmeste vegg: lys, bare øverst, med steiner som i bg5
+    r = np.random.default_rng(31)
+    kant = 110 + periodisk(W, W, r, [(900, 30), (300, 10), (80, 2)])
+    vegg = yy < kant[None, :]
+    skygge = (yy >= kant[None, :]) & (yy < kant[None, :] + 14)
+    bilde[skygge] = bilde[skygge] * 0.55
+    bilde[vegg] = (146, 92, 56)
+    for _ in range(26):
+        cx, cy = r.integers(0, W), r.uniform(10, 100)
+        rx, ry = r.uniform(18, 60), r.uniform(12, 34)
+        xs = (np.arange(W) - cx + W / 2) % W - W / 2
+        d = (xs[None, :] / rx) ** 2 + ((yy - cy) / ry) ** 2
+        flekk = (d < 1) & vegg
+        skyggeside = (d < 1.25) & (d >= 1) & vegg
+        bilde[skyggeside] = (126, 79, 48)
+        bilde[flekk] = (107, 68, 41)
+    return Image.fromarray(bilde.clip(0, 255).astype(np.uint8), "RGB")
+
+
 def main():
+    meny_bakgrunn().save("meny_bg.jpg", quality=88)
+    print("meny_bg.jpg")
+    arena_bakgrunn().save("arena_bg.jpg", quality=88)
+    print("arena_bg.jpg")
     for navn, tekst in KNAPPER.items():
         knapp(tekst).save(navn, optimize=True)
         print(navn)

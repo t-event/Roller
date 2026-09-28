@@ -98,7 +98,7 @@ end
 
 function scene:create( event )
 	local grp = self.view
-	sport.bakgrunn( grp )
+	local bakgrunn = sport.bakgrunn( grp )
 
 	verden = display.newGroup()
 	grp:insert( verden )
@@ -190,6 +190,7 @@ function scene:create( event )
 		pil.rotation = -vinkel
 		fart:sett( v / sport.VMAKS )
 		verden.x = math.min( 0, -( x - 300 ) )
+		bakgrunn:rull( -verden.x )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end

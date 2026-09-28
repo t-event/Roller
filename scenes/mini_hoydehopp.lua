@@ -10,7 +10,7 @@ local sport = require( "lib.minisport" )
 local scene = composer.newScene()
 
 local START = 120
-local LISTE = START + 900
+local LISTE = START + 820
 local PX_PER_M_H = 90           -- oppover: 90 px per meter
 local G = 1100
 local MIN, MAKS, STEG = 0.50, 2.60, 0.05
@@ -93,7 +93,7 @@ end
 
 function scene:create( event )
 	local grp = self.view
-	sport.bakgrunn( grp )
+	local bakgrunn = sport.bakgrunn( grp )
 	hoyde, bom = 1.00, 0
 
 	verden = display.newGroup()
@@ -211,7 +211,9 @@ function scene:create( event )
 		maaler.x, maaler.y = x - 45, mark.y - 30
 		maalerFyll.yScale = math.max( 0.01, kraft )
 		fart:sett( v / sport.VMAKS )
-		verden.x = math.min( 0, -( x - 300 ) )
+		-- kameraet følger marken, men stopper så lista alltid synes
+		verden.x = -math.max( 0, math.min( x - 300, LISTE + 380 - sport.B ) )
+		bakgrunn:rull( -verden.x )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
