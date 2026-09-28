@@ -1854,7 +1854,9 @@ Runtime:addEventListener("collision", knekk)
     local levelWidth = camera:layer(6).width
     local levelHeight = camera:layer(6).height
     camera:setParallax( 0.30, 0.25, 0.20, 0.15, 0.10 )
-    camera:setBounds(0, firkant4.x+firkant4.width/3 , 0, firkant4.y+firkant4.height/3)
+    -- Som i bane 1-4 stopper kameraet litt før målet, og marken ruller
+    -- videre ut av skjermen til høyre (punktet står i lib/baneoppsett7.lua).
+    camera:setBounds(0, oppsett.kamera.x_maks, 0, oppsett.kamera.y_maks)
     camera.damping = 10
     --camera.damping = 30
     camera:track()

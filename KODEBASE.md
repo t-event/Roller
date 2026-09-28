@@ -882,6 +882,12 @@ fra før denne datoen er historikk.
   som høyden tillater (gulv, det som er over og stein under), og neste
   starter 350 px før. Hver verdenspiksel tegnes bare i den første flisa
   som dekker den. Får ikke banen plass, kortes siste bakke inn.
+- **Målet** virker som i bane 1-4: kameraet stopper 900 px (1800
+  enheter) før slutten av gulvet (`kamera.x_maks`/`y_maks` i
+  `lib/baneoppsettN.lua`, brukt i `camera:setBounds`), og marken ruller
+  videre ut av skjermen til høyre før den treffer `mal2`, 150 px før
+  slutten. `python3 Util/baner/hule.py N --oppsett` skriver bare
+  oppsettfila på nytt.
 - **`levelN.lua`** for 5-9 er samme fil som `level8.lua` med nummeret
   byttet (bane 6 bruker fortsatt bakgrunnsbildene uten `1` foran). Alt
   som er banespesifikt ligger i `lib/baneoppsettN.lua`.

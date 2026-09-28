@@ -8,7 +8,8 @@ return {
         { x = 14120, y = 6657 },
         { x = 20580, y = 8679 },
     },
-    dod = { x = 10659, y = 6088, rotasjon = 24.46 },
-    mal2 = { x = 21319, y = 9966 },
-    bakgrunn = { rotasjon = 25.06, steg_x = 1811, steg_y = 847 },
+    dod = { x = 10769, y = 6138, rotasjon = 24.46 },
+    mal2 = { x = 21539, y = 10064 },
+    kamera = { x_maks = 20039, y_maks = 9408 },
+    bakgrunn = { rotasjon = 25.04, steg_x = 1811, steg_y = 846 },
 }

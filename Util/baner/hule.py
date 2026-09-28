@@ -479,7 +479,7 @@ def bygg(bane):
         if dekket >= x_slutt + 300 and len(origo) <= 4:
             break
         siste = g.biter[-1]
-        if len(siste) < 3 or siste[-1][0] - siste[0][0] < 900:
+        if len(siste) < 3 or siste[-1][0] - siste[0][0] < KAMERA_STOPP + 200:
             raise SystemExit("bane %d får ikke plass i 4 fliser" % bane)
         siste.pop()
         g.x, g.y = siste[-1]
@@ -567,10 +567,19 @@ def dodslinje(g):
     return a, b
 
 
+KAMERA_STOPP = 900
+MAL_FOR_SLUTT = 150
+
+
 def skriv_oppsett(bane, g, origo):
     a, b = dodslinje(g)
+    # Som i bane 1-4: kameraet stopper KAMERA_STOPP px før slutten av
+    # gulvet, og marken ruller videre ut av skjermen (halve skjermen er
+    # 400 px) før den treffer målet MAL_FOR_SLUTT px før slutten.
     slutt = g.biter[-1][-1]
-    mx, my = slutt[0] - 260, g.gulv_y(slutt[0] - 260)
+    mx, my = slutt[0] - MAL_FOR_SLUTT, g.gulv_y(slutt[0] - MAL_FOR_SLUTT)
+    kx = slutt[0] - KAMERA_STOPP
+    ky = g.gulv_y(kx) - 20
     vinkel = math.atan2(my, mx)
     linjer = ["-- Generert av Util/baner/hule.py %d. Ikke rediger for hånd." % bane,
               "-- Plassering av flisene (sentrum), dødslinja, målet og bakgrunnen for bane %d," % bane,
@@ -583,6 +592,8 @@ def skriv_oppsett(bane, g, origo):
                "    dod = { x = %d, y = %d, rotasjon = %.2f }," % (2 * dx_, 2 * (a * dx_ + b), math.degrees(math.atan(a))),
                # målet krysser gulvet like før slutten av banen
                "    mal2 = { x = %d, y = %d }," % (2 * mx, 2 * my),
+               # kameraet følger marken hit, så ruller den ut til høyre
+               "    kamera = { x_maks = %d, y_maks = %d }," % (2 * kx, 2 * ky),
                "    bakgrunn = { rotasjon = %.2f, steg_x = %d, steg_y = %d }," % (
                    math.degrees(vinkel), round(1999 * math.cos(vinkel)), round(1999 * math.sin(vinkel))),
                "}", ""]
@@ -615,6 +626,11 @@ def main():
     g, masser, origo = bygg(bane)
     ok = sjekk(g)
     if "--sjekk" in sys.argv:
+        return
+    if "--oppsett" in sys.argv:
+        # bare lib/baneoppsettN.lua, bildene og formene er uendret
+        skriv_oppsett(bane, g, origo)
+        print("lib/baneoppsett%d.lua skrevet" % bane)
         return
     if not ok:
         raise SystemExit("målingene er utenfor kravene, skriver ingenting")

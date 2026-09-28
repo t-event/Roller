@@ -3860,3 +3860,10 @@ banene gjerne kan se annerledes ut enn nå.
 
 De gamle bildene og formene for bane 5-9 er erstattet. Hvordan banene
 føles å spille må testes av et menneske.
+
+## 2026-09-28, målet i bane 5-9 som i bane 1-4
+
+Mathias: i bane 6 kom han i mål før banen tok slutt. Målet skal være som
+i bane 1-4, der kameraet stopper og marken fortsetter ut av skjermen til
+høyre. Nå stopper kameraet 1800 enheter før slutten av gulvet, og målet
+ligger rett før slutten, utenfor skjermen.
