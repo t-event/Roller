@@ -3876,3 +3876,7 @@ dødslinje, og sjekken så bare på navnet ("dod" og "del1"), ikke på om
 det var denne banens objekter. Samme feil som målet hadde 2026-09-27.
 Rettet i alle ni banefilene: sjekken sammenligner nå med banens egne
 `dod` og `del1`-`del9`.
+
+Samme feil fantes i knekk-systemet: når forrige bane ble revet ned,
+traff knottene i den gamle marken hverandre, og den nye banen trodde
+det var dens egen marke som knakk. Rettet likt i alle ni banene.

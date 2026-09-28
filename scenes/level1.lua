@@ -1645,11 +1645,11 @@ local function knekk(event)
 if event.phase == "began" then
 
 
-if  (event.object1.type == "knott1" and event.object2.type == "knott2") then
+if  (event.object1 == knott1 and event.object2 == knott2) then
 
 print( "knott1 og knott2" )
 
-elseif  (event.object1.type == "knott2" and event.object2.type == "knott3") then
+elseif  (event.object1 == knott2 and event.object2 == knott3) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -1720,7 +1720,7 @@ camera:add (blod2,1,false)
 -- (_G.eventTimer), samme mønster som _G.camera/_G.grp.
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
-elseif  (event.object1.type == "knott3" and event.object2.type == "knott4") then
+elseif  (event.object1 == knott3 and event.object2 == knott4) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -1781,7 +1781,7 @@ camera:add (blod2,1,false)
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
 
-elseif  (event.object1.type == "knott4" and event.object2.type == "knott5") then
+elseif  (event.object1 == knott4 and event.object2 == knott5) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -1842,7 +1842,7 @@ camera:add (blod2,1,false)
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
 
-elseif  (event.object1.type == "knott5" and event.object2.type == "knott6") then
+elseif  (event.object1 == knott5 and event.object2 == knott6) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -1902,7 +1902,7 @@ camera:add (blod2,1,false)
             
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
-elseif  (event.object1.type == "knott6" and event.object2.type == "knott7") then
+elseif  (event.object1 == knott6 and event.object2 == knott7) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -1962,7 +1962,7 @@ camera:add (blod2,1,false)
             
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
-elseif  (event.object1.type == "knott7" and event.object2.type == "knott8") then
+elseif  (event.object1 == knott7 and event.object2 == knott8) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
@@ -2022,7 +2022,7 @@ camera:add (blod2,1,false)
             
 _G.eventTimer = timer.performWithDelay( 3000, goto)
 
-elseif  (event.object1.type == "knott8" and event.object2.type == "knott9") then
+elseif  (event.object1 == knott8 and event.object2 == knott9) then
 
 knapp1.alpha = 0
 Runtime:removeEventListener("collision", onCollision)
