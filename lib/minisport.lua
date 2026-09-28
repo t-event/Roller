@@ -58,11 +58,13 @@ function M.bakgrunn( forelder, meny )
 		function g:rull() end
 		return g
 	end
-	local BB = 1200
+	-- dekker hele skjermhøyden, også på skjermer som er høyere enn 16:9
+	local hoyde = display.actualContentHeight + 20
+	local BB = 1200 * hoyde / 540
 	for i = 0, 2 do
-		local bg = display.newImageRect( g, "arena_bg.jpg", BB, 540 )
+		local bg = display.newImageRect( g, "arena_bg.jpg", BB, hoyde )
 		bg.anchorX = 0
-		bg.x, bg.y = display.screenOriginX + ( i - 1 ) * BB, M.H / 2
+		bg.x, bg.y = display.screenOriginX + ( i - 1 ) * BB, display.contentCenterY
 	end
 	function g:rull( kx )
 		g.x = -( ( kx * 0.3 ) % BB )
@@ -88,13 +90,15 @@ end
 -- fargene fra banene, med en fysisk kjede langs overflata.
 function M.terreng( verden, pkt, valg )
 	valg = valg or {}
-	local dybde = valg.dybde or 900
+	local dybde = valg.dybde or ( valg.opp and 260 or 1400 )
+	-- steinen følger overflata dybde px nedover (eller oppover for tak),
+	-- så den ser ut som en masse og ikke en kloss
 	local fyll = {}
 	for _, p in ipairs( pkt ) do fyll[#fyll + 1] = { p[1], p[2] } end
-	local siste, forste = pkt[#pkt], pkt[1]
 	local retning = valg.opp and -1 or 1
-	fyll[#fyll + 1] = { siste[1], siste[2] + retning * dybde }
-	fyll[#fyll + 1] = { forste[1], forste[2] + retning * dybde }
+	for i = #pkt, 1, -1 do
+		fyll[#fyll + 1] = { pkt[i][1], pkt[i][2] + retning * dybde }
+	end
 	local minx, maxx, miny, maxy = math.huge, -math.huge, math.huge, -math.huge
 	for _, p in ipairs( fyll ) do
 		minx, maxx = math.min( minx, p[1] ), math.max( maxx, p[1] )
