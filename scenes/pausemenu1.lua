@@ -81,6 +81,16 @@ grp=sceneGroup
     return true
   end )
 
+  -- Lagt til 2026-09-28: forklaring av styringen, se lib/kontroller.lua.
+  local pausemenucontrols = display.newImageRect( "pausemenucontrols.png",109,45)
+  pausemenucontrols.x = pausemenu.x
+  pausemenucontrols.y = pausemenu.y-100
+  grp:insert(pausemenucontrols)
+  pausemenucontrols:addEventListener( "tap", function()
+    require( "lib.kontroller" ).vis( grp )
+    return true
+  end )
+
   local pausemenulevels = display.newImageRect( "pausemenulevels.png",109,45)
   pausemenulevels.x = pausemenu.x-142
   pausemenulevels.y = pausemenu.y+48

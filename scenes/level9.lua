@@ -1872,6 +1872,8 @@ camera:layer(2).parallaxRatio=0
 camera:layer(2):toFront()
 -- Mørket i hulen, tettere for hver bane (2026-09-28, se lib/morke.lua).
 require( "lib.morke" ).lag( 9, punkt )
+-- Banenummeret som nummerstein øverst til venstre (2026-09-28).
+require( "lib.banenummer" ).vis( 9 )
 
 -- Lagt til 2026-09-15 (Mathias: "Marken kunne falle ut av banen på bane
 -- 2 uten at det kom opp at den døde. Gjør slik at man dør om man faller

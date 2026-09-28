@@ -230,6 +230,8 @@ end
     end
     lagStein( "settingsknapp.png", 292, 320, "scenes.innstillinger", true )
     lagStein( "gamesknapp.png", 634, 444, "scenes.minispill" )
+    -- Lagt til 2026-09-28: forklaring av styringen (lib/kontroller.lua).
+    lagStein( "controlsknapp.png", 655, 108, "scenes.kontroller" )
     --storyknapp:addEventListener( "tap", hent )
 checkpoint("menu:after_spill_listener")
 ------------------------------------------------------------------------------
