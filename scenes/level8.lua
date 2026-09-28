@@ -11,10 +11,10 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
--- Bane 8 er laget av Util/baner/lag_bane.py fra Ørjans tegning (2026-09-27).
--- Flisene ligger ikke i den faste diagonalen som i de andre banene, men der
--- hoppene mellom massene går opp. Posisjonene til flisene, dod og mal2
--- kommer fra lib/baneoppsett8.lua, som genereres sammen med bildene.
+-- Bane 8 er en grotte laget av Util/baner/hule.py (2026-09-28): gulv, tak,
+-- hopp, søyler og is i ett organisk stykke nedover. Flisene ligger fritt
+-- langs grotta. Posisjonene til flisene, dod og mal2 kommer fra
+-- lib/baneoppsett8.lua, som genereres sammen med bildene.
 local physicsData = (require "lib.shapedefs8").physicsData(scaleFactor)
 local oppsett = require "lib.baneoppsett8"
 local centerX = display.contentCenterX

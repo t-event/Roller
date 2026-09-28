@@ -1,14 +1,14 @@
--- Generert av Util/baner/lag_bane.py 9. Ikke rediger for hånd.
+-- Generert av Util/baner/hule.py 9. Ikke rediger for hånd.
 -- Plassering av flisene (sentrum), dødslinja, målet og bakgrunnen for bane 9,
 -- i spillenheter. Marken står som i alle baner i del1 = (0, 0).
 return {
     fliser = {
-        { x = 2391, y = 2300 },
-        { x = 6031, y = 5938 },
-        { x = 11743, y = 10852 },
-        { x = 15973, y = 15318 },
+        { x = 2800, y = 1911 },
+        { x = 9660, y = 3871 },
+        { x = 14120, y = 6657 },
+        { x = 20580, y = 8679 },
     },
-    dod = { x = 8037, y = 11271, rotasjon = 40.49 },
-    mal2 = { x = 17523, y = 16451 },
-    bakgrunn = { rotasjon = 43.19, steg_x = 1457, steg_y = 1368 },
+    dod = { x = 10659, y = 6088, rotasjon = 24.46 },
+    mal2 = { x = 21319, y = 9966 },
+    bakgrunn = { rotasjon = 25.06, steg_x = 1811, steg_y = 847 },
 }

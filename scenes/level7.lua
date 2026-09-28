@@ -11,10 +11,12 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
--- Bane 7 har egne kollisjonsformer fra 2026-09-24. For det brukte den
--- lib.shapedefs, altsa bane 1 sine former, som ikke passet kunsten i det
--- hele tatt. Bane 8 og 9 gjor fortsatt det samme.
+-- Bane 7 er en grotte laget av Util/baner/hule.py (2026-09-28): gulv, tak,
+-- hopp, søyler og is i ett organisk stykke nedover. Flisene ligger fritt
+-- langs grotta. Posisjonene til flisene, dod og mal2 kommer fra
+-- lib/baneoppsett7.lua, som genereres sammen med bildene.
 local physicsData = (require "lib.shapedefs7").physicsData(scaleFactor)
+local oppsett = require "lib.baneoppsett7"
 local centerX = display.contentCenterX
 local centerY = display.contentCenterY
 local screenLeft = display.screenOriginX
@@ -165,8 +167,8 @@ lm.currentLevel = 7 -- så retry vet hvilken bane den skal restarte
     physics.setContinuous( true )
     liv.lastliv()
 
-    local justerside   = 1705
-    local justeroppned = 1044
+    local justerside   = oppsett.bakgrunn.steg_x
+    local justeroppned = oppsett.bakgrunn.steg_y
 
 
     --local scaleFactccor = 0.025
@@ -182,17 +184,9 @@ lm.currentLevel = 7 -- så retry vet hvilken bane den skal restarte
 
 
           local dod = display.newRect (0, 0, 70000, 50) 
-          -- Bane 7: flisene, dod og mal2 er flyttet 1130 enheter mot
-          -- venstre (se firkant1.x), slik at marken starter der toppen av
-          -- første masse begynner å helle nedover mot høyre. Med 600 sto
-          -- den ytterst på venstre kant av den flate toppen, vippet
-          -- bakover og falt ut. Marken selv må stå i x=0 som i de andre
-          -- banene. Med marken i x=600 ble fysikken NaN og banen krasjet
-          -- med en gang (2026-09-27), trolig fordi sveiseleddene til
-          -- knottene bruker (knott.x, knott.x) som festepunkt.
-          dod.x = bredde -bredde-bredde - 1130
-          dod.y = hoyde
-          dod:rotate( 31.48 ) 
+          dod.x = oppsett.dod.x
+          dod.y = oppsett.dod.y
+          dod:rotate( oppsett.dod.rotasjon ) 
           dod.myName = "dod"
           grp:insert( dod ) 
           dod.alpha = 0
@@ -205,8 +199,8 @@ lm.currentLevel = 7 -- så retry vet hvilken bane den skal restarte
           
           local mal2 = display.newRect( 0, 0, 10, 3000 )
           --mal2:setReferencePoint( display.BottomLeftReferencePoint )
-          mal2.x = 31000 - 1130
-          mal2.y = 18000
+          mal2.x = oppsett.mal2.x
+          mal2.y = oppsett.mal2.y
           mal2.myName = "mal2"
           mal2:rotate(45)
           grp:insert ( mal2 )
@@ -236,12 +230,14 @@ timer.performWithDelay(3000, hent, 1)
 
 
 
+    -- Bane 7: bakgrunnen ligger langs linja fra spawn til målet, ikke langs
+    -- 31,48 grader som i de andre banene (se lib/baneoppsett7.lua).
     local background = display.newImageRect( "background/1dirt1.png", 1920*40, 1080*5 )
     background.anchorX = 0.5
     background.anchorY = 0.5
     background.x = bredde-bredde-bredde
     background.y = background.height-background.height
-    background:rotate( 31.48 )
+    background:rotate( oppsett.bakgrunn.rotasjon )
     background.alpha = 1
 
 
@@ -250,7 +246,7 @@ timer.performWithDelay(3000, hent, 1)
     background1.anchorY = 0.5
     background1.x = bredde-bredde
     background1.y = hoyde-hoyde-hoyde*0.67
-    background1.rotation = 31.48 
+    background1.rotation = oppsett.bakgrunn.rotasjon 
     background1.alpha = 1
 
     local background2 = display.newImageRect( "background/1back_cave.png", 2000, 6000 )
@@ -412,7 +408,7 @@ timer.performWithDelay(3000, hent, 1)
     background1a.anchorY = 0.5
     background1a.x = bredde-bredde
     background1a.y = hoyde-hoyde-hoyde*0.67
-    background1a.rotation = 31.48 
+    background1a.rotation = oppsett.bakgrunn.rotasjon 
     background1a.alpha = 1
 
     local background2a = display.newImageRect( "background/1back_cave1.png", 2000, 6000 )
@@ -575,7 +571,7 @@ timer.performWithDelay(3000, hent, 1)
     background1b.anchorY = 0.5
     background1b.x = bredde-bredde
     background1b.y = hoyde-hoyde-hoyde*0.67
-    background1b.rotation = 31.48 
+    background1b.rotation = oppsett.bakgrunn.rotasjon 
     background1b.alpha = 1
 
     local background2b = display.newImageRect( "background/1back_cave2.png", 2000, 6000 )
@@ -1004,30 +1000,29 @@ local weldJoint9 = physics.newJoint( "weld", knott9, del9, knott9.x, knott9.x )
 
                                      
                                       local     firkant1 = display.newImageRect("level7/1.png", 7680,4702)
-                                                firkant1.x = 3500 - 1130   -- bane 7, se dod.x
-                                                --firkant1.x = 3850
-                                                firkant1.y = 2300
+                                                firkant1.x = oppsett.fliser[1].x
+                                                firkant1.y = oppsett.fliser[1].y
                                                 physics.addBody(firkant1,"static", physicsData:get("1") )
                                                 firkant1.alpha = 1  
                                                 firkant1.myName = "firkant1"                                
                                                 
                                       local     firkant2 = display.newImageRect("level7/2.png", 7680,4702)
-                                                firkant2.x = firkant1.x+firkant2.width
-                                                firkant2.y = firkant1.y+firkant2.height
+                                                firkant2.x = oppsett.fliser[2].x
+                                                firkant2.y = oppsett.fliser[2].y
                                                 physics.addBody(firkant2,"static", physicsData:get("2") )
                                                 firkant2.myName = "firkant2"   
                                                 
                                                  
                                       local     firkant3 = display.newImageRect("level7/3.png", 7680,4702)
-                                                firkant3.x = firkant2.x+firkant3.width
-                                                firkant3.y = firkant2.y+firkant3.height
+                                                firkant3.x = oppsett.fliser[3].x
+                                                firkant3.y = oppsett.fliser[3].y
                                                 physics.addBody(firkant3,"static", physicsData:get("3") )
                                                 firkant3.myName = "firkant3"   
                                                 
                                                 
                                       local     firkant4 = display.newImageRect("level7/4.png", 7680,4702)
-                                                firkant4.x = firkant3.x+firkant4.width
-                                                firkant4.y = firkant3.y+firkant4.height
+                                                firkant4.x = oppsett.fliser[4].x
+                                                firkant4.y = oppsett.fliser[4].y
                                                 physics.addBody(firkant4,"static", physicsData:get("4") )
                                                 firkant4.myName = "firkant4"   
                                                 

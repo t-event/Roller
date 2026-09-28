@@ -8,3 +8,6 @@
 *.jks
 *.mobileprovision
 secrets.*
+
+# Python-cache fra verktøyene i Util/
+__pycache__/

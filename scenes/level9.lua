@@ -11,11 +11,10 @@ local physics = require( "physics" )
 local perspective = require ("lib.perspective")
 
 local scaleFactor = 1.0
--- Bane 9 er laget av Util/baner/lag_bane.py (2026-09-28). Den har ingen egen
--- tegning, men bruker massene fra Ørjans tegning 7 og 8, omformet.
--- Flisene ligger ikke i den faste diagonalen som i de andre banene, men der
--- hoppene mellom massene går opp. Posisjonene til flisene, dod og mal2
--- kommer fra lib/baneoppsett9.lua, som genereres sammen med bildene.
+-- Bane 9 er en grotte laget av Util/baner/hule.py (2026-09-28): gulv, tak,
+-- hopp, søyler og is i ett organisk stykke nedover. Flisene ligger fritt
+-- langs grotta. Posisjonene til flisene, dod og mal2 kommer fra
+-- lib/baneoppsett9.lua, som genereres sammen med bildene.
 local physicsData = (require "lib.shapedefs9").physicsData(scaleFactor)
 local oppsett = require "lib.baneoppsett9"
 local centerX = display.contentCenterX

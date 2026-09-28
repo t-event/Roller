@@ -3840,3 +3840,23 @@ bruke designet fra bane 7 og 8."
 
 Hvis Ørjan tegner bane 9, kan den lages fra tegningen som bane 7 og 8.
 
+## 2026-09-28, bane 5-9 laget på nytt som grotter
+
+Mathias: bane 5-9 skal ligne mer på bane 4, med is, et hopp nær det
+marken klarer, en sprekk med is marken må gli slapp gjennom, og tak som
+gjør det trangt som i bane 3. Organisk, som en hule nedover, og
+vanskeligere for hver bane. Han sendte en skisse av en grotte og sa at
+banene gjerne kan se annerledes ut enn nå.
+
+- Alle fem er laget på nytt av et nytt verktøy, `Util/baner/hule.py`.
+  Hver bane er én sammenhengende grotte med steinbånd under marken,
+  hopp, søyler, is, tak med drypp og isdaler med overheng.
+- Hoppene er målt mot første hopp i bane 4, som er nesten det marken
+  klarer. Hver bane har minst ett hopp på 96-100 % av det.
+- Fra bane 7 er det isdaler der taket går ned til 42-55 px over bunnen.
+- Fargen går fra brun jord i bane 5 mot grå stein i bane 9.
+- `level5.lua` til `level9.lua` er nå samme fil med ulikt nummer.
+  Posisjonene ligger i `lib/baneoppsettN.lua`.
+
+De gamle bildene og formene for bane 5-9 er erstattet. Hvordan banene
+føles å spille må testes av et menneske.

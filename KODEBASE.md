@@ -853,6 +853,59 @@ innført av meg.
 - Spawnhøyden i fri plassering holder nå også fremste del av marken
   innenfor 200 px fall, ikke bare bakerste.
 
+## Bane 5-9 som grotter (2026-09-28, gjeldende)
+
+Mathias ville at bane 5-9 skulle ligne mer på bane 4, med is, hopp nær
+det marken klarer, en isdal marken må gli slapp gjennom, og tak som i
+bane 3, men organisk, som en hule nedover. Etter en skisse fra ham ble
+alle fem laget på nytt av `Util/baner/hule.py`. Sidene over om bane 5-9
+fra før denne datoen er historikk.
+
+    python3 Util/baner/hule.py 7 --sjekk   # bare målinger
+    python3 Util/baner/hule.py 7           # skriver level7/*.png,
+                                           # lib/shapedefs7.lua og lib/baneoppsett7.lua
+
+- **Banen beskrives som partier** i `bane5()` til `bane9()` nederst i fila:
+  `bakke(lengde, grader, bue)`, `hopp(bort, ned)`,
+  `soyletrapp(antall, bredde, gap, ned, is_paa)`,
+  `isdal(bredde, dybde, ut, klaring)`, og `tak_over(lengde, klaring,
+  drypp)` / `is_over(lengde)` for strekningen som kommer etterpå.
+- **Massene** lages rundt gulvlinja: et steinbånd under rulleflata, søyler
+  som smalner nedover, taksteiner med drypp, og overheng over isdalene.
+  Konturene rundes (Chaikin) og får rolige bølger, og males i stilen fra
+  bane 4 (`lag_bane.mal`). Fargene går fra bane 4 sin brune jord i bane 5
+  mot grå stein i bane 9 (`palett()`).
+- **Is** males på toppen av gulvet i is-strekningene og under
+  overhengene, med fargene målt i bane 4. Kollisjonsklossene der får
+  `pe_fixture_id = "is"` og friksjon 0,05, som isen i bane 4.
+- **Flisene** (4 stk.) legges fritt langs grotta. Hver flis blir så bred
+  som høyden tillater (gulv, det som er over og stein under), og neste
+  starter 350 px før. Hver verdenspiksel tegnes bare i den første flisa
+  som dekker den. Får ikke banen plass, kortes siste bakke inn.
+- **`levelN.lua`** for 5-9 er samme fil som `level8.lua` med nummeret
+  byttet (bane 6 bruker fortsatt bakgrunnsbildene uten `1` foran). Alt
+  som er banespesifikt ligger i `lib/baneoppsettN.lua`.
+
+### Bane 4 målt, og hva grottene bygger på
+
+- Rulleflatene i bane 4 heller 13-31 grader (median 24, sjelden over 41).
+  Grottene bruker 16-30.
+- Første hopp i bane 4 er omtrent det marken klarer: 30 graders tilløp,
+  520 px bort og 265 px ned. `--sjekk` viser hvert hopp i prosent av det,
+  og stopper over 102 %.
+- Isdalen i bane 4 er en V under et overheng med 10-50 px åpning, og
+  utgangen er lavere enn inngangen. Grottene bruker 42-55 px klaring.
+- Tak i bane 3 gir 44-400 px åpning. Grottene bruker 230-460, trangest
+  nederst.
+
+| Bane | Hopp (maks-hopp) | Søyler | Tak | Isdaler |
+|---|---|---|---|---|
+| 5 | 3 (1) | - | 3, 380-460 px | - |
+| 6 | 2 (1) | 3 med is | 1, 340 px | - |
+| 7 | 2 (1) | 2 med is | 1, 320 px | 1 |
+| 8 | 2 (1) | 3 med is | 2, 270-330 px | 1 |
+| 9 | 2 (2) | 2 med is | 2, 230-260 px | 2 |
+
 ## Mørket i hulen (2026-09-28)
 
 `lib/morke.lua` legger et mørkt lag over banen, tettere for hver bane

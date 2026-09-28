@@ -236,6 +236,7 @@ def loddrett_dybde(m):
 
 def mal(f, frø):
     rng = np.random.default_rng(frø)
+    H, W = f.shape   # fungerer for utsnitt av alle størrelser
     m = f >= 0.5
     alfa = rund_kant(f)
 

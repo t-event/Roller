@@ -21,13 +21,13 @@ hans ned i hulen. Han hopper etter og starter jakten på dem.
   (utendørs) og så 10, 18, 26 ... 66 % i bane 9, med et lyst felt rundt
   marken. Styrken per bane står i `M.STYRKE` i `lib/morke.lua`, og
   størrelsen på lyset er tegnet inn i `morke.png`.
-- **Stein i stedet for jord:** verktøyet `Util/baner/lag_bane.py` maler
-  massene selv. Det kan få en fargepalett og et kornmønster per bane, fra
-  brun jord (bane 1-4) via grå stein til mørkt berg, med skarpere kanter
-  nedover.
-- **Sprekker:** smale, dype hull i bakken som marken må hoppe over. Kan
-  tegnes inn i Ørjans skisser som hull i de blå massene, så lager
-  verktøyet dem.
+- **Stein i stedet for jord: påbegynt 2026-09-28.** Bane 5-9 er nå
+  grotter laget av `Util/baner/hule.py`, med farge fra brun jord (bane 5)
+  mot grå stein (bane 9). Et kornmønster eller skarpere kanter nedover
+  er ikke gjort.
+- **Sprekker og farlige partier: påbegynt 2026-09-28.** Grottene har gap
+  marken må hoppe over, søyler med is og isdaler der marken må være
+  slapp, flere og trangere for hver bane.
 
 ## Samle ting, awards og oppgraderinger
 
