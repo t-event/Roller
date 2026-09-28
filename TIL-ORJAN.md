@@ -3826,3 +3826,17 @@ av bakgrunnen forsvinner før banen er ferdig spillet."
   men vinkelen og steget mellom bitene kommer nå fra linja spawn -> mål i
   `lib/baneoppsett8.lua`.
 
+## 2026-09-28, bane 8 slakere og ny bane 9
+
+Mathias: "Level 8 er alt for bratt. Kan du endre litt på vinkelen. Bane
+9 er laget av claude tidligere. Kan du forsøke å lage en ny bane med å
+bruke designet fra bane 7 og 8."
+
+- Bane 8 går nå i 41 grader i stedet for 55. Tegningen dreies 20 grader
+  før massene legges ut.
+- Bane 9 er laget på nytt i samme stil som 7 og 8, av massene fra
+  tegning 7 og 8 om hverandre, omformet så de blir nye former. Den gamle
+  bane 9 (plassholder med bane 1 sine kollisjonsformer) er erstattet.
+
+Hvis Ørjan tegner bane 9, kan den lages fra tegningen som bane 7 og 8.
+

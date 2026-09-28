@@ -74,10 +74,29 @@ BANER = {
     # lib/baneoppsett8.lua, som level8.lua leser.
     8: dict(
         fri=True,
+        # Tegningen dreies 20 grader mot klokka: uten dreiing gikk banen i
+        # 55 grader og var alt for bratt (Mathias 2026-09-28). Nå 41 grader.
+        vri=20,
         skala_maks=9.5,     # bildepunkter i flis per tegningspiksel
         hopp_bort=180,      # hodetoppen på neste masse ligger så langt til
         hopp_ned=600,       # høyre for og under kanten på den forrige
         klipp_lilla=False,
+    ),
+    # Bane 9 har ingen egen tegning. Den bruker massene fra tegning 7 og 8
+    # om hverandre, hver med en jevn tilfeldig deformasjon (frø) og litt
+    # annen bredde, så formene blir nye men i samme stil. Massene fra
+    # tegning 8 dreies 20 grader som i bane 8.
+    9: dict(
+        fri=True,
+        kilder=[
+            dict(tegning=7, masse=3, vri=0, fro=91, bredde=1.10),
+            dict(tegning=8, masse=4, vri=20, fro=92, bredde=0.90),
+            dict(tegning=7, masse=2, vri=0, fro=93, bredde=1.15),
+            dict(tegning=8, masse=2, vri=20, fro=94, bredde=1.05),
+        ],
+        skala_maks=9.5,
+        hopp_bort=180,
+        hopp_ned=600,
     ),
 }
 
@@ -616,6 +635,57 @@ def spawnpunkt(m):
     raise SystemExit("fant ikke noe spawnpunkt i flis 1")
 
 
+def deformer(masse, fro, bredde=1.0, styrke=9.0):
+    """Jevn tilfeldig deformasjon av en tegningsmasse: forskyver hvert punkt
+    inntil `styrke` tegningspiksler i et mykt felt (sigma 22 px), og
+    strekker massen `bredde` ganger bortover."""
+    rng = np.random.default_rng(fro)
+    h, w = masse.shape
+    pad = 40
+    m = np.pad(masse, pad)
+    H2, W2 = m.shape
+    felt = []
+    for _ in range(2):
+        f = nd.gaussian_filter(rng.normal(size=(H2, W2)), 22)
+        felt.append(f / np.abs(f).max() * styrke)
+    yy, xx = np.mgrid[0:H2, 0:W2].astype(float)
+    ys, xs = np.nonzero(m)
+    cx = xs.mean()
+    kx = cx + (xx - cx) / bredde + felt[0]
+    ky = yy + felt[1]
+    ut = nd.map_coordinates(nd.gaussian_filter(m.astype(float), 1.0), [ky, kx], order=1) >= 0.5
+    lab, n = nd.label(ut)
+    if n > 1:
+        ut = lab == (1 + np.argmax(nd.sum(ut, lab, range(1, n + 1))))
+    return ut
+
+
+def hent_kilder(kilder):
+    """Massene til en bane uten egen tegning, hentet fra andre tegninger."""
+    global BANE, TEGNING
+    lagret = BANE, TEGNING
+    cache, ut = {}, []
+    for k in kilder:
+        if k["tegning"] not in cache:
+            BANE, TEGNING = k["tegning"], "Util/baner/tegning%d.jpg" % k["tegning"]
+            cache[k["tegning"]] = hent_masser()
+        masse = cache[k["tegning"]][k["masse"] - 1]
+        masse = drei(masse, k.get("vri", 0))
+        ut.append(deformer(masse, k["fro"], k.get("bredde", 1.0), styrke=14.0))
+    BANE, TEGNING = lagret
+    return ut
+
+
+def drei(masse, grader):
+    """Dreier en tegningsmasse mot klokka (grader > 0 gjør en masse som
+    heller ned mot høyre slakere)."""
+    if not grader:
+        return masse
+    im = Image.fromarray((masse * 255).astype(np.uint8))
+    im = im.rotate(grader, resample=Image.BILINEAR, expand=True)
+    return np.asarray(im) >= 128
+
+
 def plasser_fritt(masser, cfg):
     """Lager maskene og regner ut hvor hver flis skal ligge.
 
@@ -624,6 +694,8 @@ def plasser_fritt(masser, cfg):
     koordinatsystem, forskyvning er hvor mange enheter flis 1 flyttes mot
     venstre så markens bakende (del8, x=-189) står over spawnpunktet."""
     felt = []
+    if "kilder" not in cfg:
+        masser = [drei(m, cfg.get("vri", 0)) for m in masser]
     for i, masse in enumerate(masser):
         ys, xs = np.nonzero(masse)
         h, w = ys.max() - ys.min(), xs.max() - xs.min()
@@ -634,7 +706,9 @@ def plasser_fritt(masser, cfg):
             # under marken der den starter (ekte baner 111-210)
             f = lag_maske_fri(masse, s, 60, y0)
             sx_ = spawnpunkt(f >= 0.5)
-            y0 += 26 + 160 - overflate(f >= 0.5)[sx_]
+            # (fremste del av marken skal heller ikke falle mer enn 200 px)
+            topp = overflate(f >= 0.5)
+            y0 += 26 + min(160, 200 - (topp[sx_ + 95] - topp[sx_])) - topp[sx_]
             if y0 < 20 or y0 + h * s > H - 20:
                 raise SystemExit("flis 1: massen får ikke plass med riktig spawn-fall")
         felt.append(lag_maske_fri(masse, s, 60, y0))
@@ -777,7 +851,7 @@ def skriv_oppsett(origo, forskyvning, dod, maal):
     dodx, dody = enheter(dx_, a * dx_ + b)
     mx, my = enheter(*maal)
     linjer = ["-- Generert av Util/baner/lag_bane.py %d. Ikke rediger for hånd." % BANE,
-              "-- Plassering av flisene (sentrum), dødslinja og målet for bane %d," % BANE,
+              "-- Plassering av flisene (sentrum), dødslinja, målet og bakgrunnen for bane %d," % BANE,
               "-- i spillenheter. Marken står som i alle baner i del1 = (0, 0).",
               "return {",
               "    fliser = {"]
@@ -798,7 +872,7 @@ def skriv_oppsett(origo, forskyvning, dod, maal):
 
 
 def main_fri(cfg):
-    masser = hent_masser()
+    masser = hent_kilder(cfg["kilder"]) if "kilder" in cfg else hent_masser()
     felt, origo, forskyvning = plasser_fritt(masser, cfg)
     masker = [f >= 0.5 for f in felt]
     dod = dodslinje(masker, origo)

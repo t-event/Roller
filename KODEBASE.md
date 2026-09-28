@@ -838,6 +838,21 @@ enheter/s. **Hold søyla tjukk, flytt den sidelengs.**
 gradvise mørkningen i bane 5 og 6 finnes ikke i den ekte kunsten, den er
 innført av meg.
 
+## Bane 8 slakere og ny bane 9 (2026-09-28)
+
+- **Bane 8** gikk i 55 grader og var alt for bratt. Tegningen dreies nå
+  20 grader mot klokka før massene legges ut (`vri=20` i `BANER[8]`), og
+  banen går i 41 grader.
+- **Bane 9** er ny og har ingen egen tegning. `BANER[9]["kilder"]` henter
+  masser fra tegning 7 og 8 om hverandre, dreier massene fra tegning 8
+  som i bane 8, strekker dem litt ulikt bortover og gir hver en jevn
+  tilfeldig deformasjon (`deformer()`, frø per masse), så formene er nye
+  men i samme stil. Plassert fritt som bane 8, med `lib/baneoppsett9.lua`.
+  `level9.lua` er `level8.lua` med banenummeret byttet (de var identiske
+  fra før, bortsett fra nummeret).
+- Spawnhøyden i fri plassering holder nå også fremste del av marken
+  innenfor 200 px fall, ikke bare bakerste.
+
 ## Mørket i hulen (2026-09-28)
 
 `lib/morke.lua` legger et mørkt lag over banen, tettere for hver bane
