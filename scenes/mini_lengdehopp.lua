@@ -130,16 +130,21 @@ function scene:create( event )
 	sport.tilbake( grp )
 	forsok = 1
 	nyttForsok()
-	verden.x = sport.B * 0.35 - mark.midt.x * sport.SKALA
-	verden.y = sport.H * 0.55 - mark.midt.y * sport.SKALA
+	do
+		local sx, sy = mark:senter()
+		verden.x = sport.B * 0.35 - sx * sport.SKALA
+		verden.y = sport.H * 0.55 - sy * sport.SKALA
+	end
 
 	local sist = system.getTimer()
 	lytter = function()
 		local naa = system.getTimer()
 		local dt = math.min( 0.05, ( naa - sist ) / 1000 )
 		sist = naa
-		if not mark or not mark.midt.x then return end
-		local mx, my = mark.midt.x, mark.midt.y
+		if not mark then return end
+		-- sentrum av hele marken, ikke én del: den går rundt i ringen
+		local mx, my = mark:senter()
+		if not mx then return end
 		if tilstand == "tillop" then
 			if mark:fart() < 8 then stilleTid = stilleTid + dt else stilleTid = 0 end
 			if stilleTid > 2 then

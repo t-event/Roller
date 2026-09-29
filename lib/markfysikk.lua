@@ -17,7 +17,7 @@
 --     local markfysikk = require( "lib.markfysikk" )
 --     local mark = markfysikk.lag( verden, x, y )
 --     mark:trykk() / mark:slipp()     -- fra en touch-lytter
---     mark.midt                       -- midtdelen (del5), til kamera og måling
+--     mark:senter()                   -- sentrum av marken, til kamera og måling
 --     mark:fjern()
 
 local physics = require( "physics" )
@@ -118,9 +118,32 @@ function M.lag( forelder, x, y )
 		return y
 	end
 
+	-- Sentrum av hele marken (snittet av delene). Når marken ruller som
+	-- en ring, er dette midt i ringen og står rolig, mens hver enkelt del
+	-- går rundt og rundt. Brukes av kameraet og til målinger.
+	function mark:senter()
+		local sx, sy, n = 0, 0, 0
+		for _, d in ipairs( mark.deler ) do
+			if d.x then
+				sx, sy, n = sx + d.x, sy + d.y, n + 1
+			end
+		end
+		if n == 0 then return nil end
+		return sx / n, sy / n
+	end
+
+	-- Farten til marken som helhet (snittet av delene).
 	function mark:fart()
-		local vx, vy = mark.midt:getLinearVelocity()
-		return math.sqrt( vx * vx + vy * vy ), vx, vy
+		local sx, sy, n = 0, 0, 0
+		for _, d in ipairs( mark.deler ) do
+			if d.getLinearVelocity then
+				local vx, vy = d:getLinearVelocity()
+				sx, sy, n = sx + vx, sy + vy, n + 1
+			end
+		end
+		if n == 0 then return 0, 0, 0 end
+		sx, sy = sx / n, sy / n
+		return math.sqrt( sx * sx + sy * sy ), sx, sy
 	end
 
 	function mark:fjern()

@@ -198,9 +198,10 @@ end
 function M.kamera( verden, bakgrunn, x, y, andelX, andelY, myk )
 	local mx = M.B * ( andelX or 0.4 ) - x * M.SKALA
 	local my = M.H * ( andelY or 0.5 ) - y * M.SKALA
+	-- litt mykere opp og ned, så små hopp på bakken ikke rister bildet
 	local k = myk or 0.12
 	verden.x = verden.x + ( mx - verden.x ) * k
-	verden.y = verden.y + ( my - verden.y ) * k
+	verden.y = verden.y + ( my - verden.y ) * k * 0.7
 	if bakgrunn then bakgrunn:rull( -verden.x ) end
 end
 
