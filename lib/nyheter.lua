@@ -59,7 +59,7 @@ function M.visHvisNy( forelder )
 		for _, l in ipairs( n.linjer ) do
 			if vist < 6 then
 				local t = display.newText( { parent = g, text = "- " .. l, x = panel.x - 310, y = y,
-					width = 620, font = native.systemFontBold, fontSize = 18, align = "left" } )
+					width = 620, font = native.systemFontBold, fontSize = 20, align = "left" } )
 				t.anchorX, t.anchorY = 0, 0
 				t:setFillColor( 0.92, 0.9, 0.86 )
 				y = y + t.height + 10
