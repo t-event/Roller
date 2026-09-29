@@ -23,7 +23,19 @@ S2D_DMG="${S2D_DIR}/S2D-${S2D_BUILD_NUMBER}.dmg"
 if [ ! -f "${S2D_DMG}" ]
 then
 	echo "Downloading Solar2D ${S2D_BUILD_NAME}"
-	curl -L "https://github.com/coronalabs/corona/releases/download/${S2D_BUILD_NUMBER}/Solar2D-macOS-${S2D_BUILD_NAME}.dmg" -o "${S2D_DMG}"
+	# -f: et feilsvar (f.eks. 92 byte fra GitHub når nedlastingen
+	# strupes) skal gi feil, ikke en ødelagt .dmg. Prøv på nytt noen
+	# ganger før bygget gis opp (feilet slik 2026-09-29).
+	curl -fL --retry 5 --retry-delay 15 --retry-all-errors \
+		"https://github.com/coronalabs/corona/releases/download/${S2D_BUILD_NUMBER}/Solar2D-macOS-${S2D_BUILD_NAME}.dmg" -o "${S2D_DMG}"
+fi
+if [ "$(wc -c < "${S2D_DMG}")" -lt 1000000 ]
+then
+	echo "Solar2D-nedlastingen er for liten ($(wc -c < "${S2D_DMG}") byte), prøver en gang til" 1>&2
+	rm -f "${S2D_DMG}"
+	sleep 30
+	curl -fL --retry 5 --retry-delay 15 --retry-all-errors \
+		"https://github.com/coronalabs/corona/releases/download/${S2D_BUILD_NUMBER}/Solar2D-macOS-${S2D_BUILD_NAME}.dmg" -o "${S2D_DMG}"
 fi
 
 S2D_MOUNT="${S2D_DIR}/mnt"
