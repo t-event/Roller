@@ -19,6 +19,9 @@
 
 - **Lenken skal stå helt sist i svaret**, så Mathias kan teste uten å
   bla opp.
+- **Rett over lenken står Mathias sin siste melding, ordrett, som et
+  sitat** med overskriften "Siste melding fra deg:", så han ser hvilken
+  melding svaret gjelder.
 
 - **Test slutten av en bane med teststart.** Marken kan ikke flyttes, men
   banen kan: `python3 Util/baner/hule.py N --teststart PX` (bane 5-9)
