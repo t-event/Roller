@@ -29,10 +29,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Skriv versjonen inn i spillet
+        # lib/oppdatering.lua sammenligner denne med versjon.txt på
+        # nettsiden og viser et varsel når en nyere versjon er publisert.
+        run: echo "return \"${GITHUB_SHA}\"" > lib/byggversjon.lua
       - name: Build HTML5
         run: |
           chmod +x Util/build-html5.sh
           Util/build-html5.sh
+      - name: Legg versjon.txt ved siden av spillet
+        run: printf '%s' "${GITHUB_SHA}" > "${RUNNER_TEMP}/Output/Roller.html5/versjon.txt"
       - name: Publiser til gh-pages-grenen
         uses: peaceiris/actions-gh-pages@v4
         with:

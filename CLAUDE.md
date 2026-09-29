@@ -27,5 +27,11 @@
   med `python3 Util/baner/hule.py N --oppsett` og en ny push før lenken
   gis. Hele banen må også testes fra vanlig start.
 
+- **Hver oppdatering spillerne merker, får en oppføring i
+  `lib/nyheter.lua`** (øverst, neste nummer, 1-4 korte linjer på engelsk).
+  Den vises én gang på startskjermen ("What's new"). Varselet om at en
+  ny versjon er klar kommer av seg selv (`lib/oppdatering.lua` sjekker
+  `versjon.txt` som byggingen legger ut).
+
 Se `KODEBASE.md` for hvordan koden henger sammen og `SPILLIDE.md` for
 spillideen.

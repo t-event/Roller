@@ -28,6 +28,8 @@ end
 require( "lib.innstillinger" ).brukLyd()
 
 composer.gotoScene( "scenes.gotomenu" )
+-- Varsel nede i hjørnet når en ny versjon er publisert (lib/oppdatering.lua).
+require( "lib.oppdatering" ).start()
 
  
 
