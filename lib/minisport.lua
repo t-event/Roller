@@ -205,6 +205,12 @@ function M.kamera( forelder, bakgrunn )
 	ytre:insert( kamera )
 	kamera.xScale, kamera.yScale = 0.6, 0.6
 	ytre.xScale, ytre.yScale = 0.6, 0.6
+	-- I banene havner fokuset øverst til venstre (0,36 x midten av
+	-- skjermen), fordi bakken der går nedover mot høyre. Øvelsene er
+	-- flate, så hele kameraet flyttes til marken står litt til venstre
+	-- for midten og litt under, med bakken synlig foran.
+	ytre.x = M.B * 0.33 - display.contentCenterX * 0.36
+	ytre.y = M.H * 0.6 - display.contentCenterY * 0.36
 	local verden = display.newGroup()
 	kamera:add( verden, 1, false )
 	-- banene setter grenser rundt hele banen; her er løypene i
