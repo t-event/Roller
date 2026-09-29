@@ -24,13 +24,13 @@ local function visLapp()
 		return
 	end
 	lapp = display.newGroup()
-	local x = display.screenOriginX + 150
-	local y = display.screenOriginY + display.actualContentHeight - 38
-	local stein = display.newImageRect( lapp, "pausemenu.png", 280, 62 )
+	local x = display.screenOriginX + 175
+	local y = display.screenOriginY + display.actualContentHeight - 44
+	local stein = display.newImageRect( lapp, "pausemenu.png", 330, 74 )
 	stein.x, stein.y = x, y
 	stein.alpha = 0.92
 	local t = display.newText( { parent = lapp, text = "Update ready!\nReload the page to play it.",
-		x = x, y = y, width = 250, font = native.systemFontBold, fontSize = 14, align = "center" } )
+		x = x, y = y, width = 300, font = native.systemFontBold, fontSize = 17, align = "center" } )
 	t:setFillColor( 0.95, 0.85, 0.7 )
 	-- "touch" og ikke "tap": da tar lappen hele trykket, så det ikke også
 	-- styrer marken (banene lytter på touch for hele skjermen)
