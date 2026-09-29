@@ -1,11 +1,14 @@
 -- Minispill: lengdehopp (lagt til 2026-09-28, ekte markfysikk fra
--- samme dag). Marken ruller ned tilløpsbakken av seg selv og hopper ut
--- fra kanten. Holder man inne rett før kanten, strekker marken seg og
--- hopper lenger; for tidlig stopper den i bakken, for sent hjelper lite.
--- Lengden måles fra kanten til der marken først treffer gropa. Tre hopp.
+-- samme dag, flat grop fra 2026-09-29 etter ønske fra Mathias).
+-- Tilløpsbakke til marken har toppfart, så noen meter flatt, streken og
+-- sandgropa i samme høyde. Ingen hoppbakke: marken må selv hoppe ved å
+-- strekke seg på riktig tidspunkt. Lengden måles fra streken til der
+-- marken først treffer gropa. Tre hopp.
 --
--- Målt i en kopi av fysikken (se KODEBASE.md): passivt ca. 530 px, med
--- strekk ca. 40 px før kanten opptil ca. 600 px. 70 px = 1 m.
+-- Målt i en kopi av fysikken (se KODEBASE.md): uten å trykke ruller
+-- marken rett ned i gropa (0 m). Holder man inne ca. 0,5 s når hodet er
+-- nede foran i ringen, rett før streken, hopper den opptil ca. 370 px.
+-- Feil tidspunkt gir nesten ingenting. 50 px = 1 m.
 
 local composer = require( "composer" )
 local physics = require( "physics" )
@@ -14,14 +17,14 @@ local markfysikk = require( "lib.markfysikk" )
 
 local scene = composer.newScene()
 
-local GRADER, LENGDE, FALL = 26, 2400, 250
-local PX_PER_M = 70
+local GRADER, BAKKE, FLAT = 22, 1600, 300
+local PX_PER_M = 50
 local FORSOK = 3
 local TAN = math.tan( math.rad( GRADER ) )
-local KANTX = LENGDE + 80
-local KANTY = LENGDE * TAN + 230
+local KANTY = BAKKE * TAN + 230       -- høyden på den flate delen og gropa
+local KANTX = BAKKE + FLAT            -- streken
 
-local tilstand, mark, forsok, beste, stilleTid, flyTid
+local tilstand, mark, forsok, beste, stilleTid
 local kamera, verden, bakgrunn, info, status, merker
 local lytter
 
@@ -35,8 +38,8 @@ local function nyttForsok()
 	tilstand = "klar"
 	physics.pause()
 	nyMark()
-	stilleTid, flyTid = 0, 0
-	info.text = "Tap to start. Hold just before the edge to stretch out and jump further."
+	stilleTid = 0
+	info.text = "Tap to start. Just before the line, hold when the head is at the bottom front."
 	status.text = string.format( "Jump %d of %d", forsok, FORSOK ) ..
 		( beste and string.format( "    Best: %.2f m", beste ) or "" )
 end
@@ -77,12 +80,16 @@ local function videre( tekst )
 end
 
 local function landet( x )
-	local lengde = ( x - KANTX ) / PX_PER_M
-	local m = display.newCircle( verden, x, KANTY + FALL + 4, 14 )
+	local lengde = math.max( 0, ( x - KANTX ) / PX_PER_M )
+	local m = display.newCircle( verden, x, KANTY + 4, 14 )
 	m:setFillColor( 0.2, 0.1, 0.03 )
 	merker[#merker + 1] = m
 	if beste == nil or lengde > beste then beste = lengde end
-	videre( string.format( "%.2f m", lengde ) )
+	if lengde < 0.3 then
+		videre( string.format( "%.2f m. The worm rolled in. Hold to jump!", lengde ) )
+	else
+		videre( string.format( "%.2f m", lengde ) )
+	end
 end
 
 function scene:create( event )
@@ -92,21 +99,22 @@ function scene:create( event )
 
 	kamera, verden = sport.kamera( grp, bakgrunn )
 
-	-- tilløpsbakke og kanten (planken)
-	sport.terreng( verden, { { -300, -300 * TAN + 230 }, { LENGDE, KANTY }, { KANTX, KANTY } } )
-	local brett = display.newRect( verden, KANTX - 30, KANTY + 8, 60, 16 )
-	brett:setFillColor( 0.92, 0.9, 0.84 )
-	sport.merke( verden, KANTX - 30, KANTY, "Board", 36 )
-	-- gropa: myk, lys jord, FALL px under kanten
-	local grop = sport.terreng( verden, { { KANTX, KANTY + FALL }, { KANTX + 2600, KANTY + FALL } },
+	-- tilløpsbakke, flatt tilløp og streken
+	sport.terreng( verden, { { -300, -300 * TAN + 230 }, { BAKKE, KANTY }, { KANTX, KANTY } } )
+	local strek = display.newRect( verden, KANTX - 12, KANTY + 10, 24, 20 )
+	strek:setFillColor( 0.92, 0.9, 0.84 )
+	sport.merke( verden, KANTX - 12, KANTY, "Line", 36 )
+	-- sandgropa i samme høyde, og stein bak den
+	local grop = sport.terreng( verden, { { KANTX, KANTY }, { KANTX + 1000, KANTY } },
 		{ farge = { 0.62, 0.42, 0.24 } } )
-	for m = 4, 10 do
-		sport.merke( verden, KANTX + m * PX_PER_M, KANTY + FALL, m .. "", 34 )
+	sport.terreng( verden, { { KANTX + 1000, KANTY }, { KANTX + 4000, KANTY } } )
+	for m = 1, 9 do
+		sport.merke( verden, KANTX + m * PX_PER_M, KANTY, m .. "", 30 )
 	end
 	merker = {}
 
 	grop:addEventListener( "collision", function( e )
-		if e.phase == "began" and tilstand == "flyr" and e.other and e.other.erMark then
+		if e.phase == "began" and tilstand == "tillop" and e.other and e.other.erMark then
 			tilstand = "landet"
 			local x = e.other.x
 			timer.performWithDelay( 1, function() landet( x ) end )
@@ -142,14 +150,7 @@ function scene:create( event )
 		if tilstand == "tillop" then
 			if mark:fart() < 8 then stilleTid = stilleTid + dt else stilleTid = 0 end
 			if stilleTid > 2 then
-				videre( "The worm stopped. Let go on the run-up, it only rolls as a ring." )
-			elseif mx > KANTX then
-				tilstand = "flyr"
-			end
-		elseif tilstand == "flyr" then
-			flyTid = flyTid + dt
-			if flyTid > 6 or my > KANTY + FALL + 600 then
-				videre( "No landing." )
+				videre( "The worm stopped. Only hold right before the line." )
 			end
 		end
 	end

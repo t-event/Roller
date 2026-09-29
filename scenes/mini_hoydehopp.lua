@@ -1,13 +1,16 @@
 -- Minispill: høydehopp (lagt til 2026-09-28, ekte markfysikk fra samme
--- dag). Marken ruller ned tilløpet og kastes opp av en hoppkant. Lista
--- står like etter kanten og stilles med "Bar up" / "Bar down" (5 cm om
--- gangen). Hele marken må over lista. Tre forsøk per høyde.
+-- dag, flat bane og fysisk liste fra 2026-09-29 etter ønske fra Mathias).
+-- En liten bakke gir litt fart, så er det flatt fram til lista. Marken
+-- må selv hoppe over: hold inne på riktig tidspunkt, så strekker den seg
+-- og spretter opp. Lista stilles med "Bar up" / "Bar down" (5 cm om
+-- gangen) og ligger løst på en knagg, så den faller ned hvis marken
+-- treffer den. Hele marken må over. Tre forsøk per høyde.
 --
--- Målt i en kopi av fysikken (se KODEBASE.md): uten å gjøre noe kommer
--- marken ca. 0,4 m over lista. Strekker man den ut (holder inne) litt før
--- kanten, farer den opp kanten som en stiv pinne og kan komme over 3 m,
--- men det er følsomt for når man trykker, som hoppene i banene.
--- 100 px = 1 m, målt fra kanten.
+-- Målt i en kopi av fysikken (se KODEBASE.md): uten å trykke ruller
+-- marken rett inn i lista. Holder man inne når hodet er oppe foran i
+-- ringen, et stykke før lista, kan den komme opptil ca. 145 px over
+-- bakken der lista står, men det er følsomt for tidspunktet.
+-- 50 px = 1 m.
 
 local composer = require( "composer" )
 local physics = require( "physics" )
@@ -16,35 +19,48 @@ local markfysikk = require( "lib.markfysikk" )
 
 local scene = composer.newScene()
 
-local GRADER, LENGDE, UT, R = 35, 3000, 45, 450
-local PX_PER_M = 100
-local MIN, MAKS, STEG = 0.00, 3.50, 0.05
+local GRADER, BAKKE = 22, 400
 local TAN = math.tan( math.rad( GRADER ) )
+local GULVY = BAKKE * TAN + 230
+local LISTEX = BAKKE + 900
+local PX_PER_M = 50
+local MIN, MAKS, STEG = 0.10, 3.00, 0.05
 
--- tilløpet og hoppkanten (en bue fra bakken og opp til UT grader)
-local function lagBane()
-	local pkt = { { -300, -300 * TAN + 230 }, { LENGDE, LENGDE * TAN + 230 } }
-	local a0 = math.rad( GRADER )
-	local x, y = pkt[2][1], pkt[2][2]
-	local cx, cy = x + R * math.sin( a0 ), y - R * math.cos( a0 )
-	local n = 24
-	for i = 1, n do
-		local a = -a0 + ( a0 + math.rad( UT ) ) * i / n
-		pkt[#pkt + 1] = { cx + R * math.sin( a ), cy + R * math.cos( a ) }
-	end
-	return pkt, pkt[#pkt]
-end
+-- lista sett fra siden (enden av en liste som går inn i skjermen) og
+-- knaggen den ligger på. Knaggen kolliderer bare med lista.
+local LISTE_B, LISTE_H = 34, 12
+local KNAGG = { kategori = 2, maske = 4 }
+local LISTEKAT = 4
 
-local BANE, LEPP = lagBane()
-local LISTEX = LEPP[1] + 200
-local GULVY = LEPP[2] + 400
-
-local tilstand, mark, hoyde, bom, beste, lavest, stilleTid, flyTid
-local kamera, verden, bakgrunn, liste, info, status, opp, ned
+local tilstand, mark, hoyde, bom, beste, lavest, stilleTid, etterTid
+local kamera, verden, bakgrunn, liste, knagg, listeStart, info, status, opp, ned
 local lytter
 
-local function listeY()
-	return LEPP[2] - hoyde * PX_PER_M
+local function listeBunnY()
+	return GULVY - hoyde * PX_PER_M
+end
+
+local function lagListe()
+	display.remove( liste )
+	display.remove( knagg )
+	local by = listeBunnY()
+	knagg = display.newRect( verden, LISTEX + 5, by + 4, 22, 8 )  -- tyngdepunktet til lista er over knaggen
+	knagg:setFillColor( 0.45, 0.36, 0.28 )
+	physics.addBody( knagg, "static", { friction = 0.3,
+		filter = { categoryBits = KNAGG.kategori, maskBits = KNAGG.maske } } )
+	liste = display.newRect( verden, LISTEX, by - LISTE_H / 2, LISTE_B, LISTE_H )
+	liste:setFillColor( 0.95, 0.9, 0.8 )
+	liste.strokeWidth = 3
+	liste:setStrokeColor( 0.6, 0.25, 0.1 )
+	physics.addBody( liste, "dynamic", { density = 0.3, friction = 0.4, bounce = 0.1,
+		filter = { categoryBits = LISTEKAT, maskBits = 65535 } } )
+	listeStart = { x = liste.x, y = liste.y }
+end
+
+local function listeRevet()
+	if not liste or not liste.x then return true end
+	return math.abs( liste.y - listeStart.y ) > 6 or math.abs( liste.x - listeStart.x ) > 10
+		or math.abs( liste.rotation ) > 12
 end
 
 local function visStatus()
@@ -59,15 +75,13 @@ local function nyttForsok()
 	physics.pause()
 	if mark then mark:fjern() end
 	mark = markfysikk.lag( verden, 0, 0 )
-	-- mens lista stilles, står kameraet slik at kanten og lista synes
+	lagListe()
+	-- mens lista stilles, står kameraet slik at lista synes
 	-- (fokus vises øverst til venstre, som i banene)
-	kamera:setFocus( { x = LISTEX - 900, y = LEPP[2] - 600 } )
-	lavest, stilleTid, flyTid = nil, 0, 0
-	transition.cancel( liste )
-	liste.rotation = 0
-	liste.x, liste.y = LISTEX, listeY()
+	kamera:setFocus( { x = LISTEX - 900, y = GULVY - 450 } )
+	lavest, stilleTid, etterTid = nil, 0, 0
 	opp.isVisible, ned.isVisible = true, true
-	info.text = "Set the bar, then tap to start. Hold before the ramp to fly higher."
+	info.text = "Set the bar, then tap to start. Hold when the head is at the top front to jump."
 	visStatus()
 end
 
@@ -75,7 +89,7 @@ local function endreHoyde( d )
 	if tilstand ~= "klar" then return end
 	hoyde = math.max( MIN, math.min( MAKS, math.floor( ( hoyde + d ) * 100 + 0.5 ) / 100 ) )
 	bom = 0
-	liste.y = listeY()
+	lagListe()
 	visStatus()
 end
 
@@ -96,13 +110,9 @@ local function ferdigForsok( klart, tekst )
 	end
 	info.text = tekst
 	visStatus()
-	timer.performWithDelay( 2200, function()
+	timer.performWithDelay( 2500, function()
 		if tilstand == "vent" then nyttForsok() end
 	end )
-end
-
-local function riv()
-	transition.to( liste, { time = 600, y = GULVY - 10, rotation = 30, transition = easing.inQuad } )
 end
 
 function scene:create( event )
@@ -113,26 +123,22 @@ function scene:create( event )
 
 	kamera, verden = sport.kamera( grp, bakgrunn )
 
-	sport.terreng( verden, BANE )
-	-- matta under og bak lista
-	sport.terreng( verden, { { LEPP[1] - 150, GULVY }, { LEPP[1] + 2500, GULVY } },
-		{ farge = { 0.55, 0.36, 0.2 } } )
-
-	-- stativet med høydemerker, og lista som en stripe
-	local stolpe = display.newRect( verden, LISTEX + 70, ( GULVY + LEPP[2] - 380 ) / 2, 14, GULVY - LEPP[2] + 380 )
+	-- stativet bak lista: stolpe med høydemerker (bare til pynt)
+	local topp = GULVY - MAKS * PX_PER_M - 40
+	local stolpe = display.newRect( verden, LISTEX + 24, ( GULVY + topp ) / 2, 12, GULVY - topp )
 	stolpe:setFillColor( 0.55, 0.45, 0.35 )
-	for m = 0, 3.5, 0.5 do
-		local y = LEPP[2] - m * PX_PER_M
-		local s = display.newRect( verden, LISTEX + 70, y, 36, 6 )
+	for m = 0.5, MAKS, 0.5 do
+		local y = GULVY - m * PX_PER_M
+		local s = display.newRect( verden, LISTEX + 24, y, 28, 4 )
 		s:setFillColor( 0.9, 0.82, 0.7 )
-		local t = display.newText( { parent = verden, text = string.format( "%.1f", m ), x = LISTEX + 130, y = y,
-			font = native.systemFontBold, fontSize = 30 } )
+		local t = display.newText( { parent = verden, text = string.format( "%.1f", m ), x = LISTEX + 70, y = y,
+			font = native.systemFontBold, fontSize = 26 } )
 		t:setFillColor( 0.9, 0.82, 0.7 )
 	end
-	liste = display.newRect( verden, LISTEX, 0, 150, 14 )
-	liste:setFillColor( 0.95, 0.9, 0.8 )
-	liste.strokeWidth = 4
-	liste:setStrokeColor( 0.6, 0.25, 0.1 )
+	-- liten bakke, flatt, og matta bak lista
+	sport.terreng( verden, { { -300, -300 * TAN + 230 }, { BAKKE, GULVY }, { LISTEX + 60, GULVY } } )
+	sport.terreng( verden, { { LISTEX + 60, GULVY }, { LISTEX + 700, GULVY } }, { farge = { 0.55, 0.36, 0.2 } } )
+	sport.terreng( verden, { { LISTEX + 700, GULVY }, { LISTEX + 3000, GULVY } } )
 
 	sport.tekst( grp, "High jump", sport.B / 2, 30, 30 )
 	status = sport.tekst( grp, "", sport.B / 2, 68, 21, { 0.92, 0.9, 0.86 } )
@@ -147,7 +153,7 @@ function scene:create( event )
 			physics.start()
 			return false
 		end
-		return tilstand == "tillop" or tilstand == "flyr"
+		return tilstand == "tillop"
 	end )
 	opp = sport.knapp( grp, "knapp_opp.png", display.screenOriginX + 90, sport.H / 2 - 50, function() endreHoyde( STEG ) end )
 	ned = sport.knapp( grp, "knapp_ned.png", display.screenOriginX + 90, sport.H / 2 + 5, function() endreHoyde( -STEG ) end )
@@ -159,36 +165,28 @@ function scene:create( event )
 		local naa = system.getTimer()
 		local dt = math.min( 0.05, ( naa - sist ) / 1000 )
 		sist = naa
-		if not mark then return end
-		-- sentrum av hele marken, ikke én del: den går rundt i ringen
+		if not mark or tilstand ~= "tillop" then return end
 		local mx, my = mark:senter()
 		if not mx then return end
-		if tilstand == "tillop" then
-			if mark:fart() < 8 then stilleTid = stilleTid + dt else stilleTid = 0 end
-			if stilleTid > 2 then
-				ferdigForsok( false, "The worm stopped. Only hold near the ramp." )
-			elseif mx > LEPP[1] - R * 0.3 then
-				tilstand = "flyr"
+		-- laveste del som passerer lista (bunnen av delen, over bakken)
+		for _, d in ipairs( mark.deler ) do
+			if math.abs( d.x - LISTEX ) < 14 then
+				local h = GULVY - ( d.y + 9 )
+				if lavest == nil or h < lavest then lavest = h end
 			end
-		elseif tilstand == "flyr" then
-			flyTid = flyTid + dt
-			-- laveste del som passerer lista (bunnen av delen, over kanten)
-			for _, d in ipairs( mark.deler ) do
-				if math.abs( d.x - LISTEX ) < 14 then
-					local h = LEPP[2] - ( d.y + 9 )
-					if lavest == nil or h < lavest then lavest = h end
-				end
+		end
+		if mark:fart() < 8 then stilleTid = stilleTid + dt else stilleTid = 0 end
+		if listeRevet() then
+			etterTid = etterTid + dt
+			if etterTid > 1 then ferdigForsok( false, "The bar fell." ) end
+		elseif mx > LISTEX + 250 then
+			if lavest ~= nil and lavest >= hoyde * PX_PER_M then
+				ferdigForsok( true, string.format( "Cleared %.2f m!", hoyde ) )
+			else
+				ferdigForsok( false, "Under the bar. Jump over it!" )
 			end
-			if mx > LISTEX + 300 or my > GULVY - 60 or flyTid > 8 then
-				if lavest == nil then
-					ferdigForsok( false, "The worm did not reach the bar." )
-				elseif lavest >= hoyde * PX_PER_M then
-					ferdigForsok( true, string.format( "Cleared %.2f m!", hoyde ) )
-				else
-					riv()
-					ferdigForsok( false, "The bar fell." )
-				end
-			end
+		elseif stilleTid > 2.5 then
+			ferdigForsok( false, "The worm stopped before the bar." )
 		end
 	end
 	Runtime:addEventListener( "enterFrame", lytter )

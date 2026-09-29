@@ -1,15 +1,14 @@
--- Minispill: 100 m (lagt til 2026-09-28, ekte markfysikk fra samme dag).
--- En nedoverløype i hulen med to trange istunneler og en liten sprekk.
--- Marken ruller av seg selv (den ruller fortest når man lar den være),
--- men ringen setter seg fast i tunnelene: gjør den slapp med
--- dobbelttrykk rett før tunnelen, så glir den gjennom på isen, og gjør
--- den stram igjen med ett trykk etterpå. Nedtelling først; trykker man
--- før "GO!" er det tyvstart.
+-- Minispill: 100 m (lagt til 2026-09-28, ekte markfysikk fra samme dag,
+-- flat bane fra 2026-09-29 etter ønske fra Mathias).
+-- En liten bakke i starten gir litt fart, så er resten flatt. Marken
+-- ruller ikke langt av seg selv på flat bakke; man må finne teknikken
+-- for å komme seg bortover. Nedtelling først; trykker man før "GO!" er
+-- det tyvstart.
 --
--- Målt i en kopi av fysikken (se KODEBASE.md): ringen står fast i
--- tunneler med 30-60 px klaring og kommer ikke løs igjen, slapp glir
--- gjennom hvis man trykker 200-300 px før tunnelen. God timing gir ca.
--- 21-24 s. 50 px = 1 m.
+-- Målt i en kopi av fysikken (se KODEBASE.md): uten å trykke ruller
+-- marken ca. 1300 px (37 m) og stopper. Et kort trykk per omdreining,
+-- når hodet er bak i ringen, holder den gående i ca. 110 px/s. Andre
+-- rytmer hjelper lite eller bremser. 35 px = 1 m.
 
 local composer = require( "composer" )
 local physics = require( "physics" )
@@ -18,18 +17,17 @@ local markfysikk = require( "lib.markfysikk" )
 
 local scene = composer.newScene()
 
-local GRADER = 20
+local GRADER = 22
 local TAN = math.tan( math.rad( GRADER ) )
-local PX_PER_M = 50
+local BAKKE = 200                     -- startbakken, px bortover
+local PX_PER_M = 35
 local START = -108                    -- midten av marken ved start
 local MAAL = START + 100 * PX_PER_M
-local SPREKK, SPREKK_B, SPREKK_FALL = 2700, 90, 40
-local TUNNELER = { { 1500, 500, 45 }, { 3700, 500, 40 } }  -- x, lengde, klaring
+local FLATY = BAKKE * TAN + 230
 
 local function bakkeY( x )
-	local y = x * TAN + 230
-	if x > SPREKK then y = y + SPREKK_FALL end
-	return y
+	if x < BAKKE then return x * TAN + 230 end
+	return FLATY
 end
 
 local tilstand, mark, tid, fastTid
@@ -53,7 +51,7 @@ local function klar()
 	nyMark()
 	tid, fastTid = 0, 0
 	tidtekst.text = "0.00 s"
-	info.text = "Tap to start. Double tap before the icy tunnels to slide through, tap once after."
+	info.text = "Tap to start. Then find the rhythm: a short tap when the head is at the back of the ring."
 	visStatus()
 end
 
@@ -104,33 +102,8 @@ function scene:create( event )
 
 	kamera, verden = sport.kamera( grp, bakgrunn )
 
-	-- bakken: stein, is i tunnelene, en sprekk
-	local function strekning( a, b, is )
-		if b <= a then return end
-		local pkt = {}
-		local n = math.max( 1, math.floor( ( b - a ) / 200 ) )
-		for i = 0, n do
-			local x = a + ( b - a ) * i / n
-			pkt[#pkt + 1] = { x, bakkeY( x ) }
-		end
-		sport.terreng( verden, pkt, { is = is } )
-	end
-	strekning( -300, TUNNELER[1][1] - 150 )
-	strekning( TUNNELER[1][1] - 150, TUNNELER[1][1] + TUNNELER[1][2] + 50, true )
-	strekning( TUNNELER[1][1] + TUNNELER[1][2] + 50, SPREKK )
-	strekning( SPREKK + SPREKK_B, TUNNELER[2][1] - 150 )
-	strekning( TUNNELER[2][1] - 150, TUNNELER[2][1] + TUNNELER[2][2] + 50, true )
-	strekning( TUNNELER[2][1] + TUNNELER[2][2] + 50, MAAL + 3000 )
-	-- tak over tunnelene, med is på undersiden
-	for _, t in ipairs( TUNNELER ) do
-		local tak = {}
-		for i = 0, 20 do
-			local x = t[1] - 250 + ( t[2] + 300 ) * i / 20
-			local k = t[3] + 250 * ( math.abs( i - 10 ) / 10 ) ^ 2
-			tak[#tak + 1] = { x, bakkeY( x ) - k }
-		end
-		sport.terreng( verden, tak, { opp = true, is = true } )
-	end
+	-- liten startbakke og så flatt
+	sport.terreng( verden, { { -300, bakkeY( -300 ) }, { BAKKE, FLATY }, { MAAL + 3000, FLATY } } )
 	for m = 0, 100, 10 do
 		local x = START + m * PX_PER_M
 		sport.merke( verden, x, bakkeY( x ), m .. " m", 34 )
@@ -138,7 +111,6 @@ function scene:create( event )
 	-- mål
 	local linje = display.newRect( verden, MAAL, bakkeY( MAAL ) + 10, 20, 40 )
 	linje:setFillColor( 0.92, 0.9, 0.84 )
-	linje.rotation = GRADER
 	local skilt = display.newImageRect( verden, "pausemenu.png", 300, 140 )
 	skilt.x, skilt.y = MAAL, bakkeY( MAAL ) - 260
 	sport.tekst( verden, "Finish", MAAL, bakkeY( MAAL ) - 260, 48 )
@@ -174,22 +146,15 @@ function scene:create( event )
 			tid = tid + dt
 			tidtekst.text = string.format( "%.2f s", tid )
 			if mark:fart() < 8 then fastTid = fastTid + dt else fastTid = 0 end
-			-- Står ringen fast i en tunnel, kommer den ikke løs igjen (målt),
-			-- så da er løpet over. Slapp marke stopper på steinen etter
-			-- tunnelen til den gjøres stram.
-			if mark:erSlapp() and fastTid > 1 then
-				info.text = "Tap once to make the worm firm again."
-			elseif info.text ~= "GO!" then
+			if fastTid > 2 then
+				info.text = "Tap when the head is at the back of the ring."
+			elseif info.text ~= "GO!" and fastTid == 0 and tid > 6 then
 				info.text = ""
 			end
-			if not mark:erSlapp() and fastTid > 2.5 then
-				ferdig( false, "Stuck! Go limp just before the tunnel." )
-			elseif mark:erSlapp() and fastTid > 8 then
+			if fastTid > 12 then
 				ferdig( false, "The worm stopped." )
 			elseif mx >= MAAL then
 				ferdig( true )
-			elseif my > bakkeY( mx ) + 500 then
-				ferdig( false, "The worm fell into the crack." )
 			end
 		end
 	end

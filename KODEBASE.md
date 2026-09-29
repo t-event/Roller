@@ -952,6 +952,24 @@ fra før denne datoen er historikk.
   - 100 m (20 grader, istunneler med 40-45 px klaring): ringen står fast
     i tunnelen og kommer ikke løs. Slapp 200-300 px før tunnelen glir
     gjennom, og stram etterpå. Det gir ca. 21-24 s.
+- **Flate øvelser (2026-09-29, Mathias: "100m skal bare være en liten
+  bakke i begynnelsen ... så må man finne teknikken for å kunne bevege seg
+  bortover").** Målt i kopien av fysikken:
+  - Marken kommer seg frem på flat bakke med ett kort trykk per
+    omdreining når hodet er bak i ringen (del5-vinkelen 250-295 grader),
+    ca. 110 px/s, også etter 60 s. Uten trykk stopper den, og andre
+    rytmer bremser. Fra helt stillestående er det vanskelig å komme i
+    gang igjen.
+  - 100 m: bakke 200 px (22 grader), så flatt. 35 px = 1 m. Passivt ca.
+    37 m, med teknikken ca. 30 s.
+  - Lengdehopp: bakke 1600 px til toppfart, 300 px flatt, strek og
+    sandgrop i samme høyde. Hold ca. 0,5 s når hodet er nede foran, rett
+    før streken: opptil ca. 370 px (7,4 m). Passivt 0 m.
+  - Høydehopp: bakke 400 px, lista 900 px ut på flaten. Hold når hodet er
+    oppe foran: opptil ca. 145 px (2,9 m) over bakken ved lista. Lista er
+    en fysisk kropp (34 x 12 px) som ligger løst på en knagg; knaggen
+    kolliderer bare med lista (filter), og lista regnes som revet når den
+    har flyttet seg mer enn 6-10 px eller vridd seg over 12 grader.
   Rekordene lagres som "100m_fysikk", "lengdehopp_fysikk" og
   "hoydehopp_fysikk", så tider fra den første utgaven (uten ekte fysikk)
   ikke henger igjen.

@@ -14,6 +14,11 @@ local GGData = require( "lib.GGData" )
 local M = {}
 
 M.NYHETER = {
+	{ nr = 2, dato = "2026-09-29", linjer = {
+		"Worm athletics is now on flat ground. Find the technique to move and jump!",
+		"100 m: a short tap when the head is at the back of the ring keeps the worm going.",
+		"Long jump: a flat run-up and a line. High jump: the bar really falls if you hit it.",
+	} },
 	{ nr = 1, dato = "2026-09-29", linjer = {
 		"Levels 5-9 are brand new caves, harder the deeper you go: ice, big jumps and narrow icy cracks.",
 		"The stone in the top left corner shows which level you are on.",
