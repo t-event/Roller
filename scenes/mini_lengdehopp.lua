@@ -22,12 +22,13 @@ local KANTX = LENGDE + 80
 local KANTY = LENGDE * TAN + 230
 
 local tilstand, mark, forsok, beste, stilleTid, flyTid
-local verden, bakgrunn, info, status, merker
+local kamera, verden, bakgrunn, info, status, merker
 local lytter
 
 local function nyMark()
 	if mark then mark:fjern() end
 	mark = markfysikk.lag( verden, 0, 0 )
+	kamera:setFocus( mark.punkt )
 end
 
 local function nyttForsok()
@@ -89,9 +90,7 @@ function scene:create( event )
 	physics.start()
 	bakgrunn = sport.bakgrunn( grp )
 
-	verden = display.newGroup()
-	grp:insert( verden )
-	verden.xScale, verden.yScale = sport.SKALA, sport.SKALA
+	kamera, verden = sport.kamera( grp, bakgrunn )
 
 	-- tilløpsbakke og kanten (planken)
 	sport.terreng( verden, { { -300, -300 * TAN + 230 }, { LENGDE, KANTY }, { KANTX, KANTY } } )
@@ -130,11 +129,6 @@ function scene:create( event )
 	sport.tilbake( grp )
 	forsok = 1
 	nyttForsok()
-	do
-		local sx, sy = mark:senter()
-		verden.x = sport.B * 0.35 - sx * sport.SKALA
-		verden.y = sport.H * 0.55 - sy * sport.SKALA
-	end
 
 	local sist = system.getTimer()
 	lytter = function()
@@ -158,7 +152,6 @@ function scene:create( event )
 				videre( "No landing." )
 			end
 		end
-		sport.kamera( verden, bakgrunn, mx, my, 0.35, 0.55 )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
@@ -166,6 +159,7 @@ end
 function scene:hide( event )
 	if event.phase == "will" then
 		Runtime:removeEventListener( "enterFrame", lytter )
+		kamera:stopp()
 		tilstand = "borte"
 	elseif event.phase == "did" then
 		mark = nil

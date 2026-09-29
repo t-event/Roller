@@ -33,12 +33,13 @@ local function bakkeY( x )
 end
 
 local tilstand, mark, tid, fastTid
-local verden, bakgrunn, tidtekst, info, status
+local kamera, verden, bakgrunn, tidtekst, info, status
 local lytter
 
 local function nyMark()
 	if mark then mark:fjern() end
 	mark = markfysikk.lag( verden, 0, 0 )
+	kamera:setFocus( mark.punkt )
 end
 
 local function visStatus()
@@ -101,9 +102,7 @@ function scene:create( event )
 	physics.start()
 	bakgrunn = sport.bakgrunn( grp )
 
-	verden = display.newGroup()
-	grp:insert( verden )
-	verden.xScale, verden.yScale = sport.SKALA, sport.SKALA
+	kamera, verden = sport.kamera( grp, bakgrunn )
 
 	-- bakken: stein, is i tunnelene, en sprekk
 	local function strekning( a, b, is )
@@ -161,11 +160,6 @@ function scene:create( event )
 	end )
 	sport.tilbake( grp )
 	klar()
-	do
-		local sx, sy = mark:senter()
-		verden.x = sport.B * 0.35 - sx * sport.SKALA
-		verden.y = sport.H * 0.55 - sy * sport.SKALA
-	end
 
 	local sist = system.getTimer()
 	lytter = function()
@@ -198,7 +192,6 @@ function scene:create( event )
 				ferdig( false, "The worm fell into the crack." )
 			end
 		end
-		sport.kamera( verden, bakgrunn, mx, my, 0.35, 0.55 )
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
@@ -206,6 +199,7 @@ end
 function scene:hide( event )
 	if event.phase == "will" then
 		Runtime:removeEventListener( "enterFrame", lytter )
+		kamera:stopp()
 		tilstand = "borte"
 	elseif event.phase == "did" then
 		mark = nil

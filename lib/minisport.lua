@@ -11,17 +11,17 @@
 -- sprekker med is.
 --
 -- Banene er i "verdenspiksler" som i Box2D-oppsettet i banene, og
--- verdensgruppa vises i SKALA (som kamera og grp i banene, 0,6 x 0,6).
+-- kameraet er det samme som i banene (M.kamera).
 
 local composer = require( "composer" )
 local physics = require( "physics" )
+local perspective = require( "lib.perspective" )
 local GGData = require( "lib.GGData" )
 
 local M = {}
 
 M.B = display.contentWidth
 M.H = display.contentHeight
-M.SKALA = 0.42                 -- verden på skjermen (banene: 0,36)
 M.STEIN = 3.0                  -- friksjon på stein, som i banene
 M.IS = 0.05                    -- friksjon på is, som i banene
 
@@ -193,16 +193,39 @@ function M.trykkflate( forelder, hentMark, vedTrykk )
 	return flate
 end
 
--- Kamera: flytter verdensgruppa mykt mot et punkt i verden, som vises
--- ved (andelX, andelY) av skjermen.
-function M.kamera( verden, bakgrunn, x, y, andelX, andelY, myk )
-	local mx = M.B * ( andelX or 0.4 ) - x * M.SKALA
-	local my = M.H * ( andelY or 0.5 ) - y * M.SKALA
-	-- litt mykere opp og ned, så små hopp på bakken ikke rister bildet
-	local k = myk or 0.12
-	verden.x = verden.x + ( mx - verden.x ) * k
-	verden.y = verden.y + ( my - verden.y ) * k * 0.7
-	if bakgrunn then bakgrunn:rull( -verden.x ) end
+-- Kamera, på samme måte som i banene: lib/perspective.lua med demping
+-- 10, kameraet skalert 0,6 inni en gruppe som også er skalert 0,6, og
+-- fokus på "punkt" (sveiset til marken, mark.punkt). Returnerer kameraet
+-- og verdensgruppa (i lag 1) som alt i øvelsen legges i.
+-- Kall kamera:setFocus( mark.punkt ) når marken er laget.
+function M.kamera( forelder, bakgrunn )
+	local ytre = display.newGroup()
+	forelder:insert( ytre )
+	local kamera = perspective.createView()
+	ytre:insert( kamera )
+	kamera.xScale, kamera.yScale = 0.6, 0.6
+	ytre.xScale, ytre.yScale = 0.6, 0.6
+	local verden = display.newGroup()
+	kamera:add( verden, 1, false )
+	-- banene setter grenser rundt hele banen; her er løypene i
+	-- negative koordinater også, så ingen grenser
+	kamera:setBounds( -1e7, 1e7, -1e7, 1e7 )
+	kamera.damping = 10
+	kamera:track()
+	if bakgrunn then
+		local lag1 = kamera:layer( 1 )
+		kamera.bakgrunnLytter = function()
+			if lag1.x then bakgrunn:rull( -lag1.x * 0.36 ) end
+		end
+		Runtime:addEventListener( "enterFrame", kamera.bakgrunnLytter )
+	end
+	function kamera:stopp()
+		kamera:cancel()
+		if kamera.bakgrunnLytter then
+			Runtime:removeEventListener( "enterFrame", kamera.bakgrunnLytter )
+		end
+	end
+	return kamera, verden
 end
 
 -- Resultatpanel (steinpanelet fra pausemenyen) med knapper.

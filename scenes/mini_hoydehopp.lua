@@ -40,7 +40,7 @@ local LISTEX = LEPP[1] + 200
 local GULVY = LEPP[2] + 400
 
 local tilstand, mark, hoyde, bom, beste, lavest, stilleTid, flyTid
-local verden, bakgrunn, liste, info, status, opp, ned
+local kamera, verden, bakgrunn, liste, info, status, opp, ned
 local lytter
 
 local function listeY()
@@ -59,6 +59,9 @@ local function nyttForsok()
 	physics.pause()
 	if mark then mark:fjern() end
 	mark = markfysikk.lag( verden, 0, 0 )
+	-- mens lista stilles, står kameraet slik at kanten og lista synes
+	-- (fokus vises øverst til venstre, som i banene)
+	kamera:setFocus( { x = LISTEX - 900, y = LEPP[2] - 600 } )
 	lavest, stilleTid, flyTid = nil, 0, 0
 	transition.cancel( liste )
 	liste.rotation = 0
@@ -108,9 +111,7 @@ function scene:create( event )
 	hoyde, bom = 0.30, 0
 	bakgrunn = sport.bakgrunn( grp )
 
-	verden = display.newGroup()
-	grp:insert( verden )
-	verden.xScale, verden.yScale = sport.SKALA, sport.SKALA
+	kamera, verden = sport.kamera( grp, bakgrunn )
 
 	sport.terreng( verden, BANE )
 	-- matta under og bak lista
@@ -140,6 +141,7 @@ function scene:create( event )
 	sport.trykkflate( grp, function() return mark end, function()
 		if tilstand == "klar" then
 			tilstand = "tillop"
+			kamera:setFocus( mark.punkt )
 			opp.isVisible, ned.isVisible = false, false
 			info.text = ""
 			physics.start()
@@ -151,11 +153,6 @@ function scene:create( event )
 	ned = sport.knapp( grp, "knapp_ned.png", display.screenOriginX + 90, sport.H / 2 + 5, function() endreHoyde( -STEG ) end )
 	sport.tilbake( grp )
 	nyttForsok()
-	do
-		local sx, sy = mark:senter()
-		verden.x = sport.B * 0.35 - sx * sport.SKALA
-		verden.y = sport.H * 0.55 - sy * sport.SKALA
-	end
 
 	local sist = system.getTimer()
 	lytter = function()
@@ -193,12 +190,6 @@ function scene:create( event )
 				end
 			end
 		end
-		if tilstand == "klar" then
-			-- vis lista mens den stilles
-			sport.kamera( verden, bakgrunn, LISTEX - 500, LEPP[2] - 100, 0.5, 0.55, 0.08 )
-		else
-			sport.kamera( verden, bakgrunn, mx, my, 0.35, 0.55 )
-		end
 	end
 	Runtime:addEventListener( "enterFrame", lytter )
 end
@@ -206,6 +197,7 @@ end
 function scene:hide( event )
 	if event.phase == "will" then
 		Runtime:removeEventListener( "enterFrame", lytter )
+		kamera:stopp()
 		tilstand = "borte"
 	elseif event.phase == "did" then
 		mark = nil

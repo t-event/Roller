@@ -958,6 +958,10 @@ fra før denne datoen er historikk.
 - Felles for minispillene er `lib/minisport.lua`: bakgrunn, terreng med
   fysikk (stein friksjon 3, is 0,05, som i banene), kamera, trykkflate,
   knapper og rekorder (GGData "minispill").
+- **Kameraet i minispillene er det samme som i banene** (`sport.kamera`):
+  `lib/perspective.lua`, demping 10, kamera og ytre gruppe skalert 0,6
+  hver, fokus på `mark.punkt` (sveiset til marken som i banene). Et eget
+  kamera som fulgte én del av marken, svingte når marken rullet som ring.
 - Nye knapper, Controls-steinen og bakgrunnene `meny_bg.jpg` og
   `arena_bg.jpg` lages av `Util/knapper/lag_knapper.py`, i samme stil som
   de gamle.
