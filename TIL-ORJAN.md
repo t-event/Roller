@@ -3911,3 +3911,11 @@ og kant i lengdehopp, hoppkant i høydehopp, og istunneler i 100 m der
 marken må gjøres slapp. En ting jeg fant underveis: `isCollideConnected
 = true` på leddene i banefilene gjør ingenting (den kan bare leses i
 Solar2D). Det er ikke endret, fordi banene er laget med den fysikken.
+
+## 2026-09-29, "What's new" og varsel om oppdatering
+
+Mathias ba om en kort oppsummering av hva som er nytt når spillet
+starter etter en oppdatering, og et varsel i spillet når en ny versjon
+er klar. Oppsummeringen skrives i `lib/nyheter.lua` for hver oppdatering.
+Varselet kommer av seg selv: spillet sjekker `versjon.txt` på nettsiden
+hvert andre minutt og viser en liten lapp nede til venstre.

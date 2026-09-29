@@ -966,6 +966,25 @@ fra før denne datoen er historikk.
   `arena_bg.jpg` lages av `Util/knapper/lag_knapper.py`, i samme stil som
   de gamle.
 
+## Oppdateringer: "What's new" og varsel (2026-09-29)
+
+- **`lib/nyheter.lua`** har en kort endringslogg for spillerne. Nyeste
+  oppføring øverst, med nummer. `scenes/menu.lua` kaller
+  `visHvisNy( sceneGroup )` i `show did`, og det som er nytt siden sist
+  vises én gang på et steinpanel. Hva som er sett, lagres med GGData
+  "nyheter". Nye spillere ser bare den nyeste oppføringen.
+- **`lib/oppdatering.lua`** (startet fra `main.lua`) henter
+  `https://thurbohnek.github.io/Roller/versjon.txt` 20 s etter start og
+  så hvert andre minutt. Er ID-en en annen enn den i
+  `lib/byggversjon.lua`, vises en liten steinlapp nede til venstre:
+  "Update ready! Reload the page to play it." Trykk skjuler den.
+- Byggingen (`.github/workflows/build-html5.yml`) skriver commit-ID-en
+  inn i `lib/byggversjon.lua` før bygget og i `versjon.txt` etterpå. I
+  repoet står det "lokal", og da sjekkes det ikke.
+- `Util/build-html5.sh` prøver Solar2D-nedlastingen på nytt hvis GitHub
+  svarer med feil. Et bygg feilet 2026-09-29 fordi nedlastingen ga 92
+  byte.
+
 ## Mørket i hulen (2026-09-28)
 
 `lib/morke.lua` legger et mørkt lag over banen, tettere for hver bane
