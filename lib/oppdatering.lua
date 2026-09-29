@@ -54,12 +54,22 @@ local function sjekk()
 	end )
 end
 
+-- Ikke timer.performWithDelay: flere scener (gotomenu, pausemenu1,
+-- dodmenu1) kaller timer.cancel( eventTimer ) med eventTimer = nil, og da
+-- stopper Solar2D ALLE timere. En enterFrame-lytter som måler tiden selv
+-- blir ikke stoppet av det.
 function M.start()
 	if denne == "lokal" then
 		return
 	end
-	timer.performWithDelay( 20000, sjekk )
-	timer.performWithDelay( SJEKK * 1000, sjekk, 0 )
+	local neste = system.getTimer() + 20000
+	Runtime:addEventListener( "enterFrame", function()
+		local naa = system.getTimer()
+		if naa >= neste then
+			neste = naa + SJEKK * 1000
+			sjekk()
+		end
+	end )
 end
 
 return M

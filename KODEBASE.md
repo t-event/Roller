@@ -978,6 +978,10 @@ fra før denne datoen er historikk.
   så hvert andre minutt. Er ID-en en annen enn den i
   `lib/byggversjon.lua`, vises en liten steinlapp nede til venstre:
   "Update ready! Reload the page to play it." Trykk skjuler den.
+  Tiden måles med en `enterFrame`-lytter, ikke med timere:
+  `timer.cancel( eventTimer )` med `eventTimer = nil` (i gotomenu,
+  pausemenu1 og dodmenu1) stopper alle timere i Solar2D, og stoppet
+  den første utgaven av sjekken.
 - Byggingen (`.github/workflows/build-html5.yml`) skriver commit-ID-en
   inn i `lib/byggversjon.lua` før bygget og i `versjon.txt` etterpå. I
   repoet står det "lokal", og da sjekkes det ikke.
